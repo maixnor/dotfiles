@@ -46,6 +46,9 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
+  services.xserver.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
+
   # Enabling hyprlnd on NixOS
   programs.hyprland = {
     enable = true;
