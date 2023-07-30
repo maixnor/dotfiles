@@ -1,4 +1,4 @@
-# Edit this configuration file to define what should be installed on
+#"displaylink"  Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
@@ -141,7 +141,6 @@
     dotnet-sdk_8
     dotnet-runtime_8
     dotnet-aspnetcore_8
-    python39
     fd clang coreutils
     jq jc jo gron yj yq pup # json/toml/yaml/hcl/xml/html handling
     libgccjit # gcc compiler collection
