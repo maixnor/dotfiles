@@ -54,6 +54,8 @@
   services.xserver.desktopManager.plasma5.enable = true;
   services.xserver.videoDrivers = [ "modesetting" ];
 
+  programs.hyprland.enable = true;
+
   # Configure keymap in X11
   services.xserver = {
     layout = "us";

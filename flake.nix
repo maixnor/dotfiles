@@ -24,6 +24,7 @@
         specialArgs = { inherit system; };
         modules = [
           ./nixos/configuration.nix
+# 	  ./hyprland/flake.nix
         ];
       };
     };
