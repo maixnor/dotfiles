@@ -68,12 +68,6 @@
       nvidia.modesetting.enable = true;
   };
   
-  # waybar
-  (pkgs.waybar.overrideAttrs (oldAttrs: {
-      mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
-    })
-  )
-  
   # XDG portal
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
