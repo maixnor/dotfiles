@@ -114,6 +114,17 @@
   environment.systemPackages = with pkgs; [
     # postAG specific
     
+    # hyprland
+    (pkgs.waybar.overrideAttrs (oldAttrs: {
+        mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
+      })
+    )
+    dunst
+    libnotify
+    rofi-wayland
+    swww
+    kitty
+    xwayland
 
     # general stuff
     iosevka-comfy.comfy
