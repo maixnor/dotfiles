@@ -83,9 +83,6 @@
     jack.enable = true;
   };
   
-  # rofi keybind
-  bind = $mainMod, S, exec, rofi -show drun -show-icons
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   nixpkgs.config.allowUnfree = true; 
   users.users.maixnor = {
