@@ -2,13 +2,22 @@
   description = "Maixnor's nix configuration flake";
 
   inputs = {
+    # nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    # Home Manager
+    home-manager.url = "github:nix-community/home-manager/release-23.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Doom Emacs 
+    # probabyly add doom emacs reference here
+
   };
 
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, home-manager }@inputs:
 
-  let 
+  let
     system = "x86_64-linux";
 
     pkgs = import nixpkgs {
@@ -24,8 +33,16 @@
         specialArgs = { inherit system; };
         modules = [
           ./nixos/configuration.nix
+	  ./home/flake.nix
 # 	  ./hyprland/flake.nix
         ];
+      };
+    };
+
+    homeConfigurations = {
+      "maixnor@bierzelt" = home-manager.lib.homeManagerConfiguration {
+	extraSpecialArgs = { inherit inputs; };
+	modules = [ ./home/home.nix ];
       };
     };
   };
