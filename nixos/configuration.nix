@@ -48,29 +48,14 @@
 
   services.xserver.enable = true;
   services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+ 
+  # Workman
+  services.xserver = {
+    layout = "us";
+    xkbVariant = "workman";
+  };
 
-  # Enabling hyprlnd on NixOS
-  programs.hyprland = {
-    enable = true;
-    nvidiaPatches = true;
-    xwayland.enable = true;
-  };
-  
-  environment.sessionVariables = {
-    # If your cursor becomes invisible
-    WLR_NO_HARDWARE_CURSORS = "1";
-    # Hint electron apps to use wayland
-    NIXOS_OZONE_WL = "1";
-  };
-  
-  hardware = {
-      # Opengl
-      opengl.enable = true;
-  
-      # Most wayland compositors need this
-      nvidia.modesetting.enable = true;
-  };
-  
   # XDG portal
   xdg.portal.enable = true;
   xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
@@ -117,18 +102,6 @@
   environment.systemPackages = with pkgs; [
     # postAG specific
     
-    # hyprland
-    (pkgs.waybar.overrideAttrs (oldAttrs: {
-        mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
-      })
-    )
-    dunst
-    libnotify
-    rofi-wayland
-    swww
-    kitty
-    xwayland
-
     # general stuff
     iosevka-comfy.comfy
     git gh

@@ -33,7 +33,6 @@
         specialArgs = { inherit system; };
         modules = [
           ./nixos/configuration.nix
-	  ./home/flake.nix
 # 	  ./hyprland/flake.nix
         ];
       };
