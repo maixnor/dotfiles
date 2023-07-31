@@ -96,7 +96,7 @@
 #       libfakekey
 #       libsForQt5.kirigami-addons
 #       libsForQt5.kcmutils
-#       libsForQt5.kpeoplevcard
+#       libsForQt5.kpeoplevcar
 #       libsForQt5.modemmanager-qt
 #       libsForQt5.pulseaudio-qt
 #       libsForQt5.qca-qt5
