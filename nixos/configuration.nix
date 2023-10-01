@@ -103,16 +103,7 @@
     # postAG specific
     
     # general stuff
-    iosevka-comfy.comfy
-    git gh
-    just
-    neovim
-    wget xh
-    alacritty
-    freshfetch
-    spotify
-    discord
-    obsidian
+    # handled by home-manager atm
 
     # kde applications
     kate
