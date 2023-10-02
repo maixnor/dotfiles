@@ -14,7 +14,6 @@
     };
   };
 
-  #TODO need to port the whole starship config here or at least integrate the file into this repo
   programs.starship.enable = true;
 
   home.file = {
