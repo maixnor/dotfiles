@@ -19,7 +19,7 @@
   home.file = {
     ".local/share/zsh/nix-zsh-completions".source =
       "${pkgs.nix-zsh-completions}/share/zsh/plugins/nix";
-    "starship.toml".text = ''
+    ".config/starship.toml".text = ''
       ## FIRST LINE/ROW: Info & Status
       # First param ─┌
       [username]
