@@ -18,8 +18,6 @@
       homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
         modules = [ ./bierzelt.nix ];
 
         # Optionally use extraSpecialArgs
@@ -29,9 +27,7 @@
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
-        # Specify your home configuration modules here, for example,
-        # the path to your home.nix.
-        modules = [ "./bierbasis.nix" ];
+        modules = [ ./bierbasis.nix ];
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix
