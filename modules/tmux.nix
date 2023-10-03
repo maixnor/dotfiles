@@ -22,8 +22,8 @@ in
     plugins = with pkgs;
       [
 	{ 
-	  plugin = tmuxPlugins.fingers;
-	  extraConfig = "set -g @fingers-key F";
+	  plugin = tmuxPlugins.tmux-thumbs;
+	  extraConfig = "set -g @thumbs-key F";
 	}
         # {
         #   plugin = tmux-super-fingers;
