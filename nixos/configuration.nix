@@ -16,7 +16,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Bluetooth
-  hardware.bluetooth.enable = false;
+  hardware.bluetooth.enable = true;
 
   networking.hostName = "bierzelt"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
