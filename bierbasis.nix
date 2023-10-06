@@ -12,6 +12,7 @@
   imports = [
     ./modules/shell.nix
     ./modules/tmux.nix
+    ./modules/nvim.nix
   ];
 
   # This value determines the Home Manager release that your
