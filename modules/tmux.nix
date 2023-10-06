@@ -25,6 +25,10 @@ in
 	  plugin = tmuxPlugins.tmux-thumbs;
 	  extraConfig = "set -g @thumbs-key F";
 	}
+	{ 
+	  plugin = tmuxPlugins.fuzzback;
+	  extraConfig = "set -g @fuzzback-bind k";
+	}
         # {
         #   plugin = tmux-super-fingers;
         #   extraConfig = "set -g @super-fingers-key f";
@@ -77,6 +81,8 @@ in
       
       # remove delay for exiting insert mode with ESC in Neovim
       set -sg escape-time 10
+
+      set -g focus-events on
    '';
   };
 }
