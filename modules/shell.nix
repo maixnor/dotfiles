@@ -9,8 +9,7 @@
     zplug = {
       enable = true;
       plugins = [ 
-        { name = "zsh-users/zsh-autosuggestions"; }
-      ];
+        { name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } ];
     };
   };
 
