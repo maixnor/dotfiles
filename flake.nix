@@ -8,6 +8,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # everything colors and styling
+    base16-schemes = "github:maixnor/base16-schemes";
+    nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors.inputs.base16-schemes.follows = "base16-schemes";
+
   };
 
   outputs = { nixpkgs, home-manager, ... }:
@@ -19,6 +24,7 @@
         inherit pkgs;
 
         modules = [ ./bierzelt.nix ];
+	extraSpecialArgs = { inherit nix-colors };
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix
@@ -28,6 +34,7 @@
         inherit pkgs;
 
         modules = [ ./bierbasis.nix ];
+	extraSpecialArgs = { inherit nix-colors };
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix
