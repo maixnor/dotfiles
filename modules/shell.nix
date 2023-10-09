@@ -2,6 +2,15 @@
 
 {
 
+  programs.ripgrep.enable = true;
+  programs.bat.enable = true;
+  programs.git-credential-oauth.enable = true;
+  programs.translate-shell.enable = true;
+  programs.atuin = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
@@ -20,6 +29,9 @@
       enable = true;
       plugins = [ 
         { name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } ];
+    };
+    shellAliases = {
+      # "cat" = "bat"; NOTE: not working
     };
   };
 
