@@ -11,37 +11,37 @@ in
     newSession = true;
     plugins = with pkgs;
       [
-	{ 
-	  plugin = tmuxPlugins.tmux-thumbs;
-	  extraConfig = "set -g @thumbs-key F";
-	}
-	{ 
-	  plugin = tmuxPlugins.fuzzback;
-	  extraConfig = "set -g @fuzzback-bind k";
-	}
-	{ 
-	  plugin = tmuxPlugins.tmux-fzf;
-	  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
-	}
-        { 
-	  plugin = tmuxPlugins.catppuccin;
-	  extraConfig = "";
-	}
-        { 
-	  plugin = tmuxPlugins.better-mouse-mode;
-	  extraConfig = "";
-	}
-	{ 
-	  plugin = tmuxPlugins.resurrect;
-	  extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
-	}
-	{ 
-	  plugin = tmuxPlugins.continuum;
-	  extraConfig = ''
-	  set -g @continuum-restore 'on'
-	  set -g @continuum-save-interval '1'
-	  '';
-	}
+				{ 
+				  plugin = tmuxPlugins.tmux-thumbs;
+				  extraConfig = "set -g @thumbs-key F";
+				}
+				{ 
+				  plugin = tmuxPlugins.fuzzback;
+				  extraConfig = "set -g @fuzzback-bind k";
+				}
+				{ 
+				  plugin = tmuxPlugins.tmux-fzf;
+				  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
+				}
+			        { 
+				  plugin = tmuxPlugins.catppuccin;
+				  extraConfig = "";
+				}
+			        { 
+				  plugin = tmuxPlugins.better-mouse-mode;
+				  extraConfig = "";
+				}
+				{ 
+				  plugin = tmuxPlugins.resurrect;
+				  extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
+				}
+				{ 
+				  plugin = tmuxPlugins.continuum;
+				  extraConfig = ''
+					  set -g @continuum-restore 'on'
+					  set -g @continuum-save-interval '1'
+				  '';
+				}
       ];
     extraConfig = ''
       set -g prefix C-a

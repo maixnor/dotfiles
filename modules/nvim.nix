@@ -1,7 +1,4 @@
-{ pkgs, lib, nix-colors, ...}:
-
-let
-in
+{ pkgs, lib, config, ...}:
 
 {
   programs.neovim = {

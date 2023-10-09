@@ -10,9 +10,11 @@
   nixpkgs.config.allowUnfree = true;
 
   imports = [
+		./colors.nix
     ./modules/shell.nix
     ./modules/tmux.nix
     ./modules/nvim.nix
+		./modules/alacritty.nix
   ];
 
   # This value determines the Home Manager release that your

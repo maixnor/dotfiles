@@ -24,7 +24,8 @@
     zplug = {
       enable = true;
       plugins = [ 
-        { name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } ];
+        { name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } 
+			];
     };
     shellAliases = {
       # "cat" = "bat"; NOTE: not working
@@ -34,8 +35,6 @@
   programs.starship.enable = true;
 
   home.file = {
-    ".local/share/zsh/nix-zsh-completions".source =
-      "${pkgs.nix-zsh-completions}/share/zsh/plugins/nix";
     ".config/starship.toml".text = ''
       ## FIRST LINE/ROW: Info & Status
       # First param ─┌
