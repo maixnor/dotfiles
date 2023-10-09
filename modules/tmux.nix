@@ -8,6 +8,7 @@ in
     shell = "${pkgs.zsh}/bin/zsh";
     terminal = "tmux-256color";
     historyLimit = 100000;
+    newSession = true;
     plugins = with pkgs;
       [
 	{ 
@@ -17,6 +18,10 @@ in
 	{ 
 	  plugin = tmuxPlugins.fuzzback;
 	  extraConfig = "set -g @fuzzback-bind k";
+	}
+	{ 
+	  plugin = tmuxPlugins.tmux-fzf;
+	  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
 	}
         { 
 	  plugin = tmuxPlugins.catppuccin;
