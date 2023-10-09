@@ -1,4 +1,4 @@
-{ pkgs, nix-colors, ... }:
+{ pkgs, inputs, ... }:
 
 {
 	import = [

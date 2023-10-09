@@ -13,7 +13,7 @@
 
   };
 
-  outputs = { nixpkgs, home-manager, nix-colors, ... }:
+  outputs = { nixpkgs, home-manager, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -22,7 +22,7 @@
         inherit pkgs;
 
         modules = [ ./bierzelt.nix ];
-        extraSpecialArgs = { inherit nix-colors; };
+        extraSpecialArgs = { inherit inputs; };
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix
@@ -32,7 +32,7 @@
         inherit pkgs;
 
         modules = [ ./bierbasis.nix ];
-        extraSpecialArgs = { inherit nix-colors; };
+        extraSpecialArgs = { inherit inputs; };
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix

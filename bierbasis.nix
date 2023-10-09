@@ -1,6 +1,7 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
+
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "maixnor";
@@ -10,12 +11,14 @@
   nixpkgs.config.allowUnfree = true;
 
   imports = [
-		./colors.nix
+    inputs.nix-colors.homeManagerModules.default
     ./modules/shell.nix
     ./modules/tmux.nix
     ./modules/nvim.nix
 		./modules/alacritty.nix
   ];
+
+	colorScheme = inputs.nix-colors.colorSchemes.dracula;
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
