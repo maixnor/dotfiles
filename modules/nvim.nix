@@ -12,6 +12,8 @@ in
     vimdiffAlias = true;
     extraConfig = ''
       set number relativenumber
+      set tabstop=2 shiftwidth=2
+			set autoindent smartindent
     '';
     plugins = with pkgs.vimPlugins; [
       vim-fugitive
