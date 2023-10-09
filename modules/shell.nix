@@ -6,10 +6,6 @@
   programs.bat.enable = true;
   programs.git-credential-oauth.enable = true;
   programs.translate-shell.enable = true;
-  programs.atuin = {
-    enable = true;
-    enableZshIntegration = true;
-  };
 
   programs.zoxide = {
     enable = true;
