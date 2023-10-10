@@ -6,7 +6,7 @@
 		enable = true;
 		settings = {
 			window = {
-				opacity = 0.9;
+				opacity = 0.8;
 				startup_mode = "Fullscreen";
 				decorations = "full";
 			};
@@ -38,25 +38,27 @@
 				program = "${pkgs.zsh}/bin/zsh";
 			};
 			colors = with config.colorScheme.colors; {
-				bright = {
-
-				};
 				cursor = {
-
+					text = "#000000";
+					cursor = "#ffffff";
 				};
 				selection = {
-
+					background = "#${base04}";
+					foreground = "#${base00}";
 				};
 				normal = {
-					purple = "#${base00}";
-					black = "#${base09}";
-					pink = "#${base08}";
-					red = "#${base07}";
-					green = "#${base03}";
+					black = "#${base00}";
+					white = "#${base05}";
+					blue = "#${base0B}";
+					cyan = "#${base07}";
+					purple = "#${base0E}";
+					pink = "#${base0C}";
+					red = "#${base0A}";
+					green = "#${base0D}";
 				};
 				primary = {
 					background = "#${base00}";
-					foreground = "#${base05}";
+					foreground = "#${base04}";
 				};
 			};	
 		};
