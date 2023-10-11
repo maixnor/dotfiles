@@ -24,7 +24,7 @@
     zplug = {
       enable = true;
       plugins = [ 
-        { name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } 
+        #{ name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } 
 			];
     };
     shellAliases = {
@@ -33,6 +33,10 @@
   };
 
   programs.starship.enable = true;
+
+	home.packages = [
+		pkgs.neofetch
+	];
 
   home.file = {
     ".config/starship.toml".text = ''

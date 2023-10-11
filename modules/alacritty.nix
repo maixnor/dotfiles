@@ -2,6 +2,10 @@
 
 {
 
+	home.packages = [
+		pkgs.iosevka
+	];
+
 	programs.alacritty = {
 		enable = true;
 		settings = {
@@ -14,16 +18,16 @@
 				history = 0;
 			};
 			font = {
-				size = 12;
+				size = 8;
 				normal = {
-					family = "Iosevka Nerd Font";
+					family = "Iosevka";
 				};
 				bold = {
-					family = "Iosevka Nerd Font";
+					family = "Iosevka";
 					style = "Bold";
 				};
 				bold_italid = {
-					family = "Iosevka Nerd Font";
+					family = "Iosevka";
 					style = "Bold Italic";
 				};
 				italic = {

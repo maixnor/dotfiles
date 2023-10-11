@@ -9,7 +9,16 @@
     in {
       devShells.default = pkgs.mkShell {
         nativeBuildInputs = [ pkgs.bashInteractive ];
-        buildInputs = with pkgs; [ R rPackages.pagedown chromium pandoc ];
+        buildInputs = with pkgs; [ 
+					R 
+					rstudio
+					rstudio-server
+					rPackages.pagedown 
+					chromium 
+					pandoc
+					texlive.combined.scheme-full
+					nodejs_16
+				];
        };
     });
 }
