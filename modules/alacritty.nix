@@ -18,7 +18,7 @@
 				history = 0;
 			};
 			font = {
-				size = config.fontSettings.size;
+				size = 8;
 				normal = {
 					family = "Iosevka";
 				};
