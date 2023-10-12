@@ -18,6 +18,11 @@
 		./modules/alacritty.nix
   ];
 
+	fontSettings = { 
+		size = 12; 
+		mono = "Iosevka";
+	};
+
 	colorScheme = {
     slug = "oxocarbon";
     name = "Oxocarbon Dark";

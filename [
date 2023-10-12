@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, font_size, ... }:
 
 {
 
@@ -18,7 +18,7 @@
 				history = 0;
 			};
 			font = {
-				size = config.fontSettings.size;
+				size = config.font_size;
 				normal = {
 					family = "Iosevka";
 				};
