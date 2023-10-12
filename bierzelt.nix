@@ -1,8 +1,5 @@
 { config, pkgs, inputs, ... }:
 
-let 
-	my = { font.size = 8; };
-in
 {
   imports = [
     inputs.nix-colors.homeManagerModules.default
