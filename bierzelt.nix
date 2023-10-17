@@ -8,6 +8,7 @@
     ./modules/nvim.nix
 		./modules/alacritty.nix
 		./modules/kdeconnect.nix
+		./modules/office.nix
   ];
 
 config = {
