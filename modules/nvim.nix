@@ -8,42 +8,48 @@
     vimAlias = true;
     vimdiffAlias = true;
     extraConfig = ''
-	set number relativenumber
-	set tabstop=2 shiftwidth=2
-	set autoindent smartindent
-	set undofile
-	set termguicolors
+			set number relativenumber
+			set tabstop=2 shiftwidth=2
+			set autoindent smartindent
+			set undofile
+			set termguicolors
 
-	let mapleader = " "
-			
-	nnoremap <leader>e :Ex<cr>
-	nnoremap <leader>g :Git<cr>
-	nnoremap <leader>gp :Git push<cr>
-	nnoremap <leader>gf :Git pull<cr>
+			let mapleader = " "
+					
+			nnoremap <leader>e :Ex<cr>
+			nnoremap <leader>g :Git<cr>
+			nnoremap <leader>gp :Git push<cr>
+			nnoremap <leader>gf :Git pull<cr>
 
-	nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
-	nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
-	nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
-	nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
+			nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
+			nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
+			nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
+			nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
-	highlight LineNrAbove guifg=#${config.colorScheme.colors.base03}
-	highlight LineNr      guifg=#${config.colorScheme.colors.base04}
-	highlight LineNrBelow guifg=#${config.colorScheme.colors.base03}
+			highlight LineNrAbove guifg=#${config.colorScheme.colors.base03}
+			highlight LineNr      guifg=#${config.colorScheme.colors.base04}
+			highlight LineNrBelow guifg=#${config.colorScheme.colors.base03}
+
+			let g:coc_filetype_map = {'tex': 'latex'}
+			let g:ltex.languageToolHttpServerUri = '${pkgs.ltex-ls}'
     '';
     plugins = with pkgs.vimPlugins; [
-	plenary-nvim
+			plenary-nvim
       vim-fugitive
       vim-sensible
       nvim-lspconfig
       nvim-treesitter.withAllGrammars
-	telescope-nvim
-
+			telescope-nvim
+			coc-ltex
       vim-tmux-clipboard
       vim-tmux-navigator
     ];
   };
 
+
+
 	home.packages = with pkgs; [
 		ripgrep
+		ltex-ls
 	];
 }
