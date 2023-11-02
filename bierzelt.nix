@@ -9,6 +9,7 @@
 		./modules/alacritty.nix
 		./modules/kdeconnect.nix
 		./modules/office.nix
+		./modules/misc.nix
   ];
 
 config = {

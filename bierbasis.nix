@@ -17,6 +17,7 @@
     ./modules/nvim.nix
 		./modules/alacritty.nix
 		./modules/office.nix
+		./modules/misc.nix
   ];
 
 	colorScheme = {
