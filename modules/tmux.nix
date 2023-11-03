@@ -38,8 +38,8 @@ in
 				{ 
 				  plugin = tmuxPlugins.continuum;
 				  extraConfig = ''
-					  set -g @continuum-restore 'on'
-					  set -g @continuum-save-interval '1'
+						set -g @continuum-restore 'on'
+						set -g @continuum-save-interval '1'
 				  '';
 				}
       ];
@@ -67,6 +67,7 @@ in
       bind -r m resize-pane -Z
 
       set -g mode-keys vi
+			set -g status-position top
       
       bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
       bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "y"

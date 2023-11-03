@@ -18,7 +18,7 @@
 				history = 0;
 			};
 			font = {
-				size = 8;
+				size = 12;
 				normal = {
 					family = "Iosevka";
 				};
