@@ -16,12 +16,8 @@
     ./modules/tmux.nix
     ./modules/nvim.nix
 		./modules/alacritty.nix
+		./modules/office.nix
   ];
-
-	fontSettings = { 
-		size = 12; 
-		mono = "Iosevka";
-	};
 
 	colorScheme = {
     slug = "oxocarbon";

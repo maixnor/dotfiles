@@ -27,7 +27,7 @@ in
 				  plugin = tmuxPlugins.catppuccin;
 				  extraConfig = "";
 				}
-			        { 
+			  { 
 				  plugin = tmuxPlugins.better-mouse-mode;
 				  extraConfig = "";
 				}
