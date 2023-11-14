@@ -4,6 +4,7 @@
 
 	home.packages = [
 		pkgs.iosevka
+		pkgs.just
 	];
 
 	programs.alacritty = {
@@ -18,7 +19,7 @@
 				history = 0;
 			};
 			font = {
-				size = 12;
+				size = 8;
 				normal = {
 					family = "Iosevka";
 				};

@@ -1,7 +1,8 @@
 { config, pkgs, inputs, ... }:
 
 {
-  imports = [
+  
+	imports = [
     inputs.nix-colors.homeManagerModules.default
     ./modules/shell.nix
     ./modules/tmux.nix
@@ -10,11 +11,14 @@
 		./modules/kdeconnect.nix
 		./modules/office.nix
 		./modules/misc.nix
+		./modules/zsh.nix
   ];
 
 config = {
   home.username = "maixnor";
   home.homeDirectory = "/home/maixnor";
+
+	nixpkgs.config.allowUnfree = true;
 
 	colorScheme = {
     slug = "oxocarbon";
