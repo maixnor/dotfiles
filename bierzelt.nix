@@ -44,7 +44,7 @@ config = {
     };
   };
 
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
 
   programs.home-manager.enable = true;
   programs.git = {
@@ -53,7 +53,6 @@ config = {
     userEmail = "46966993+maixnor@users.noreply.github.com";
 		lfs.enable = true;
 		extraConfig = {
-      #credential.helper = "${pkgs.git.override { withLibsecret = true; }}/bin/git-credential-libsecret";
 			pull.rebase = true;
 			rebase.autoStash = true;
 			init.defaultBranch = "main";

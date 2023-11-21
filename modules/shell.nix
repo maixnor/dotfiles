@@ -4,7 +4,6 @@
 
   programs.ripgrep.enable = true;
   programs.bat.enable = true;
-  programs.git-credential-oauth.enable = true;
   programs.translate-shell.enable = true;
 
   programs.zoxide = {
