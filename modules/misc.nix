@@ -13,7 +13,7 @@
 				btop
 				pandoc
 				ripgrep
-				ollama
+				geogebra6
 
 				# kde
 				kate

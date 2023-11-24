@@ -12,6 +12,7 @@
 		./modules/office.nix
 		./modules/misc.nix
 		./modules/zsh.nix
+		./modules/ollama.nix
   ];
 
 config = {
