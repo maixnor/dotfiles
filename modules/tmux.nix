@@ -44,7 +44,7 @@ in
 				}
       ];
     extraConfig = ''
-      set -g prefix C-t
+      set -g prefix C-n
       unbind C-b
       bind-key C-a send-prefix
       
