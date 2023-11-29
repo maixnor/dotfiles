@@ -16,8 +16,12 @@
     ./modules/tmux.nix
     ./modules/nvim.nix
 		./modules/alacritty.nix
+		./modules/kdeconnect.nix
 		./modules/office.nix
 		./modules/misc.nix
+		./modules/zsh.nix
+		./modules/ollama.nix
+		./modules/graphics.nix
   ];
 
 	colorScheme = {
