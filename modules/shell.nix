@@ -20,12 +20,6 @@
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
-    zplug = {
-      enable = true;
-      plugins = [ 
-        #{ name = "bobsoppe/zsh-ssh-agent"; tags = [ use:ssh-agent.zsh from:github ]; } 
-			];
-    };
     shellAliases = {
       # "cat" = "bat"; NOTE: not working
     };

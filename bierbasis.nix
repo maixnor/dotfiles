@@ -7,7 +7,6 @@
   home.username = "maixnor";
   home.homeDirectory = "/home/maixnor";
 
-  targets.genericLinux.enable = true;
   nixpkgs.config.allowUnfree = true;
 
   imports = [
@@ -56,7 +55,7 @@
   # You can update Home Manager without changing this value. See
   # the Home Manager release notes for a list of state version
   # changes in each release.
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
 
   home.sessionVariables = {
     EDITOR = "nvim";
@@ -75,5 +74,6 @@
     enable = true;
     userName = "maixnor";
     userEmail = "46966993+maixnor@users.noreply.github.com";
+		extraConfig.credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
   };
 }
