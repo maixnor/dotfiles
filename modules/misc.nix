@@ -28,7 +28,6 @@
 				jq jc jo gron yj yq pup
 
 				# unfree
-				vivaldi
     ];
 
 }
