@@ -23,6 +23,8 @@
 		./modules/graphics.nix
   ];
 
+	programs.kdeconnect.enable = true;
+
 	colorScheme = {
     slug = "oxocarbon";
     name = "Oxocarbon Dark";

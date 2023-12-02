@@ -13,29 +13,35 @@
 
   };
 
-  outputs = { nixpkgs, home-manager, ... } @inputs :
+  outputs = { self, nixpkgs, home-manager, ... } @inputs :
     let
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs { 
+				inherit system;
+
+				config = {
+					allowUnfree = true;
+				};
+			};
     in {
+
+			nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
+				specialArgs = { inherit system; };
+				modules = [ ./bierbasis/configuration.nix ];
+			};
+
       homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
         modules = [ ./bierzelt.nix ];
         extraSpecialArgs = { inherit inputs; };
-
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
       };
       
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
-        modules = [ ./bierbasis.nix ];
+        modules = [ ./bierbasis/home.nix ];
         extraSpecialArgs = { inherit inputs; };
-
-        # Optionally use extraSpecialArgs
-        # to pass through arguments to home.nix
       };
     };
 }
