@@ -30,18 +30,24 @@
 				modules = [ ./bierbasis/configuration.nix ];
 			};
 
-      homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs;
+			nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
+				specialArgs = { inherit system; };
+				modules = [ ./bierzelt/configuration.nix ];
+			};
 
-        modules = [ ./bierzelt.nix ];
-        extraSpecialArgs = { inherit inputs; };
-      };
-      
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
 
         modules = [ ./bierbasis/home.nix ];
         extraSpecialArgs = { inherit inputs; };
       };
+
+      homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
+        inherit pkgs;
+
+        modules = [ ./bierzelt/home.nix ];
+        extraSpecialArgs = { inherit inputs; };
+      };
+      
     };
 }

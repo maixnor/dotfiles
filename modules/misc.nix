@@ -14,6 +14,7 @@
 				pandoc
 				ripgrep
 				geogebra6
+				parallel
 
 				# kde
 				kate

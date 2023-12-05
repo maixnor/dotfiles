@@ -4,16 +4,16 @@
   
 	imports = [
     inputs.nix-colors.homeManagerModules.default
-    ./modules/shell.nix
-    ./modules/tmux.nix
-    ./modules/nvim.nix
-		./modules/alacritty.nix
-		./modules/kdeconnect.nix
-		./modules/office.nix
-		./modules/misc.nix
-		./modules/zsh.nix
-		./modules/ollama.nix
-		./modules/graphics.nix
+    ../modules/shell.nix
+    ../modules/tmux.nix
+    ../modules/nvim.nix
+		../modules/alacritty.nix
+		../modules/kdeconnect.nix
+		../modules/office.nix
+		../modules/misc.nix
+		../modules/zsh.nix
+		../modules/ollama.nix
+		../modules/graphics.nix
   ];
 
 config = {
