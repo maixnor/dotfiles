@@ -20,8 +20,6 @@ config = {
   home.username = "maixnor";
   home.homeDirectory = "/home/maixnor";
 
-	nixpkgs.config.allowUnfree = true;
-
 	colorScheme = {
     slug = "oxocarbon";
     name = "Oxocarbon Dark";
