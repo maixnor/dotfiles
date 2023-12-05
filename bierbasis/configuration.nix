@@ -8,6 +8,8 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+			./nextcloud.nix
+			./nvidia.nix
     ];
 
   nixpkgs.config.allowUnfreePredicate = _: true;
@@ -93,6 +95,7 @@
       firefox
       kate
 			virt-manager
+			steam-run
     #  thunderbird
       vivaldi
     ];
