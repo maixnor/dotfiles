@@ -22,6 +22,9 @@
 				spectacle
 				kmail
 				konsole
+				krusader
+				kompare
+				krename
 
 				# general development stuff
 				vagrant
