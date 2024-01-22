@@ -8,13 +8,18 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-			./nextcloud.nix
+			#./nextcloud.nix
 			./nvidia.nix
     ];
 
   nixpkgs.config.allowUnfreePredicate = _: true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-25.9.0"
+  ];
+ 
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -132,6 +137,7 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+    r2modman
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -159,6 +165,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.11"; # Did you read the comment?
+  system.stateVersion = "24.05"; # Did you read the comment?
 
 }

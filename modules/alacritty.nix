@@ -27,22 +27,17 @@
 					family = "Iosevka";
 					style = "Bold";
 				};
-				bold_italid = {
-					family = "Iosevka";
-					style = "Bold Italic";
-				};
 				italic = {
 					family = "Iosevka Nerd Font";
 					style = "Italic";
 				};
 			};
-			draw_bold_text_with_bright_colors = true;
 			live_config_reload = true;
-			save_to_clipboard = true;
 			shell = {
 				program = "${pkgs.zsh}/bin/zsh";
 			};
 			colors = with config.colorScheme.colors; {
+        draw_bold_text_with_bright_colors = true;
 				cursor = {
 					text = "#000000";
 					cursor = "#ffffff";
@@ -56,8 +51,6 @@
 					white = "#${base05}";
 					blue = "#${base0B}";
 					cyan = "#${base07}";
-					purple = "#${base0E}";
-					pink = "#${base0C}";
 					red = "#${base0A}";
 					green = "#${base0D}";
 				};
