@@ -64,6 +64,10 @@
 	# launch in wayland session per default
 	services.xserver.displayManager.defaultSession = "plasmawayland";
 
+  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+    ksshaskpass
+  ];
+
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
