@@ -2,7 +2,7 @@
 
 {
 	home.packages = with pkgs; [ 
-    libreoffice-fresh
+    libreoffice-qt
     hunspell
     hunspellDicts.sv_SE
     hunspellDicts.en_US-large
