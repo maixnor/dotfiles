@@ -5,10 +5,15 @@
     enable = true;
 
     options = {
-      number = true;         # Show line numbers
-      relativenumber = true; # Show relative line numbers
+      number = true;         
+      relativenumber = true; 
 
-      shiftwidth = 2;        # Tab width should be 2
+      shiftwidth = 2;        
+      tabstop = 2;
+      undofile = true;
+      termguicolors = true;
+      autoindent = true;
+      smartindent = true;
     };
 
     globals.mapleader = " ";
