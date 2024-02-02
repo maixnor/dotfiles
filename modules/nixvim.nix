@@ -29,6 +29,7 @@
       fugitive.enable = true;
       telescope.enable = true;
       tmux-navigator.enable = true;
+			luasnip.enable = true;
       treesitter.enable = true;
       treesitter-textobjects.enable = true;
       undotree.enable = true;
@@ -62,28 +63,32 @@
 
     keymaps = [
       {
-	action = "<cmd>Telescope live_grep<CR>";
-	key = "<leader>fg";
+				action = "<cmd>Telescope live_grep<CR>";
+				key = "<leader>fg";
       }
       {
-	action = "<cmd>Telescope find_files<CR>";
-	key = "<leader>ff";
+				action = "<cmd>Telescope find_files<CR>";
+				key = "<leader>ff";
       }
       {
-	action = "<cmd>Git<CR>";
-	key = "<leader>g";
+				action = "<cmd>Git<CR>";
+				key = "<leader>g";
       }
       {
-	action = "<cmd>Git push<CR>";
-	key = "<leader>gp";
+				action = "<cmd>Git push<CR>";
+				key = "<leader>gp";
       }
       {
-	action = "<cmd>Git pull<CR>";
-	key = "<leader>gf";
+				action = "<cmd>Git pull<CR>";
+				key = "<leader>gf";
       }
       {
-	action = "<cmd>UndoTreeShow<CR>";
-	key = "<leader>u";
+				action = "<cmd>lua vim.lsp.buf.formatting()<CR>";
+				key = "<leader>a";
+      }
+      {
+				action = "<cmd>UndoTreeShow<CR>";
+				key = "<leader>u";
       }
     ];
 
@@ -94,6 +99,7 @@
         {name = "nvim_lsp";}
         {name = "path";}
         {name = "buffer";}
+        {name = "luasnip";}
       ];
 
       mapping = {
@@ -103,8 +109,6 @@
             function(fallback)
               if cmp.visible() then
                 cmp.select_next_item()
-              elseif check_backspace() then
-                fallback()
               else
                 fallback()
               end
