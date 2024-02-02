@@ -11,11 +11,11 @@
 
   imports = [
     inputs.nix-colors.homeManagerModules.default
+    inputs.nixvim.homeManagerModules.nixvim
     ../modules/shell.nix
     ../modules/tmux.nix
 #    ../modules/nvim.nix
-# 	 ../modules/nixvim.nix
-		../modules/nvchad/default.nix
+../modules/nixvim.nix
 		../modules/alacritty.nix
 		../modules/kdeconnect.nix
 		../modules/office.nix
@@ -29,7 +29,7 @@
     slug = "oxocarbon";
     name = "Oxocarbon Dark";
     author = "shaunsingh/IBM";
-    colors = {
+    palette = {
       base00 = "#161616";
       base01 = "#262626";
       base02 = "#393939";
@@ -70,11 +70,6 @@
   home.file = {
   };
 
-	xdg.configFile."nvim" = {
-    source = "${pkgs.vimPlugins.nvchad}";
-    recursive = true;
-  };
-
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   programs.git = {
@@ -82,6 +77,5 @@
     userName = "maixnor";
     userEmail = "46966993+maixnor@users.noreply.github.com";
 		extraConfig.credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
-    lfs.enable = true;
   };
 }

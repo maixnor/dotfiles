@@ -9,7 +9,6 @@
 				wget xh
 				freshfetch
 				spotify
-				discord
 				btop
 				pandoc
 				ripgrep
@@ -32,6 +31,17 @@
 				jq jc jo gron yj yq pup
 
 				# unfree
+
+        # discord
+        (pkgs.writeShellApplication {
+          name = "discord";
+          text = "${pkgs.discord}/bin/discord --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-features=WaylandWindowDecorations";
+        })
+        (pkgs.makeDesktopItem {
+          name = "discord";
+          exec = "discord";
+          desktopName = "Discord";
+        })
     ];
 
 }

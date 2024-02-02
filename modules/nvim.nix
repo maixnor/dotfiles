@@ -26,9 +26,9 @@
 			nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 			nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
-			highlight LineNrAbove guifg=#${config.colorScheme.colors.base03}
-			highlight LineNr      guifg=#${config.colorScheme.colors.base04}
-			highlight LineNrBelow guifg=#${config.colorScheme.colors.base03}
+			highlight LineNrAbove guifg=#${config.colorScheme.palette.base03}
+			highlight LineNr      guifg=#${config.colorScheme.palette.base04}
+			highlight LineNrBelow guifg=#${config.colorScheme.palette.base03}
     '';
     plugins = with pkgs.vimPlugins; [
 			plenary-nvim

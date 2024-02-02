@@ -4,6 +4,7 @@
 
 	home.packages = [
 		pkgs.iosevka
+    pkgs.fira-code
 		pkgs.just
 	];
 
@@ -28,7 +29,7 @@
 					style = "Bold";
 				};
 				italic = {
-					family = "Iosevka Nerd Font";
+					family = "Iosevka";
 					style = "Italic";
 				};
 			};
@@ -36,7 +37,7 @@
 			shell = {
 				program = "${pkgs.zsh}/bin/zsh";
 			};
-			colors = with config.colorScheme.colors; {
+			colors = with config.colorScheme.palette; {
         draw_bold_text_with_bright_colors = true;
 				cursor = {
 					text = "#000000";
