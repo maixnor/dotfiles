@@ -1,6 +1,9 @@
 { config, lib, pkgs, nixvim, ... }:
 
 {
+
+  home.packages = with pkgs; [ ripgrep parallel ];
+
   programs.nixvim = {
     enable = true;
 
@@ -33,12 +36,12 @@
       lsp-format.enable = true;
 
       lsp = {
-	enable = true;
-	servers = {
-	  lua-ls.enable = true;
-	  rust-analyzer.enable = true;
-	  nixd.enable = true;
-	};
+				enable = true;
+				servers = {
+					lua-ls.enable = true;
+					rust-analyzer.enable = true;
+					nixd.enable = true;
+				};
       };
     };
 
