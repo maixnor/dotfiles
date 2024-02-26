@@ -23,6 +23,8 @@
 
     colorschemes.oxocarbon.enable = true;
 
+		clipboard.providers.wl-copy.enable = true;
+
     plugins = {
       lualine.enable = true;
       bufferline.enable = true;
@@ -42,6 +44,7 @@
 					lua-ls.enable = true;
 					rust-analyzer.enable = true;
 					nixd.enable = true;
+					bashls.enable = true;
 				};
       };
     };
