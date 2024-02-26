@@ -19,11 +19,12 @@
   nixpkgs.config.permittedInsecurePackages = [
     "electron-25.9.0"
   ];
- 
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+	boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "Bierbasis"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -64,14 +65,10 @@
 	# launch in wayland session per default
 	services.xserver.displayManager.defaultSession = "plasmawayland";
 
-  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
-    ksshaskpass
-  ];
-
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Enable CUPS to print documents.
