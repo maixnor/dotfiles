@@ -29,6 +29,7 @@
 
 	home.packages = [
 		pkgs.neofetch
+		pkgs.fd
 	];
 
   home.file = {

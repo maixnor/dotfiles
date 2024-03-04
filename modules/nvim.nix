@@ -26,9 +26,16 @@
 			nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 			nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 
+<<<<<<< Updated upstream
 			highlight LineNrAbove guifg=#${config.colorScheme.palette.base03}
 			highlight LineNr      guifg=#${config.colorScheme.palette.base04}
 			highlight LineNrBelow guifg=#${config.colorScheme.palette.base03}
+=======
+			highlight LineNrAbove guifg=#${config.colorScheme.colors.base03}
+			highlight LineNr      guifg=#${config.colorScheme.colors.base04}
+			highlight LineNrBelow guifg=#${config.colorScheme.colors.base03}
+
+>>>>>>> Stashed changes
     '';
     plugins = with pkgs.vimPlugins; [
 			plenary-nvim
@@ -37,6 +44,7 @@
       nvim-lspconfig
       nvim-treesitter.withAllGrammars
 			telescope-nvim
+			mason-nvim
 
       vim-tmux-clipboard
       vim-tmux-navigator

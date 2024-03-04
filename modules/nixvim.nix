@@ -33,6 +33,7 @@
       tmux-navigator.enable = true;
 			luasnip.enable = true;
       treesitter.enable = true;
+			treesitter-context.enable = true;
       treesitter-textobjects.enable = true;
       undotree.enable = true;
       nvim-colorizer.enable = true;
@@ -58,6 +59,8 @@
       Comment.bold = true;
       Normal.bg = "NONE";
       NonText.bg = "NONE";
+			Normal.ctermbg = "NONE";
+			NormalNC.bg = "NONE";
 
       LineNrAbove.fg="#${config.colorScheme.palette.base03}";
       LineNr.fg="#${config.colorScheme.palette.base04}";

@@ -133,6 +133,11 @@
     ];
   };
 
+	users.users.nixos.isSystemUser = true ;
+	users.users.nixos.initialPassword = "nixos";
+	users.users.nixos.group = "nixos";
+	users.groups.nixos = {};
+
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
 

@@ -17,10 +17,10 @@
 				decorations = "full";
 			};
 			scrolling = {
-				history = 0;
+				history = 30000;
 			};
 			font = {
-				size = 12;
+				size = 16;
 				normal = {
 					family = "Iosevka";
 				};

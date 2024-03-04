@@ -4,9 +4,11 @@
   
 	imports = [
     inputs.nix-colors.homeManagerModules.default
+    inputs.nixvim.homeManagerModules.nixvim
     ../modules/shell.nix
     ../modules/tmux.nix
-    ../modules/nvim.nix
+    #../modules/nvim.nix
+		../modules/nixvim.nix
 		../modules/alacritty.nix
 		../modules/kdeconnect.nix
 		../modules/office.nix
