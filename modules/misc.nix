@@ -15,6 +15,7 @@
 		geogebra6
 		parallel
 		direnv
+		krita
 
 		# kde
 		kate
