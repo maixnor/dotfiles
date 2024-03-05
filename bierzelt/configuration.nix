@@ -130,6 +130,7 @@
 
       # unfree
       vivaldi
+			firefox
     ];
   };
 
