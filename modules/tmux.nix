@@ -9,6 +9,7 @@ in
     terminal = "tmux-256color";
     historyLimit = 100000;
     newSession = true;
+		clock24 = true;
     plugins = with pkgs;
       [
 				{ 
