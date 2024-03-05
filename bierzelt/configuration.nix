@@ -69,9 +69,9 @@
   services.xserver.videoDrivers = [ "displaylink" "modesetting" ];
 
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "us";
-    xkbVariant = "workman";
+    variant = "workman";
   };
 
   # Enable CUPS to print documents.
