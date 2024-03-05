@@ -10,6 +10,7 @@
     #../modules/nvim.nix
 		../modules/nixvim.nix
 		../modules/alacritty.nix
+		#../modules/kitty.nix
 		../modules/kdeconnect.nix
 		../modules/office.nix
 		../modules/misc.nix
