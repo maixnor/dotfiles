@@ -23,13 +23,10 @@
 
     colorschemes.oxocarbon.enable = true;
 
-		clipboard.providers.wl-copy.enable = true;
-
     plugins = {
       lualine.enable = true;
-      bufferline.enable = true;
-      fugitive.enable = true;
       telescope.enable = true;
+      fugitive.enable = true;
       tmux-navigator.enable = true;
 			luasnip.enable = true;
       treesitter.enable = true;
@@ -38,6 +35,7 @@
       undotree.enable = true;
       nvim-colorizer.enable = true;
       lsp-format.enable = true;
+			magma-nvim.enable = true;
 
       lsp = {
 				enable = true;
