@@ -16,6 +16,7 @@
 		parallel
 		direnv
 		krita
+		firefox
 
 		# kde
 		kate
@@ -35,7 +36,18 @@
 
 		# unfree
 
-    # discord
+    # vivaldi
+    (pkgs.writeShellApplication {
+      name = "vivaldi";
+      text = "${pkgs.vivaldi}/bin/vivaldi --disable-features=AllowQt";
+    })
+    (pkgs.makeDesktopItem {
+      name = "vivaldi";
+      exec = "vivaldi";
+      desktopName = "Vivaldi";
+    })
+
+		# discord
     (pkgs.writeShellApplication {
       name = "discord";
       text = "${pkgs.discord}/bin/discord --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-features=WaylandWindowDecorations";
