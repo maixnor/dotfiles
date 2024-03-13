@@ -44,6 +44,12 @@
 					rust-analyzer.enable = true;
 					nixd.enable = true;
 					bashls.enable = true;
+					tsserver.enable = true;
+					marksman.enable = true;
+
+					html.enable = true;
+					jsonls.enable = true;
+					yamlls.enable = true;
 				};
       };
     };
