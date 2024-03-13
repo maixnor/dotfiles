@@ -75,6 +75,12 @@
     enable = true;
     userName = "maixnor";
     userEmail = "46966993+maixnor@users.noreply.github.com";
-		extraConfig.credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
-  };
+		extraConfig = {
+			pull.rebase = true;
+			rebase.autoStash = true;
+			init.defaultBranch = "main";
+			push.autoSetupRemote = true;
+			credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
+    };
+	};
 }

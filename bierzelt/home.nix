@@ -60,6 +60,7 @@ config = {
 			rebase.autoStash = true;
 			init.defaultBranch = "main";
 			push.autoSetupRemote = true;
+			credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
     };
   };
 };
