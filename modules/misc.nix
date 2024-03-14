@@ -44,6 +44,7 @@
     (pkgs.makeDesktopItem {
       name = "vivaldi";
       exec = "vivaldi";
+			icon = "teams";
       desktopName = "Vivaldi";
     })
 
@@ -55,6 +56,7 @@
     (pkgs.makeDesktopItem {
       name = "discord";
       exec = "discord";
+			icon = "discord";
       desktopName = "Discord";
     })
   ];
