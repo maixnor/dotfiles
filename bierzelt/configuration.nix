@@ -132,11 +132,6 @@
     ];
   };
 
-	users.users.nixos.isSystemUser = true ;
-	users.users.nixos.initialPassword = "nixos";
-	users.users.nixos.group = "nixos";
-	users.groups.nixos = {};
-
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
 
@@ -154,6 +149,11 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+
+	programs.nix-ld.enable = true;
+	programs.nix-ld.libraries = with pkgs; [
+		# ;lace libraries here
+	];
   
   programs.steam = {
     enable = true;

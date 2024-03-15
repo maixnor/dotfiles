@@ -42,7 +42,6 @@
 				servers = {
 					lua-ls.enable = true;
 					rust-analyzer.enable = true;
-					nixd.enable = true;
 					bashls.enable = true;
 					tsserver.enable = true;
 					marksman.enable = true;
@@ -102,31 +101,9 @@
       }
     ];
 
-    plugins.nvim-cmp = {
+    plugins.cmp = {
       enable = true;
       autoEnableSources = true;
-      sources = [
-        {name = "nvim_lsp";}
-        {name = "path";}
-        {name = "buffer";}
-        {name = "luasnip";}
-      ];
-
-      mapping = {
-        "<CR>" = "cmp.mapping.confirm({ select = true })";
-        "<Tab>" = {
-          action = ''
-            function(fallback)
-              if cmp.visible() then
-                cmp.select_next_item()
-              else
-                fallback()
-              end
-            end
-          '';
-          modes = [ "i" "s" ];
-        };
-      };
     };
   };
 }
