@@ -12,7 +12,6 @@
   imports = [
     inputs.nix-colors.homeManagerModules.default
     inputs.nixvim.homeManagerModules.nixvim
-    ../modules/shell.nix
     ../modules/tmux.nix
 		../modules/nixvim.nix
 		../modules/alacritty.nix
