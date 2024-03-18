@@ -12,7 +12,6 @@
 
 		clipboard.providers.wl-copy.enable = true;
 
-
     options = {
       number = true;         
       relativenumber = true; 
@@ -40,6 +39,7 @@
       treesitter-textobjects.enable = true;
       undotree.enable = true;
       nvim-colorizer.enable = true;
+      fzf-lua.enable = true;
 
       lsp = {
 				enable = true;
@@ -75,16 +75,28 @@
 
     keymaps = [
       {
-				action = "<cmd>Telescope live_grep<CR>";
-				key = "<leader>fg";
-      }
-      {
-				action = "<cmd>Telescope find_files<CR>";
+				action = "<cmd>FzfLua files<CR>";
 				key = "<leader>ff";
       }
       {
+				action = "<cmd>FzfLua live_grep_native<CR>";
+				key = "<leader>fg";
+      }
+      {
+				action = "<cmd>FzfLua diagnistics_workspace<CR>";
+				key = "<leader>fdw";
+      }
+      {
+				action = "<cmd>FzfLua diagnistics_workspace<CR>";
+				key = "<leader>fdd";
+      }
+      {
+				action = "<cmd>FzfLua quickfix<CR>";
+				key = "<leader>fq";
+      }
+      {
 				action = "<cmd>Git<CR>";
-				key = "<leader>g";
+				key = "<leader>gs";
       }
       {
 				action = "<cmd>Git push<CR>";
@@ -93,10 +105,6 @@
       {
 				action = "<cmd>Git pull<CR>";
 				key = "<leader>gf";
-      }
-      {
-				action = "<cmd>lua vim.lsp.buf.formatting()<CR>";
-				key = "<leader>a";
       }
       {
 				action = "<cmd>UndotreeShow<CR>";
@@ -108,5 +116,6 @@
       enable = true;
       autoEnableSources = true;
     };
+    plugins.cmp-nvim-lsp.enable = true;
   };
 }
