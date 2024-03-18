@@ -22,14 +22,14 @@
 			font = {
 				size = 16;
 				normal = {
-					family = "Iosevka";
+					family = "Fira Code";
 				};
 				bold = {
-					family = "Iosevka";
+					family = "Fira Code";
 					style = "Bold";
 				};
 				italic = {
-					family = "Iosevka";
+					family = "Fira Code";
 					style = "Italic";
 				};
 			};

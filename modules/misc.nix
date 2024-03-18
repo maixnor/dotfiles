@@ -35,7 +35,17 @@
 
 		# unfree
     obsidian
-		vivaldi
+    # vivaldi
+    (pkgs.writeShellApplication {
+      name = "vivaldi";
+      text = "${pkgs.vivaldi}/bin/vivaldi --disable-features=AllowQt";
+    })
+    (pkgs.makeDesktopItem {
+      name = "vivaldi";
+      exec = "vivaldi";
+      icon = "teams";
+      desktopName = "Vivaldi";
+    })
 
 		# discord
     (pkgs.writeShellApplication {
