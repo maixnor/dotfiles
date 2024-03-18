@@ -3,7 +3,6 @@
 {
 
   home.packages = with pkgs; [
-    obsidian
 		openconnect
 		gh
 		wget xh
@@ -35,6 +34,7 @@
 		jetbrains.idea-community
 
 		# unfree
+    obsidian
 		vivaldi
 
 		# discord
