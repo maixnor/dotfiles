@@ -35,18 +35,7 @@
 		jetbrains.idea-community
 
 		# unfree
-
-    # vivaldi
-    (pkgs.writeShellApplication {
-      name = "vivaldi";
-      text = "${pkgs.vivaldi}/bin/vivaldi --disable-features=AllowQt";
-    })
-    (pkgs.makeDesktopItem {
-      name = "vivaldi";
-      exec = "vivaldi";
-			icon = "teams";
-      desktopName = "Vivaldi";
-    })
+		vivaldi
 
 		# discord
     (pkgs.writeShellApplication {
