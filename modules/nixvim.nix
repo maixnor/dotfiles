@@ -2,10 +2,16 @@
 
 {
 
-  home.packages = with pkgs; [ ripgrep parallel ];
-
   programs.nixvim = {
     enable = true;
+		enableMan = true;
+    viAlias = true;
+    vimAlias = true;
+
+		extraPackages = with pkgs; [ ripgrep parallel fd fzf ];
+
+		clipboard.providers.wl-copy.enable = true;
+
 
     options = {
       number = true;         
@@ -13,10 +19,12 @@
 
       shiftwidth = 2;        
       tabstop = 2;
-      undofile = true;
-      termguicolors = true;
+			expandtab = true;
       autoindent = true;
       smartindent = true;
+
+      undofile = true;
+      termguicolors = true;
     };
 
     globals.mapleader = " ";
@@ -25,17 +33,13 @@
 
     plugins = {
       lualine.enable = true;
-      telescope.enable = true;
       fugitive.enable = true;
       tmux-navigator.enable = true;
-			luasnip.enable = true;
       treesitter.enable = true;
 			treesitter-context.enable = true;
       treesitter-textobjects.enable = true;
       undotree.enable = true;
       nvim-colorizer.enable = true;
-      lsp-format.enable = true;
-			magma-nvim.enable = true;
 
       lsp = {
 				enable = true;
@@ -58,8 +62,7 @@
 
     highlight = {
       Comment.fg = "#f47ac9";
-      Comment.underline = true;
-      Comment.bold = true;
+
       Normal.bg = "NONE";
       NonText.bg = "NONE";
 			Normal.ctermbg = "NONE";
@@ -96,7 +99,7 @@
 				key = "<leader>a";
       }
       {
-				action = "<cmd>UndoTreeShow<CR>";
+				action = "<cmd>UndotreeShow<CR>";
 				key = "<leader>u";
       }
     ];
