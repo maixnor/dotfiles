@@ -129,6 +129,9 @@
 #       libsForQt5.kdeconnect-kde
 
       # unfree
+      qemu
+      quickemu
+      quickgui
     ];
   };
 
