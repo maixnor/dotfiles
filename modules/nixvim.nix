@@ -83,12 +83,12 @@
 				key = "<leader>fg";
       }
       {
-				action = "<cmd>FzfLua diagnistics_workspace<CR>";
-				key = "<leader>fdw";
+				action = "<cmd>FzfLua diagnostics_document<CR>";
+				key = "<leader>fd";
       }
       {
-				action = "<cmd>FzfLua diagnistics_workspace<CR>";
-				key = "<leader>fdd";
+				action = "<cmd>FzfLua diagnostics_workspace<CR>";
+				key = "<leader>fD";
       }
       {
 				action = "<cmd>FzfLua quickfix<CR>";
