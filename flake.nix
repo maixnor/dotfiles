@@ -1,5 +1,5 @@
 {
-  description = "Home Manager configuration of maixnor";
+  description = "Maixnor's NixOs and Home-Manager configuration";
 
   inputs = {
     # Specify the source of Home Manager and Nixpkgs.
@@ -14,7 +14,6 @@
     };
     # everything colors and styling
     nix-colors.url = "github:misterio77/nix-colors";
-
   };
 
   outputs = { self, nixpkgs, home-manager, nixvim, ... } @inputs :
@@ -30,12 +29,12 @@
     in {
 
 			nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
-				specialArgs = { inherit system; };
+				specialArgs = { inherit system; inherit inputs; };
 				modules = [ ./bierbasis/configuration.nix ];
 			};
 
 			nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
-				specialArgs = { inherit system; };
+				specialArgs = { inherit system; inherit inputs; };
 				modules = [ ./bierzelt/configuration.nix ];
 			};
 
