@@ -16,6 +16,7 @@
 		direnv
 		krita
 		firefox
+    mpv
 
 		# kde
 		kate
