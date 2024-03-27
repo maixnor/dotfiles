@@ -103,7 +103,6 @@
 			virt-manager
 			steam-run
     #  thunderbird
-      vivaldi
     ];
   };
 
