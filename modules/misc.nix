@@ -27,6 +27,7 @@
 		krusader
 		kompare
 		krename
+    kdePackages.krdc # RDP client
 
 		# general development stuff
 		vagrant
