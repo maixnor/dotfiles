@@ -66,7 +66,7 @@
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
-    variant = "";
+    variant = "workman";
   };
 
   # Enable CUPS to print documents.
@@ -131,6 +131,14 @@
   virtualisation.virtualbox.guest.enable = true;
   users.extraGroups.vboxusers.members = [ "maixnor" ];
 
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+    environmentVariables = {
+      HOME = "/tmp/ollama";
+    };
+  };
+
 	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
   programs.steam = {
@@ -148,6 +156,10 @@
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
+
+  environment.sessionVariables = rec {
+    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # against electron apps flickering on wayland
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

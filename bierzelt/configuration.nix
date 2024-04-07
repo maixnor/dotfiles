@@ -143,6 +143,10 @@
   #  wget
   ];
 
+  environment.sessionVariables = rec {
+    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # against electron apps flickering on wayland
+  };
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
