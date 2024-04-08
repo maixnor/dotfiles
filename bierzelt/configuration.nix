@@ -126,15 +126,15 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       # unfree
-      qemu
-      quickemu
-      quickgui
-      virt-manager
+      # qemu
+      # quickemu
+      # quickgui
+      # virt-manager
     ];
   };
 
-  virtualisation.docker.enable = true;
-  virtualisation.libvirtd.enable = true;
+  # virtualisation.docker.enable = true;
+  # virtualisation.libvirtd.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
