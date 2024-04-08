@@ -10,15 +10,13 @@
       ./hardware-configuration.nix
 			#./nextcloud.nix
 			./nvidia.nix
+      #./secenv.nix # secenv environment of uni wien
+      #../modules/post-vpn.nix
     ];
 
   nixpkgs.config.allowUnfreePredicate = _: true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-25.9.0"
-  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -26,24 +24,14 @@
 
 	boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "Bierbasis"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
   hardware.bluetooth.enable = true;
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
+  networking.hostName = "Bierbasis";
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
   time.timeZone = "Europe/Vienna";
 
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "de_AT.UTF-8";
     LC_IDENTIFICATION = "de_AT.UTF-8";
@@ -112,6 +100,8 @@
       # thunderbird
       quickemu
       quickgui
+
+      wireguard-tools
     ];
   };
 
@@ -123,13 +113,35 @@
     allowedUDPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
+    # allowedUDPPorts = [ 51980 ]; # secenv
   }; 
 
-  virtualisation.docker.enable = true;
-  virtualisation.libvirtd.enable = true;
-  virtualisation.virtualbox.host.enable = true;
-  virtualisation.virtualbox.guest.enable = true;
-  users.extraGroups.vboxusers.members = [ "maixnor" ];
+  # Enable WireGuard
+  # networking.wg-quick.interfaces = {
+  #   secenv = {
+  #     address = [ "10.80.2.24/15" ];
+  #     # dns = [ "10.81.0.2" ];
+  #     privateKey = "6Ca/50w0vkXqygspYi/LyBjfGeM09K4UrCkdAIjvQH4=";
+  #     
+  #     peers = [
+  #       {
+  #         publicKey = "gwcw/BGNjOKch5LzsztHcNqpmW/NIxmDeIIfs7ElGRQ=";
+  #         presharedKey = "A/d0NDt1ZoYlzAUP/5skFsX8VGwNPI9ZY9FrCRHukAs=";
+  #         allowedIPs = [ "10.80.0.0/15" ];
+  #         endpoint = "128.131.169.157:51980";
+  #         persistentKeepalive = 15;
+  #       }
+  #     ];
+  #   };
+  # };
+
+  # virtualisation.docker.enable = true;
+  # virtualisation.libvirtd.enable = true;
+	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
+  # needed for uniwien VM
+  # virtualisation.virtualbox.host.enable = true;
+  # virtualisation.virtualbox.guest.enable = true;
+  # users.extraGroups.vboxusers.members = [ "maixnor" ];
 
   services.ollama = {
     enable = true;
@@ -138,8 +150,6 @@
       HOME = "/tmp/ollama";
     };
   };
-
-	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
   programs.steam = {
     enable = true;
