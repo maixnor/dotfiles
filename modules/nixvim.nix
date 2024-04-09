@@ -28,6 +28,8 @@
 
     globals.mapleader = " ";
 
+    colorschemes.oxocarbon.enable = true;
+
     plugins = {
       coq-nvim.enable = true;
       coq-nvim.settings.completion.always = true;

@@ -5,3 +5,9 @@ home host:
 nixos host:
 	sudo nixos-rebuild switch --flake ~/dotfiles#{{host}}
 
+bierzelt:
+  just nixos bierzelt home bierzelt
+
+bierbasis: 
+  just nixos bierbasis home bierbasis
+

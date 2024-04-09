@@ -18,7 +18,6 @@
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
@@ -44,20 +43,14 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
-  # Enable the X11 windowing system.
   services.xserver.enable = true;
-
-  # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
-
-  # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
   };
 
-  # Enable CUPS to print documents.
   services.printing.enable = true;
 
   nix.gc = {
@@ -67,7 +60,6 @@
     options = "--delete-older-than 10d";
   };
 
-  # Enable sound with pipewire.
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -78,16 +70,9 @@
     pulse.enable = true;
     # If you want to use JACK applications, uncomment this
     #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
@@ -95,7 +80,6 @@
     packages = with pkgs; [
       firefox
       kate
-			virt-manager
 			steam-run
       # thunderbird
       quickemu
@@ -139,10 +123,7 @@
     #dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
-  ];
+  environment.systemPackages = with pkgs; [ ];
 
   environment.sessionVariables = rec {
     ELECTRON_OZONE_PLATFORM_HINT = "auto"; # against electron apps flickering on wayland
@@ -153,7 +134,12 @@
     enableSSHSupport = true;
   };
 
-  # services.openssh.enable = true;
+	programs.nix-ld.enable = true;
+	programs.nix-ld.libraries = with pkgs; [
+		# place libraries here
+	];
+  
+  services.openssh.enable = true;
 
   system.stateVersion = "24.05";
 
