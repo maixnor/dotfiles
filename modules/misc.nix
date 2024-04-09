@@ -28,6 +28,8 @@
 		kompare
 		krename
     kdePackages.krdc # RDP client
+    p7zip # ark dependency
+    unrar # ark dependency
 
 		# general development stuff
 		vagrant

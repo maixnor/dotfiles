@@ -28,9 +28,10 @@
 
     globals.mapleader = " ";
 
-    colorschemes.oxocarbon.enable = true;
-
     plugins = {
+      coq-nvim.enable = true;
+      coq-nvim.settings.completion.always = true;
+
       lualine.enable = true;
       fugitive.enable = true;
       tmux-navigator.enable = true;
@@ -40,12 +41,33 @@
       undotree.enable = true;
       nvim-colorizer.enable = true;
       fzf-lua.enable = true;
+      emmet.enable = true;
+      direnv.enable = true;
+      # ollama = { enable = true; };
+      
+      neotest = {
+        enable = true;
+        adapters = {
+          dotnet.enable = true;
+          rust.enable = true;
+        };
+      };
 
       lsp = {
 				enable = true;
 				servers = {
+          nixd.enable = true;
 					lua-ls.enable = true;
-					rust-analyzer.enable = true;
+          omnisharp = {
+            enable = true;
+            settings.enableImportCompletion = true;
+            settings.organizeImportsOnFormat = true;
+          };
+					rust-analyzer = {
+            enable = true;
+            installCargo = true;
+            installRustc = true;
+          };
 					bashls.enable = true;
 					tsserver.enable = true;
 					marksman.enable = true;
@@ -57,11 +79,9 @@
       };
     };
 
-    plugins.lsp.servers.rust-analyzer.installCargo = true;
-    plugins.lsp.servers.rust-analyzer.installRustc = true;
-
-    highlight = {
+    highlightOverride = {
       Comment.fg = "#f47ac9";
+      TreesitterContext.bg = "NONE";
 
       Normal.bg = "NONE";
       NonText.bg = "NONE";
@@ -69,7 +89,8 @@
 			NormalNC.bg = "NONE";
 
       LineNrAbove.fg="#${config.colorScheme.palette.base03}";
-      LineNr.fg="#${config.colorScheme.palette.base04}";
+      LineNr.fg="#${config.colorScheme.palette.base01}";
+      LineNr.bg="#${config.colorScheme.palette.base03}";
       LineNrBelow.fg="#${config.colorScheme.palette.base03}";
     };
 
@@ -112,10 +133,6 @@
       }
     ];
 
-    plugins.cmp = {
-      enable = true;
-      autoEnableSources = true;
-    };
-    plugins.cmp-nvim-lsp.enable = true;
+
   };
 }
