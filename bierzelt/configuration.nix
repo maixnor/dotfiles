@@ -12,7 +12,8 @@
       ../bierbasis/secenv-quick.nix
     ];
 
-	nixpkgs.config.allowUnfreePredicate = _: true;
+  nixpkgs.config.allowUnfree = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -31,6 +32,7 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  networking.nftables.enable = true;
   networking.firewall = { 
     enable = true;
     allowedTCPPortRanges = [ 
