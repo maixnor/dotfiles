@@ -45,13 +45,13 @@
       direnv.enable = true;
       # ollama = { enable = true; };
       
-      neotest = {
-        enable = true;
-        adapters = {
-          dotnet.enable = true;
-          rust.enable = true;
-        };
-      };
+      # neotest = {
+      #   enable = true;
+      #   adapters = {
+      #     dotnet.enable = true;
+      #     rust.enable = true;
+      #   };
+      # };
 
       lsp = {
 				enable = true;
