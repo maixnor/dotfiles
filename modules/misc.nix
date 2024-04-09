@@ -4,6 +4,7 @@
 
   home.packages = with pkgs; [
 		openconnect
+    traceroute
 		gh
 		wget xh
 		freshfetch
