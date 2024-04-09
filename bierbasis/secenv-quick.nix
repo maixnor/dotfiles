@@ -19,7 +19,7 @@
         {
           publicKey = "gwcw/BGNjOKch5LzsztHcNqpmW/NIxmDeIIfs7ElGRQ=";
           presharedKey = "A/d0NDt1ZoYlzAUP/5skFsX8VGwNPI9ZY9FrCRHukAs=";
-          allowedIPs = [ "10.80.0.0/14" ];
+          allowedIPs = [ "10.80.0.0/15" ];
           #allowedIPs = [ "0.0.0.0/0" ];
           endpoint = "128.131.169.157:51980";
         }
