@@ -10,8 +10,8 @@
       ./hardware-configuration.nix
 			#./nextcloud.nix
 			./nvidia.nix
-      ./secenv.nix # secenv environment of uni wien
-      #./secenv-quick.nix # secenv environment of uni wien
+      #./secenv.nix # secenv environment of uni wien
+      ./secenv-quick.nix # secenv environment of uni wien
       #../modules/post-vpn.nix
     ];
 
@@ -86,6 +86,8 @@
       quickgui
 
       wireguard-tools
+      iptables
+      nftables
     ];
   };
 

@@ -13,8 +13,6 @@
 		pandoc
 		ripgrep-all
 		geogebra6
-		parallel
-		direnv
 		krita
 		firefox
     mpv
@@ -33,10 +31,9 @@
     unrar # ark dependency
 
 		# general development stuff
-		vagrant
-		fd clang coreutils just
-		jq jc jo gron yj yq pup
+    vscodium
 		jetbrains.idea-community
+    jetbrains.rider
 
 		# unfree
     obsidian
@@ -48,7 +45,7 @@
     (pkgs.makeDesktopItem {
       name = "vivaldi";
       exec = "vivaldi";
-      icon = "teams";
+      icon = "vivaldi";
       desktopName = "Vivaldi";
     })
 
