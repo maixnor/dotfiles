@@ -107,8 +107,8 @@
   # virtualisation.libvirtd.enable = true;
   environment.systemPackages = with pkgs; [ ];
 
-  environment.sessionVariables = rec {
-    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # against electron apps flickering on wayland
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1"; # against chrome and electron apps flickering on wayland
   };
 
   programs.gnupg.agent = {

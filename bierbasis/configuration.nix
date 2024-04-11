@@ -11,7 +11,7 @@
 			#./nextcloud.nix
 			./nvidia.nix
       #./secenv.nix # secenv environment of uni wien
-      ./secenv-quick.nix # secenv environment of uni wien
+      #./secenv-quick.nix # secenv environment of uni wien
       #../modules/post-vpn.nix
     ];
 
@@ -127,8 +127,8 @@
 
   environment.systemPackages = with pkgs; [ ];
 
-  environment.sessionVariables = rec {
-    ELECTRON_OZONE_PLATFORM_HINT = "auto"; # against electron apps flickering on wayland
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland
   };
 
   programs.gnupg.agent = {
