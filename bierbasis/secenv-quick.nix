@@ -11,7 +11,7 @@
   networking.wireguard.enable = true;
   networking.wg-quick.interfaces = {
     secenv = {
-      address = [ "10.80.2.24/15" ];
+      address = [ "10.80.2.63/15" ];
       #dns = [ "10.81.0.2" ];
       privateKey = "6Ca/50w0vkXqygspYi/LyBjfGeM09K4UrCkdAIjvQH4=";
       

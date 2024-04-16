@@ -13,13 +13,7 @@
       # Determines the IP address and subnet of the client's end of the tunnel interface.
       ips = [ "10.80.2.24/15" ];
       listenPort = 51980; # to match firewall allowedUDPPorts (without this wg uses random port numbers)
-
-      # Path to the private key file.
-      #
-      # Note: The private key can also be included inline via the privateKey option,
-      # but this makes the private key world-readable; thus, using privateKeyFile is
-      # recommended.
-      privateKeyFile = "/home/maixnor/.wireguard/secenv";
+      privateKey = "6Ca/50w0vkXqygspYi/LyBjfGeM09K4UrCkdAIjvQH4=";
 
       peers = [
         # For a client configuration, one peer entry for the server will suffice.
@@ -38,7 +32,7 @@
           endpoint = "128.131.169.157:51980"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
 
           # Send keepalives every 25 seconds. Important to keep NAT tables alive.
-          persistentKeepalive = 15;
+          #persistentKeepalive = 15;
         }
       ];
     };

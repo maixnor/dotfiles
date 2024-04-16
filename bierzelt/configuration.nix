@@ -9,6 +9,7 @@
   imports =
     [
       ./hardware-configuration.nix
+      ../modules/vpns.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
