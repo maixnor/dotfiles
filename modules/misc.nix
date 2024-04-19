@@ -14,7 +14,6 @@
 		ripgrep-all
 		geogebra6
 		krita
-		firefox
     mpv
 
 		# kde
