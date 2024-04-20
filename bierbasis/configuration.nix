@@ -25,7 +25,7 @@
 
   hardware.bluetooth.enable = true;
 
-  networking.hostName = "Bierbasis";
+  networking.hostName = "bierbasis";
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Vienna";
@@ -44,7 +44,7 @@
   };
 
   services.xserver.enable = true;
-  services.xserver.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.xserver.xkb = {
     layout = "us";
