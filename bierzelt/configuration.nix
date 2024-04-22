@@ -9,7 +9,7 @@
   imports =
     [
       ./hardware-configuration.nix
-      ../modules/vpns.nix
+      ##../modules/vpns.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -52,7 +52,7 @@
   services.openssh.enable = true;
 
   services.xserver.enable = true;
-  services.xserver.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.xserver.videoDrivers = [ "displaylink" "modesetting" ];
   services.xserver.xkb = {
@@ -80,10 +80,6 @@
     persistent = true;
     dates = "weekly";
     options = "--delete-older-than 10d";
-  };
-
-  services.openvpn.servers = {
-    wu = { config = '' config ./modules/wu.conf ''; };
   };
 
   sound.enable = true;
