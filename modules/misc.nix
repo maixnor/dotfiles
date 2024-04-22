@@ -15,6 +15,7 @@
 		geogebra6
 		krita
     mpv
+    anki
 
 		# kde
 		kate

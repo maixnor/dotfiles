@@ -78,7 +78,6 @@
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [
-      firefox
       kate
 			steam-run
       # thunderbird
