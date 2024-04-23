@@ -42,9 +42,9 @@ in
         Fingerprinting = true;
       };
       DisablePocket = true;
-      DisableFirefoxAccounts = true;
-      DisableAccounts = true;
-      DisableFirefoxScreenshots = true;
+      DisableFirefoxAccounts = false;
+      DisableAccounts = false;
+      DisableFirefoxScreenshots = false;
       OverrideFirstRunPage = "";
       OverridePostUpdatePage = "";
       DontCheckDefaultBrowser = true;
