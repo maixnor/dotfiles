@@ -36,7 +36,6 @@
     shellAliases = {
 			nix-shell = "export NIXPKGS_ALLOW_UNFREE=1 && nix-shell ";
       ping = "gping";
-      man = "tldr";
       ps = "procs";
       find = "fd";
       ls = "lsd";
