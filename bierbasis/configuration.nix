@@ -101,7 +101,7 @@
     ];  
   }; 
 
-  # virtualisation.docker.enable = true;
+  virtualisation.docker.enable = true;
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
   # needed for uniwien VM
