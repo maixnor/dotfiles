@@ -13,6 +13,7 @@
       #./secenv.nix # secenv environment of uni wien
       #./secenv-quick.nix # secenv environment of uni wien
       #../modules/post-vpn.nix
+      ../modules/services.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
