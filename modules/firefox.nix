@@ -59,10 +59,10 @@ in
         "extensions.pocket.enabled" = lock-false;
         "extensions.screenshots.disabled" = lock-true;
         "browser.topsites.contile.enabled" = lock-false;
-        "browser.formfill.enable" = lock-false;
+        "browser.formfill.enable" = lock-true;
         "browser.search.suggest.enabled" = lock-false;
         "browser.search.suggest.enabled.private" = lock-false;
-        "browser.urlbar.suggest.searches" = lock-false;
+        "browser.urlbar.suggest.searches" = lock-true;
         "browser.urlbar.showSearchSuggestionsFirst" = lock-false;
         "browser.newtabpage.activity-stream.feeds.section.topstories" = lock-false;
         "browser.newtabpage.activity-stream.feeds.snippets" = lock-false;
@@ -73,6 +73,7 @@ in
         "browser.newtabpage.activity-stream.showSponsored" = lock-false;
         "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
+        "network.security.ports.banned.override".Value = "1-10000";
       };
     };
   };
