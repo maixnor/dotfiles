@@ -16,6 +16,7 @@
 		krita
     mpv
     anki
+    zerotierone
 
 		# kde
 		kate
