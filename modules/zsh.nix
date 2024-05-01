@@ -37,10 +37,8 @@
 			nix-shell = "export NIXPKGS_ALLOW_UNFREE=1 && nix-shell ";
       ping = "gping";
       ps = "procs";
-      find = "fd";
       ls = "lsd";
       diff = "delta";
-      cat = "bat";
       cd = "z";
     };
   };
@@ -50,6 +48,7 @@
 	home.packages = with pkgs; [
 		fastfetch
     parallel
+    wl-clipboard # wl-copy wl-paste
 
     bat fd ripgrep delta lsd dust duf # modern replacements
     choose sd cheat tldr gping procs dog # modern replacements
