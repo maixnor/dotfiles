@@ -23,22 +23,35 @@
 		okular
 		spectacle
 		kmail
+    libsForQt5.korganizer
+    libsForQt5.kontact
+    libsForQt5.kmail-account-wizard
 		konsole
 		krusader
 		kompare
 		krename
-    kdePackages.krdc # RDP client
+    ktimetracker
     p7zip # ark dependency
     unrar # ark dependency
 
 		# general development stuff
+    remmina
     vscodium
-		jetbrains.idea-community
+		jetbrains.idea-ultimate
     jetbrains.rider
 
 		# unfree
     obsidian
-    # vivaldi
+
+    # KDE Kontact
+    (pkgs.makeDesktopItem {
+      name = "Kontact";
+      exec = "kontact";
+      icon = "Kontact";
+      desktopName = "Kontact";
+    })
+
+    # vivaldi unfree
     (pkgs.writeShellApplication {
       name = "vivaldi";
       text = "${pkgs.vivaldi}/bin/vivaldi --disable-features=AllowQt";
@@ -50,7 +63,7 @@
       desktopName = "Vivaldi";
     })
 
-		# discord
+		# discord unfree
     (pkgs.writeShellApplication {
       name = "discord";
       text = "${pkgs.discord}/bin/discord --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-features=WaylandWindowDecorations";
