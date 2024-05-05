@@ -11,6 +11,7 @@
       ./hardware-configuration.nix
       ##../modules/vpns.nix
       ../modules/services.nix
+      ../modules/dev.nix
     ];
 
   nixpkgs.config.allowUnfree = true;

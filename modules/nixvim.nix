@@ -67,8 +67,8 @@
           };
 					rust-analyzer = {
             enable = true;
-            installCargo = true;
-            installRustc = true;
+            installCargo = false;
+            installRustc = false;
           };
 					bashls.enable = true;
 					tsserver.enable = true;
