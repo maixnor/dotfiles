@@ -30,6 +30,7 @@ in
         vimium
         tree-style-tab
         simple-translate
+        add-custom-search-engine
       ];
     };
     policies = {
