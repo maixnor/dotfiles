@@ -23,14 +23,22 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  # faster boot, don't wait on network
+  systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
+  systemd.services.NetworkManager-wait-online.enable = false;
+
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
 	boot.kernelPackages = pkgs.linuxPackages_latest;
 
   hardware.bluetooth.enable = true;
 
-  networking.hostName = "bierbasis";
-  networking.networkmanager.enable = true;
+  networking = {
+    hostName = "bierbasis";
+    networkmanager.enable = true;
+    dhcpcd.extraConfig = "noarp";
+    dhcpcd.wait = "background";
+  };
 
   time.timeZone = "Europe/Vienna";
 
@@ -106,6 +114,7 @@
   }; 
 
   virtualisation.docker.enable = true;
+  virtualisation.docker.enableOnBoot = false; # boot performance
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
   # needed for uniwien VM
