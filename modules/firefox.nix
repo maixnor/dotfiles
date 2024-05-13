@@ -25,7 +25,6 @@ in
         ublock-origin
         decentraleyes
         privacy-badger
-        windscribe
         youtube-recommended-videos
         vimium
         tree-style-tab
