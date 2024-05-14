@@ -27,6 +27,7 @@
       libsForQt5.korganizer
       libsForQt5.kontact
       libsForQt5.kmail-account-wizard
+      libsForQt5.kclock
       konsole
       krusader
       kompare
@@ -40,6 +41,8 @@
       vscodium
       jetbrains.idea-ultimate
       jetbrains.rider
+      inotify-tools
+      rstudio
 
       # unfree
       obsidian
