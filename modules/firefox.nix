@@ -30,6 +30,7 @@ in
         tree-style-tab
         simple-translate
         add-custom-search-engine
+        gesturefy
       ];
     };
     policies = {

@@ -2,6 +2,10 @@
 
 {
 
+  home.packages = with pkgs; [
+    wl-clipboard
+  ];
+
   programs.nixvim = {
     enable = true;
 		enableMan = true;
@@ -30,10 +34,18 @@
 
     colorschemes.oxocarbon.enable = true;
 
-    plugins = {
-      coq-nvim.enable = true;
-      coq-nvim.settings.completion.always = true;
+    plugins.cmp.enable = true;
+    plugins.cmp.settings.mapping = {
+      "<C-Space>" = "cmp.mapping.complete()";
+      "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+      "<C-c>" = "cmp.mapping.close()";
+      "<C-u>" = "cmp.mapping.scroll_docs(4)";
+      "<CR>" = "cmp.mapping.confirm({ select = true })";
+      "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+      "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+    };
 
+    plugins = {
       lualine.enable = true;
       fugitive.enable = true;
       tmux-navigator.enable = true;
@@ -73,6 +85,13 @@
 					bashls.enable = true;
 					tsserver.enable = true;
 					marksman.enable = true;
+          ltex = {
+            enable = true;
+            settings.enabled = true;
+            settings.checkFrequency = "edit";
+            settings.language = "de-AT";
+            settings.statusBarItem = true;
+          };
 
 					html.enable = true;
 					jsonls.enable = true;

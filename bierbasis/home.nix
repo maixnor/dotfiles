@@ -63,9 +63,6 @@
     LANG = "en_US.UTF-8";
   };
 
-  home.packages = [
-  ];
-
   home.file = {
   };
 

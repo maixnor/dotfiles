@@ -47,12 +47,15 @@ config = {
 
   home.stateVersion = "23.11";
 
+  home.packages = with pkgs; [
+    wl-clipboard
+  ];
+
   programs.home-manager.enable = true;
   programs.git = {
     enable = true;
     userName = "maixnor";
     userEmail = "46966993+maixnor@users.noreply.github.com";
-		lfs.enable = true;
 		extraConfig = {
 			pull.rebase = true;
 			rebase.autoStash = true;
