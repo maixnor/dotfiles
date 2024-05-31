@@ -45,7 +45,16 @@
       rstudio
 
       # unfree
-      obsidian
+      (writeShellApplication {
+        name = "obsidian";
+        text = "${obsidian}/bin/obsidian --disable-gpu";
+      })
+      (makeDesktopItem {
+        name = "obsidian";
+        exec = "obsidian";
+        icon = "obsidian";
+        desktopName = "Obsidian";
+      })
 
       # KDE Kontact
       (makeDesktopItem {
