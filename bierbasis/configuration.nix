@@ -6,15 +6,16 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ 
+      inputs.stylix.nixosModules.stylix
+      inputs.nixvim.nixosModules.nixvim
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
-			#./nextcloud.nix
 			./nvidia.nix
-      #./secenv.nix # secenv environment of uni wien
-      #./secenv-quick.nix # secenv environment of uni wien
-      #../modules/post-vpn.nix
       ../modules/services.nix
       ../modules/dev.nix
+      ../modules/stylix.nix
+      ../modules/nixvim.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -83,7 +84,6 @@
     # If you want to use JACK applications, uncomment this
     #jack.enable = true;
   };
-
 
   users.users.maixnor = {
     isNormalUser = true;

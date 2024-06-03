@@ -2,7 +2,7 @@
 
 {
 
-  home.packages = with pkgs; [
+  environment.systemPackages = with pkgs; [
     wl-clipboard
   ];
 
@@ -108,11 +108,6 @@
       NonText.bg = "NONE";
 			Normal.ctermbg = "NONE";
 			NormalNC.bg = "NONE";
-
-      LineNrAbove.fg="#${config.colorScheme.palette.base03}";
-      LineNr.fg="#${config.colorScheme.palette.base01}";
-      LineNr.bg="#${config.colorScheme.palette.base03}";
-      LineNrBelow.fg="#${config.colorScheme.palette.base03}";
     };
 
     keymaps = [

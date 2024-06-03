@@ -16,9 +16,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-colors.url = "github:misterio77/nix-colors";
+    stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, ... } @inputs :
+  outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
@@ -31,7 +32,7 @@
     in {
 
 			nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
-				specialArgs = { inherit system; inherit inputs; };
+				specialArgs = { inherit system; inherit inputs; inherit home-manager; };
 				modules = [ ./bierbasis/configuration.nix ];
 			};
 

@@ -16,7 +16,6 @@
 
   programs.ripgrep.enable = true;
   programs.bat.enable = true;
-	programs.bat.config.theme = "Dracula";
   programs.translate-shell.enable = true;
 
   programs.zoxide = {

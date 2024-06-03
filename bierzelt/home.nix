@@ -7,7 +7,7 @@
     inputs.nixvim.homeManagerModules.nixvim
     ../modules/tmux.nix
 		../modules/nixvim.nix
-		../modules/alacritty.nix
+		../modules/terminal.nix
 		../modules/kdeconnect.nix
 		../modules/office.nix
 		../modules/misc.nix
@@ -47,9 +47,10 @@ config = {
 
   home.stateVersion = "23.11";
 
-  home.packages = with pkgs; [
-    wl-clipboard
-  ];
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    LANG = "en_US.UTF-8";
+  };
 
   programs.home-manager.enable = true;
   programs.git = {
