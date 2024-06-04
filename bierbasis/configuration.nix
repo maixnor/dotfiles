@@ -7,14 +7,14 @@
 {
   imports =
     [ 
-      inputs.stylix.nixosModules.stylix
+      #inputs.stylix.nixosModules.stylix
       inputs.nixvim.nixosModules.nixvim
       # Include the results of the hardware scan.
       ./hardware-configuration.nix
 			./nvidia.nix
       ../modules/services.nix
       ../modules/dev.nix
-      ../modules/stylix.nix
+      #../modules/stylix.nix
       ../modules/nixvim.nix
     ];
 
