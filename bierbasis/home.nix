@@ -82,6 +82,9 @@
     opacity = {
       terminal = 0.8;
     };
+    targets.gnome.enable = false;
+    targets.gtk.enable = false;
+    targets.kde.enable = false;
   };
 
   # Let Home Manager install and manage itself.
