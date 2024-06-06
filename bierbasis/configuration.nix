@@ -6,10 +6,11 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
-			#./nextcloud.nix
-			./nvidia.nix
+      #./nextcloud.nix
+      ./nvidia.nix
       #./secenv.nix # secenv environment of uni wien
       #./secenv-quick.nix # secenv environment of uni wien
       #../modules/post-vpn.nix
@@ -29,7 +30,7 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-	boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   hardware.bluetooth.enable = true;
 

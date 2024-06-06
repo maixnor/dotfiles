@@ -12,15 +12,16 @@
   imports = [
     inputs.nix-colors.homeManagerModules.default
     inputs.nixvim.homeManagerModules.nixvim
+    inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
-		../modules/nixvim.nix
-		../modules/alacritty.nix
-		../modules/kdeconnect.nix
-		../modules/office.nix
-		../modules/misc.nix
-		../modules/zsh.nix
-		../modules/ollama.nix
-		../modules/graphics.nix
+    ../modules/nixvim.nix
+    ../modules/alacritty.nix
+    ../modules/kdeconnect.nix
+    ../modules/office.nix
+    ../modules/misc.nix
+    ../modules/zsh.nix
+    ../modules/ollama.nix
+    ../modules/graphics.nix
     ../modules/firefox.nix
   ];
 
@@ -63,10 +64,29 @@
     LANG = "en_US.UTF-8";
   };
 
-  home.packages = [
-  ];
-
-  home.file = {
+  stylix = {
+    image = pkgs.fetchurl {
+      url = "https://upload.wikimedia.org/wikipedia/commons/3/36/Golden_Horn_Metro_Bridge_Mars_2013.jpg";
+      sha256 = "sha256-pcTdVAjM2cPJrwHdS61wvpH4pJJlTcE5LlDbJHe1Kno=";
+    };
+    polarity = "dark";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
+    fonts = {
+      monospace = {
+        name = "Fira Code";
+        package = pkgs.fira-code;
+      };
+      sizes = {
+        desktop = 12;
+        terminal = 16;
+      };
+    };
+    opacity = {
+      terminal = 0.8;
+    };
+    targets.gnome.enable = false;
+    targets.gtk.enable = false;
+    targets.kde.enable = false;
   };
 
   # Let Home Manager install and manage itself.
@@ -75,12 +95,12 @@
     enable = true;
     userName = "maixnor";
     userEmail = "46966993+maixnor@users.noreply.github.com";
-		extraConfig = {
-			pull.rebase = true;
-			rebase.autoStash = true;
-			init.defaultBranch = "main";
-			push.autoSetupRemote = true;
-			credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
+      extraConfig = {
+        pull.rebase = true;
+        rebase.autoStash = true;
+        init.defaultBranch = "main";
+        push.autoSetupRemote = true;
+        credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
     };
 	};
 }
