@@ -1,11 +1,21 @@
 { config, lib, pkgs, ... }:
 {
 
-  # Enable OpenGL
+  # OpenGL
   hardware.opengl = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    driSupport = lib.mkDefault true;
+    driSupport32Bit = lib.mkDefault true;
+
+    #---------------------------------------------------------------------
+    # Install additional packages that improve graphics performance and compatibility.
+    #---------------------------------------------------------------------
+    extraPackages = with pkgs; [
+      libvdpau-va-gl
+      nvidia-vaapi-driver
+      vaapiVdpau
+      vulkan-validation-layers
+    ];
   };
 
   # Load nvidia driver for Xorg and Wayland
@@ -36,7 +46,24 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
+
+  # Set environment variables related to NVIDIA graphics
+  environment.variables = {
+    GBM_BACKEND = "nvidia-drm";
+    LIBVA_DRIVER_NAME = "nvidia";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
+
+  # Packages related to NVIDIA graphics
+  environment.systemPackages = with pkgs; [
+    clinfo
+    gwe
+    nvtopPackages.nvidia
+    virtualglLib
+    vulkan-loader
+    vulkan-tools
+  ];
 
 }
