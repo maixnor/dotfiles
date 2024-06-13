@@ -65,6 +65,11 @@
   };
 
   services.printing.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
 
   # Battery Saving
 	services.auto-cpufreq.enable = true;
