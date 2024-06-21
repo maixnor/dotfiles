@@ -4,16 +4,18 @@
   # OpenGL
   hardware.graphics = {
     enable = true;
-    driSupport32Bit = lib.mkDefault true;
-
-    #---------------------------------------------------------------------
     # Install additional packages that improve graphics performance and compatibility.
-    #---------------------------------------------------------------------
     extraPackages = with pkgs; [
       libvdpau-va-gl
       nvidia-vaapi-driver
       vaapiVdpau
       vulkan-validation-layers
+      # graphics utilties
+      wayland-utils
+      xorg.xwininfo
+      vulkan-tools
+      glxinfo
+      clinfo
     ];
   };
 
@@ -45,7 +47,7 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
   # Set environment variables related to NVIDIA graphics

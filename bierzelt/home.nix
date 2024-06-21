@@ -13,7 +13,6 @@
 		../modules/misc.nix
 		../modules/zsh.nix
 		../modules/ollama.nix
-		../modules/graphics.nix
     ../modules/firefox.nix
   ];
 

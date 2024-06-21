@@ -57,13 +57,21 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
-  services.xserver.enable = true;
+  xdg = {
+    autostart.enable = true;
+    icons.enable = true;
+    menus.enable = true;
+    mime.enable = true;
+  };
+
   services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
   };
+  systemd.defaultUnit = "graphical.target";
 
   services.printing.enable = true;
   services.avahi = {
@@ -97,6 +105,8 @@
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [
+      nixos-icons
+      xdg-utils
       # stuff 
     ];
   };
