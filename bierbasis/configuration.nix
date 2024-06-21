@@ -64,14 +64,13 @@
     mime.enable = true;
   };
 
+  fonts.enableDefaultPackages = lib.mkDefault true;
+
+  services.xserver.enable = true;
+
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "workman";
-  };
-  systemd.defaultUnit = "graphical.target";
 
   services.printing.enable = true;
   services.avahi = {
