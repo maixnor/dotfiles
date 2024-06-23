@@ -97,7 +97,7 @@
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [
-      # stuff 
+      # pkgs go here
     ];
   };
 

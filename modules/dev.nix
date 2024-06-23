@@ -11,6 +11,9 @@
       dotnet-aspnetcore_8
 
       tectonic
+
+      jdk
+      eclipses.eclipse-java
     ];
   };
 }

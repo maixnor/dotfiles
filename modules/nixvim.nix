@@ -46,13 +46,14 @@
       direnv.enable = true;
       # ollama = { enable = true; };
       
-      # neotest = {
-      #   enable = true;
-      #   adapters = {
-      #     dotnet.enable = true;
-      #     rust.enable = true;
-      #   };
-      # };
+      neotest = {
+        enable = true;
+        adapters = {
+          # dotnet.enable = true;
+          # rust.enable = true;
+          java.enable = true;
+        };
+      };
 
       lsp = {
         enable = true;
@@ -64,6 +65,7 @@
             settings.enableImportCompletion = true;
             settings.organizeImportsOnFormat = true;
           };
+          java-language-server.enable = true;
           rust-analyzer = {
             enable = true;
             installCargo = false;
@@ -133,7 +135,5 @@
         key = "<leader>u";
       }
     ];
-
-
   };
 }
