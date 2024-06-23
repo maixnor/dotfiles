@@ -44,7 +44,10 @@
       fzf-lua.enable = true;
       emmet.enable = true;
       direnv.enable = true;
-      # ollama = { enable = true; };
+      ollama = { 
+        enable = true; 
+        model = "llama3";
+      };
       
       lsp = {
         enable = true;
