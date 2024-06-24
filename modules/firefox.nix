@@ -19,7 +19,23 @@ in
 
   programs.firefox = {
     enable = true;
+    profiles.post = {
+      id = 10;
+      name = "post";
+      extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
+        darkreader
+        ublock-origin
+        decentraleyes
+        privacy-badger
+        vimium
+        tree-style-tab
+        add-custom-search-engine
+      ];
+    };
     profiles.maixnor = {
+      id = 0;
+      name = "maixnor";
+      isDefault = true;
       extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
         darkreader
         ublock-origin
@@ -75,6 +91,7 @@ in
         "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
         "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
         "network.security.ports.banned.override".Value = "1-10000";
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
       };
     };
   };

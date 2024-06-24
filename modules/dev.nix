@@ -16,7 +16,6 @@
       rPackages.rmarkdown
       rPackages.knitr
       rPackages.vioplot
-      rPackages.RDocumentation
       rPackages.emdbook
       pandoc
       # only for Rstudio, normally use tectonic

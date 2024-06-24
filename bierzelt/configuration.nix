@@ -66,19 +66,6 @@
 
   services.printing.enable = true;
 
-  # Battery Saving
-	services.auto-cpufreq.enable = true;
-	services.auto-cpufreq.settings = {
-		battery = {
-			 governor = "powersave";
-			 turbo = "never";
-		};
-		charger = {
-			 governor = "performance";
-			 turbo = "auto";
-		};
-	};
-
   nix.gc = {
     automatic = true;
     persistent = true;
