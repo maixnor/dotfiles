@@ -31,6 +31,7 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
+  boot.initrd.kernelModules = ["i915"];
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   hardware.bluetooth.enable = true;
@@ -58,8 +59,10 @@
   };
 
   services.xserver.enable = true;
+  services.displayManager.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
@@ -97,6 +100,7 @@
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [
+      nh
       # pkgs go here
     ];
   };
@@ -126,6 +130,7 @@
     acceleration = "cuda";
     environmentVariables = {
       HOME = "/tmp/ollama";
+      FLAKE = "/home/maixnor/dotfiles";
     };
   };
 
@@ -140,6 +145,14 @@
 
 	programs.nix-ld.enable = true;
 	programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc
+    zlib
+    fuse3
+    icu
+    nss
+    openssl
+    curl
+    expat
 		# place libraries here
 	];
   

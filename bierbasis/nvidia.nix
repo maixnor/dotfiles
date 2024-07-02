@@ -2,10 +2,8 @@
 {
 
   # OpenGL
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = lib.mkDefault true;
-    driSupport32Bit = lib.mkDefault true;
 
     #---------------------------------------------------------------------
     # Install additional packages that improve graphics performance and compatibility.
@@ -20,6 +18,7 @@
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
+  boot.kernelParams = [ "nvidia-drm.modeset=1" ];
 
   hardware.nvidia = {
 
@@ -46,7 +45,7 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
   };
 
   # Set environment variables related to NVIDIA graphics
