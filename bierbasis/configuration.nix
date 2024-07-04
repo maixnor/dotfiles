@@ -33,6 +33,7 @@
 
   boot.initrd.kernelModules = ["i915"];
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "nvidia_drm.modeset=1" ];
 
   hardware.bluetooth.enable = true;
 
