@@ -7,14 +7,13 @@
 {
   imports =
     [ 
-      #inputs.stylix.nixosModules.stylix
+      inputs.stylix.nixosModules.stylix
       inputs.nixvim.nixosModules.nixvim
-      # Include the results of the hardware scan.
       ./hardware-configuration.nix
 			./nvidia.nix
       ../modules/services.nix
       ../modules/dev.nix
-      #../modules/stylix.nix
+      ../modules/stylix.nix
       ../modules/nixvim.nix
     ];
 
@@ -59,6 +58,12 @@
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
