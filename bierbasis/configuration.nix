@@ -64,6 +64,13 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+
+  security.pam.services.swaylock = {};
+
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
