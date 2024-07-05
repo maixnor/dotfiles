@@ -30,9 +30,8 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-  boot.initrd.kernelModules = ["i915"];
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ "nvidia_drm.modeset=1" ];
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia-drm.fbdev=1" ];
 
   hardware.bluetooth.enable = true;
 
