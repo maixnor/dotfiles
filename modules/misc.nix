@@ -17,17 +17,15 @@
       krita
       mpv
       anki
-      zerotierone
 
       # kde
       kate
       okular
       spectacle
       kmail
-      libsForQt5.korganizer
-      libsForQt5.kontact
-      libsForQt5.kmail-account-wizard
-      libsForQt5.kclock
+      kdePackages.korganizer
+      kdePackages.kontact
+      kdePackages.kmail-account-wizard
       konsole
       krusader
       kompare
@@ -39,10 +37,13 @@
       # general development stuff
       remmina
       vscodium
+<<<<<<< HEAD
       jetbrains.idea-ultimate
       jetbrains.rider
       inotify-tools
       rstudio
+=======
+>>>>>>> save
 
       # unfree
       (writeShellApplication {

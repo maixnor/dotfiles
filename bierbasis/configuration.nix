@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, inputs, ... }:
+{ lib, pkgs, inputs, ... }:
 
 {
   imports =
@@ -10,7 +10,12 @@
       inputs.stylix.nixosModules.stylix
       inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
-			./nvidia.nix
+      #./nextcloud.nix
+      ./nvidia.nix
+      ./gaming.nix
+      #./secenv.nix # secenv environment of uni wien
+      #./secenv-quick.nix # secenv environment of uni wien
+      #../modules/post-vpn.nix
       ../modules/services.nix
       ../modules/dev.nix
       ../modules/stylix.nix
@@ -29,7 +34,9 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-	boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.initrd.kernelModules = ["i915"];
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "nvidia_drm.modeset=1" ];
 
   hardware.bluetooth.enable = true;
 
@@ -56,6 +63,7 @@
   };
 
   services.xserver.enable = true;
+  services.displayManager.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
@@ -64,12 +72,22 @@
     xwayland.enable = true;
   };
 
+<<<<<<< HEAD
+=======
+  security.pam.services.swaylock = {};
+
+>>>>>>> save
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
   };
 
   services.printing.enable = true;
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
 
   nix.gc = {
     automatic = true;
@@ -95,15 +113,8 @@
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
     packages = with pkgs; [
-      kate
-			steam-run
-      # thunderbird
-      quickemu
-      quickgui
-
-      wireguard-tools
-      iptables
-      nftables
+      nh
+      # pkgs go here
     ];
   };
 
@@ -132,17 +143,9 @@
     acceleration = "cuda";
     environmentVariables = {
       HOME = "/tmp/ollama";
+      FLAKE = "/home/maixnor/dotfiles";
     };
   };
-
-  programs.steam = {
-    enable = true;
-    # disable until needed 
-    #remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    #dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-  };
-
-  environment.systemPackages = with pkgs; [ ];
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland
@@ -155,23 +158,18 @@
 
 	programs.nix-ld.enable = true;
 	programs.nix-ld.libraries = with pkgs; [
+    stdenv.cc.cc
+    zlib
+    fuse3
+    icu
+    nss
+    openssl
+    curl
+    expat
 		# place libraries here
 	];
   
   services.openssh.enable = true;
-
-  system.autoUpgrade = {
-    enable = true;
-    persistent = true;
-    flake = inputs.self.outPath;
-    flags = [
-      "--update-input"
-      "nixpkgs"
-      "-L" # print build logs
-    ];
-    dates = "02:00";
-    randomizedDelaySec = "45min";
-  };
 
   system.stateVersion = "24.05";
 
