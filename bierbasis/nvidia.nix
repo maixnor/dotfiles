@@ -18,7 +18,7 @@
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
-  boot.kernelParams = [ "nvidia-drm.modeset=1" ];
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia-drm.fbdev=1" ];
 
   hardware.nvidia = {
 
