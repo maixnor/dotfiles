@@ -11,10 +11,8 @@
 
   imports = [
     inputs.nix-colors.homeManagerModules.default
-    inputs.nixvim.homeManagerModules.nixvim
     inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
-    ../modules/nixvim.nix
     ../modules/alacritty.nix
     ../modules/kdeconnect.nix
     ../modules/office.nix
@@ -64,8 +62,6 @@
     LANG = "en_US.UTF-8";
   };
 
-<<<<<<< HEAD
-=======
   stylix = {
     image = pkgs.fetchurl {
       url = "https://upload.wikimedia.org/wikipedia/commons/3/36/Golden_Horn_Metro_Bridge_Mars_2013.jpg";
@@ -91,7 +87,6 @@
     targets.kde.enable = false;
   };
 
->>>>>>> save
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   programs.git = {

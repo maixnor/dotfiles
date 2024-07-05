@@ -37,13 +37,7 @@
       # general development stuff
       remmina
       vscodium
-<<<<<<< HEAD
-      jetbrains.idea-ultimate
-      jetbrains.rider
       inotify-tools
-      rstudio
-=======
->>>>>>> save
 
       # unfree
       (writeShellApplication {

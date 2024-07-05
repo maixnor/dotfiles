@@ -10,12 +10,8 @@
       inputs.stylix.nixosModules.stylix
       inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
-      #./nextcloud.nix
       ./nvidia.nix
       ./gaming.nix
-      #./secenv.nix # secenv environment of uni wien
-      #./secenv-quick.nix # secenv environment of uni wien
-      #../modules/post-vpn.nix
       ../modules/services.nix
       ../modules/dev.nix
       ../modules/stylix.nix
@@ -72,11 +68,8 @@
     xwayland.enable = true;
   };
 
-<<<<<<< HEAD
-=======
   security.pam.services.swaylock = {};
 
->>>>>>> save
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
@@ -133,10 +126,6 @@
   virtualisation.docker.enableOnBoot = false; # boot performance
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
-  # needed for uniwien VM
-  # virtualisation.virtualbox.host.enable = true;
-  # virtualisation.virtualbox.guest.enable = true;
-  # users.extraGroups.vboxusers.members = [ "maixnor" ];
 
   services.ollama = {
     enable = true;

@@ -101,10 +101,6 @@
 
       Normal.bg = "NONE";
       NonText.bg = "NONE";
-<<<<<<< HEAD
-			Normal.ctermbg = "NONE";
-			NormalNC.bg = "NONE";
-=======
       Normal.ctermbg = "NONE";
       NormalNC.bg = "NONE";
 
@@ -112,7 +108,6 @@
       LineNr.fg="#${config.colorScheme.palette.base01}";
       LineNr.bg="#${config.colorScheme.palette.base03}";
       LineNrBelow.fg="#${config.colorScheme.palette.base03}";
->>>>>>> save
     };
 
     keymaps = [
