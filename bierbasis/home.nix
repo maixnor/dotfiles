@@ -13,7 +13,7 @@
     inputs.nix-colors.homeManagerModules.default
     inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
-    ../modules/alacritty.nix
+    ../modules/terminal.nix
     ../modules/kdeconnect.nix
     ../modules/office.nix
     ../modules/misc.nix
@@ -76,15 +76,13 @@
       };
       sizes = {
         desktop = 12;
-        terminal = 16;
+        terminal = 18;
       };
     };
     opacity = {
       terminal = 0.8;
     };
-    targets.gnome.enable = false;
-    targets.gtk.enable = false;
-    targets.kde.enable = false;
+    targets.alacritty.enable = true;
   };
 
   # Let Home Manager install and manage itself.

@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... }:
 {
 
-  # OpenGL
+  # Opengl
   hardware.graphics = {
     enable = true;
 
-    #---------------------------------------------------------------------
     # Install additional packages that improve graphics performance and compatibility.
-    #---------------------------------------------------------------------
     extraPackages = with pkgs; [
       libvdpau-va-gl
       nvidia-vaapi-driver
@@ -16,20 +14,15 @@
     ];
   };
 
-  # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
-  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia-drm.fbdev=1" ];
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia-drm.fbdev=1" "module_blacklist=i915" ];
 
   hardware.nvidia = {
-
-    # Modesetting is required.
+    # Required
     modesetting.enable = true;
-
-    # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
     powerManagement.enable = true;
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = false;
+    forceFullCompositionPipeline = true;
 
     # Use the NVidia open source kernel module (not to be confused with the
     # independent third-party "nouveau" open source driver).
@@ -39,13 +32,9 @@
     # Only available from driver 515.43.04+
     # Currently alpha-quality/buggy, so false is currently the recommended setting.
     open = false;
-
-    # Enable the Nvidia settings menu,
-		# accessible via `nvidia-settings`.
     nvidiaSettings = true;
 
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   # Set environment variables related to NVIDIA graphics
