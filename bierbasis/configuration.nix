@@ -88,7 +88,6 @@
     options = "--delete-older-than 10d";
   };
 
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
