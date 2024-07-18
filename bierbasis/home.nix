@@ -21,6 +21,7 @@
     ../modules/ollama.nix
     ../modules/graphics.nix
     ../modules/firefox.nix
+    ../modules/minecraft.nix
   ];
 
 	colorScheme = {

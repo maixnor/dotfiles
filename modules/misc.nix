@@ -26,6 +26,7 @@
       kdePackages.korganizer
       kdePackages.kontact
       kdePackages.kmail-account-wizard
+      kdePackages.plasma-disks
       konsole
       krusader
       kompare
