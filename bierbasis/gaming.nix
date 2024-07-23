@@ -9,9 +9,15 @@
   environment.systemPackages = with pkgs; [
     protonup
     mangohud
-    lutris
     bottles
+    lutris
     steam-run
+
+    winetricks
+    protontricks
+    wine-wayland
+    winePackages.fonts
+    winePackages.stable
   ];
 
 }

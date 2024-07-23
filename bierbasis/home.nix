@@ -2,15 +2,12 @@
 
 {
 
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
   home.username = "maixnor";
   home.homeDirectory = "/home/maixnor";
 
   nixpkgs.config.allowUnfree = true;
 
   imports = [
-    inputs.nix-colors.homeManagerModules.default
     inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
     ../modules/terminal.nix
@@ -23,30 +20,6 @@
     ../modules/firefox.nix
     ../modules/minecraft.nix
   ];
-
-	colorScheme = {
-    slug = "oxocarbon";
-    name = "Oxocarbon Dark";
-    author = "shaunsingh/IBM";
-    palette = {
-      base00 = "#161616";
-      base01 = "#262626";
-      base02 = "#393939";
-      base03 = "#525252";
-      base04 = "#dde1e6";
-      base05 = "#f2f4f8";
-      base06 = "#ffffff";
-      base07 = "#08bdba";
-      base08 = "#3ddbd9";
-      base09 = "#78a9ff";
-      base0A = "#ee5396";
-      base0B = "#33b1ff";
-      base0C = "#ff7eb6";
-      base0D = "#42be65";
-      base0E = "#be95ff";
-      base0F = "#82cfff";
-    };
-  };
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -64,6 +37,7 @@
   };
 
   stylix = {
+    enable = true;
     image = pkgs.fetchurl {
       url = "https://upload.wikimedia.org/wikipedia/commons/3/36/Golden_Horn_Metro_Bridge_Mars_2013.jpg";
       sha256 = "sha256-pcTdVAjM2cPJrwHdS61wvpH4pJJlTcE5LlDbJHe1Kno=";
@@ -76,14 +50,19 @@
         package = pkgs.fira-code;
       };
       sizes = {
-        desktop = 12;
-        terminal = 18;
+        desktop = 14;
+        popups = 14;
+        terminal = 16;
       };
     };
     opacity = {
       terminal = 0.8;
+      desktop = 0.95;
+      popups = 0.8;
     };
     targets.alacritty.enable = true;
+    targets.nixvim.transparent_bg.main = true;
+    targets.nixvim.transparent_bg.sign_column = true;
   };
 
   # Let Home Manager install and manage itself.
