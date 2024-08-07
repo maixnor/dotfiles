@@ -18,6 +18,8 @@
     wine-wayland
     winePackages.fonts
     winePackages.stable
+
+    corefonts
   ];
 
 }

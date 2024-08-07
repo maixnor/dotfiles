@@ -124,14 +124,14 @@
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-    environmentVariables = {
-      HOME = "/tmp/ollama";
-      FLAKE = "/home/maixnor/dotfiles";
-    };
-  };
+  # services.ollama = {
+  #   enable = true;
+  #   acceleration = "cuda";
+  #   environmentVariables = {
+  #     HOME = "/tmp/ollama";
+  #     FLAKE = "/home/maixnor/dotfiles";
+  #   };
+  # };
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland
