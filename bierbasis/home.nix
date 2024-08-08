@@ -61,8 +61,8 @@
       popups = 0.8;
     };
     targets.alacritty.enable = true;
-    targets.nixvim.transparent_bg.main = true;
-    targets.nixvim.transparent_bg.sign_column = true;
+    targets.nixvim.transparentBackground.main = true;
+    targets.nixvim.transparentBackground.signColumn = true;
   };
 
   # Let Home Manager install and manage itself.

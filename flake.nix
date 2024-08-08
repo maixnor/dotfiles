@@ -17,13 +17,15 @@
     };
     nix-colors.url = "github:misterio77/nix-colors";
     stylix.url = "github:danth/stylix";
+    nixpkgs-mozilla.url = "github:mozilla/nixpkgs-mozilla";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, stylix, ... } @inputs :
+  outputs = { nixpkgs, home-manager, nixvim, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
         inherit system;
+        overlays = [ inputs.nixpkgs-mozilla.overlay ];
         config = {
             allowUnfree = true;
         };

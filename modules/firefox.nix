@@ -1,6 +1,6 @@
 { pkgs, inputs, ... }:
 
-let
+let 
   lock-false = {
     Value = false;
     Status = "locked";
@@ -11,7 +11,6 @@ let
   };
 in
 {
-
   home.sessionVariables = {
     MOZ_USE_XINPUT2 = "1";
     MOZ_ENABLE_WAYLAND = "1 firefox";
@@ -19,6 +18,7 @@ in
 
   programs.firefox = {
     enable = true;
+    package = pkgs.latest.firefox-nightly-bin;
     profiles.post = {
       id = 10;
       name = "post";
