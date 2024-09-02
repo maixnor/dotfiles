@@ -19,7 +19,6 @@
     winePackages.fonts
     winePackages.stable
 
-    corefonts
   ];
 
 }
