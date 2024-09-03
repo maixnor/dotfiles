@@ -9,7 +9,6 @@
   imports =
     [
       ./hardware-configuration.nix
-      ##../modules/vpns.nix
       ../modules/services.nix
       ../modules/dev.nix
     ];
@@ -24,10 +23,15 @@
 
   hardware.bluetooth.enable = true;
 
+  services.zerotierone = {
+    enable = true;
+    joinNetworks = ["8056C2E21CF844AA"];
+  };
+
   networking.hostName = "bierzelt";
   networking.networkmanager.enable = true;
 
-  networking.nftables.enable = true;
+  #networking.nftables.enable = true;
   networking.firewall = { 
     enable = true;
     allowedTCPPortRanges = [ 
