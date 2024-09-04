@@ -4,11 +4,8 @@
   
 	imports = [
     inputs.nix-colors.homeManagerModules.default
-    inputs.nixvim.homeManagerModules.nixvim
     ../modules/tmux.nix
-		../modules/nixvim.nix
 		../modules/terminal.nix
-		../modules/kdeconnect.nix
 		../modules/office.nix
 		../modules/misc.nix
 		../modules/zsh.nix

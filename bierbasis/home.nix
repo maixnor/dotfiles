@@ -11,7 +11,6 @@
     inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
     ../modules/terminal.nix
-    ../modules/kdeconnect.nix
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/zsh.nix
@@ -60,7 +59,6 @@
       desktop = 0.95;
       popups = 0.8;
     };
-    targets.alacritty.enable = true;
     targets.nixvim.transparentBackground.main = true;
     targets.nixvim.transparentBackground.signColumn = true;
   };

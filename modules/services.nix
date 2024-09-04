@@ -9,8 +9,6 @@
       server.bind_address = "0.0.0.0";
       server.secret_key = "definetelysecret";
     };
-
   };
-  
 
 }

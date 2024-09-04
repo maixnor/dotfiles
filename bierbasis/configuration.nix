@@ -42,6 +42,11 @@
     dhcpcd.wait = "background";
   };
 
+  services.zerotierone = {
+    enable = true;
+    joinNetworks = ["8056C2E21CF844AA"];
+  };
+
   time.timeZone = "Europe/Vienna";
 
   i18n.defaultLocale = "en_US.UTF-8";
@@ -62,9 +67,14 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  programs.hyprland = {
-    enable = true;
-  };
+#  programs.hyprland = {
+#    enable = true;
+#  };
+
+  environment.systemPackages = with pkgs; [ 
+    wormhole-william
+    kdePackages.kdeconnect-kde
+  ];
 
   security.pam.services.swaylock = {};
 

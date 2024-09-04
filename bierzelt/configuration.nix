@@ -8,9 +8,13 @@
 {
   imports =
     [
+      inputs.stylix.nixosModules.stylix
+      inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
       ../modules/services.nix
       ../modules/dev.nix
+      ../modules/stylix.nix
+      ../modules/nixvim.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -18,6 +22,10 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  # faster boot, don't wait on network
+  systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
+  systemd.services.NetworkManager-wait-online.enable = false;
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
@@ -101,7 +109,10 @@
 
   # virtualisation.docker.enable = true;
   # virtualisation.libvirtd.enable = true;
-  environment.systemPackages = with pkgs; [ ];
+  environment.systemPackages = with pkgs; [ 
+    wormhole-william
+    kdePackages.kdeconnect-kde
+  ];
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against chrome and electron apps flickering on wayland
@@ -117,8 +128,6 @@
 		# place libraries here
 	];
   
-  programs.kdeconnect.enable = true;
-
   programs.steam = {
     enable = true;
     #remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
