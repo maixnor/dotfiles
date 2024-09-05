@@ -1,9 +1,17 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
-  imports = [ <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> ];
+  imports = [ 
+    <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> 
+    inputs.nixvim.nixosModules.nixvim
+    inputs.stylix.nixosModules.stylix
+    ../modules/nixvim.nix
+    ../modules/stylix.nix
+  ];
 
   nixpkgs.config.allowUnfree = true;
+
+  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
 
   networking.useDHCP = false;
   networking.defaultGateway = "10.0.30.1";
@@ -15,11 +23,18 @@
   users.users.maixnor = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
-    packages = with pkgs; [ gh neovim ];
+    packages = with pkgs; [ gh ];
   };
 
   services.openssh.enable = true;  
   services.zerotierone = { enable = true; joinNetworks = ["8056C2E21CF844AA"];};
+
+  services.searx.enable = true;
+  services.searx.settings = {
+    server.port = 6666;
+    server.bind_address = "0.0.0.0";
+    server.secret_key = "definetelysecret";
+  };
 
   # actual services
   environment.systemPackages = with pkgs; [ 
