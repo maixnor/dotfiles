@@ -24,10 +24,6 @@ in
 				  plugin = tmuxPlugins.tmux-fzf;
 				  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
 				}
-			        { 
-				  plugin = tmuxPlugins.catppuccin;
-				  extraConfig = "";
-				}
 			  { 
 				  plugin = tmuxPlugins.better-mouse-mode;
 				  extraConfig = "";
