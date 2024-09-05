@@ -11,6 +11,11 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  fileSystems."/mnt/mass" = {
+    device = "/dev/sda";
+    fsType = "ext4";
+  };
+
   networking.useDHCP = false;
   networking.defaultGateway = "10.0.30.1";
   networking.interfaces.ens32.ipv4.addresses = [{
