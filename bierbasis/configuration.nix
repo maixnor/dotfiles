@@ -73,7 +73,6 @@
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    kdePackages.kdeconnect-kde
   ];
 
   security.pam.services.swaylock = {};

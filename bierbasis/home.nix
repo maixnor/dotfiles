@@ -63,6 +63,11 @@
     targets.nixvim.transparentBackground.signColumn = true;
   };
 
+  services.kdeconnect = {
+    enable = true;
+    package = pkgs.kdePackages.kdeconnect-kde;
+  };
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   programs.git = {
