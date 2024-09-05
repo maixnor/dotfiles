@@ -49,8 +49,8 @@
   ### System Packages
   environment.systemPackages = with pkgs; [ 
     git 
-    wormhole-william
-    appflowy
+    #wormhole-william
+    #appflowy
   ];
 
   # Uncomment and configure these services if needed
@@ -60,4 +60,6 @@
 
   ### Let's Encrypt (ACME) Configuration
   security.acme.acceptTerms = true;
+
+  system.stateVersion = "24.05";
 }
