@@ -9,7 +9,6 @@
   nixpkgs.config.allowUnfree = true;
 
   imports = [
-    inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
     ../modules/misc-server.nix
   ];
@@ -19,12 +18,6 @@
   home.sessionVariables = {
     EDITOR = "nvim";
     LANG = "en_US.UTF-8";
-  };
-
-  stylix = {
-    enable = true;
-    polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
   };
 
   # Let Home Manager install and manage itself.
