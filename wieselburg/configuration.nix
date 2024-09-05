@@ -3,8 +3,10 @@
 {
   imports = [ 
     <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> 
+    ./hardware-configuration.nix
     inputs.nixvim.nixosModules.nixvim
     inputs.stylix.nixosModules.stylix
+
     ../modules/nixvim.nix
     ../modules/stylix.nix
   ];
