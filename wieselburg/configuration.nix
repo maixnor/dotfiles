@@ -59,7 +59,7 @@
   # services.nextcloud = { enable = true; hostName = "gehinoasch"; };
 
   ### Let's Encrypt (ACME) Configuration
-  security.acme.acceptTerms = true;
+  #security.acme.acceptTerms = true;
 
   system.stateVersion = "24.05";
 }
