@@ -3,15 +3,14 @@
 {
   imports = [ 
     ./hardware-configuration.nix
-    inputs.nixvim.nixosModules.nixvim
-    ../modules/nixvim.nix
+    #inputs.nixvim.nixosModules.nixvim
+    #../modules/nixvim.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
 
   ### Bootloader Configuration
   boot.loader.grub.enable = true;  # Enables GRUB bootloader
-  boot.loader.grub.version = 2;    # Specifies GRUB version
   boot.loader.grub.devices = [ "/dev/sda" ];  # Install GRUB to /dev/sda
   boot.loader.grub.useOSProber = true;        # Enables OS prober if multi-booting
 
@@ -40,12 +39,12 @@
   services.openssh.enable = true;  
   services.zerotierone = { enable = true; joinNetworks = ["8056C2E21CF844AA"]; };
 
-  services.searx.enable = true;
-  services.searx.settings = {
-    server.port = 6666;
-    server.bind_address = "0.0.0.0";
-    server.secret_key = "definetelysecret";
-  };
+  #services.searx.enable = true;
+  #services.searx.settings = {
+  #  server.port = 6666;
+  #  server.bind_address = "0.0.0.0";
+  #  server.secret_key = "definetelysecret";
+  #};
 
   ### System Packages
   environment.systemPackages = with pkgs; [ 
