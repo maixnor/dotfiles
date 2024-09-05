@@ -7,14 +7,11 @@
     home.packages = with pkgs; [
       openconnect
       traceroute
-      gh
+      gh git
       wget xh
       freshfetch
       btop iftop iotop
       ripgrep-all
-
-      # general development stuff
-      vscodium
       inotify-tools
     ];
   };

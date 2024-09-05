@@ -11,9 +11,7 @@
   imports = [
     inputs.stylix.homeManagerModules.stylix
     ../modules/tmux.nix
-    ../modules/terminal.nix
     ../modules/misc-server.nix
-    ../modules/zsh.nix
   ];
 
   home.stateVersion = "24.05";
@@ -25,25 +23,8 @@
 
   stylix = {
     enable = true;
-    image = pkgs.fetchurl {
-      url = "https://upload.wikimedia.org/wikipedia/commons/3/36/Golden_Horn_Metro_Bridge_Mars_2013.jpg";
-      sha256 = "sha256-pcTdVAjM2cPJrwHdS61wvpH4pJJlTcE5LlDbJHe1Kno=";
-    };
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    fonts = {
-      monospace = {
-        name = "Fira Code";
-        package = pkgs.fira-code;
-      };
-      sizes = {
-        desktop = 14;
-        popups = 14;
-        terminal = 16;
-      };
-    };
-    targets.nixvim.transparentBackground.main = true;
-    targets.nixvim.transparentBackground.signColumn = true;
   };
 
   # Let Home Manager install and manage itself.
