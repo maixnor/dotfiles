@@ -9,34 +9,34 @@
     historyLimit = 100000;
     newSession = true;
 		clock24 = true;
-    plugins = with pkgs;
+    plugins = with pkgs.tmuxPlugins;
       [
 				{ 
-				  plugin = tmuxPlugins.tmux-thumbs;
+				  plugin = tmux-thumbs;
 				  extraConfig = "set -g @thumbs-key F";
 				}
 				{ 
-				  plugin = tmuxPlugins.fuzzback;
+				  plugin = fuzzback;
 				  extraConfig = "set -g @fuzzback-bind k";
 				}
         {
-          plugin = tmuxPlugins.session-wizard;
+          plugin = session-wizard;
           extraConfig = "set -g @session-wizard 'e'";
         }
 				{ 
-				  plugin = tmuxPlugins.tmux-fzf;
+				  plugin = tmux-fzf;
 				  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
 				}
 			  { 
-				  plugin = tmuxPlugins.better-mouse-mode;
+				  plugin = better-mouse-mode;
 				  extraConfig = "";
 				}
 				{ 
-				  plugin = tmuxPlugins.resurrect;
+				  plugin = resurrect;
 				  extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
 				}
 				{ 
-				  plugin = tmuxPlugins.continuum;
+				  plugin = continuum;
 				  extraConfig = ''
 						set -g @continuum-restore 'on'
 						set -g @continuum-save-interval '1'

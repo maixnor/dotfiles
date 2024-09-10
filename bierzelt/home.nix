@@ -18,6 +18,14 @@ config = {
   home.username = "maixnor";
   home.homeDirectory = "/home/maixnor";
 
+  home.file."justfile".text = ''
+    sync-wu-quartz:
+      cd ~/obsidian/submodules/wu-quartz/content && git add -p . && git commit -m "backup bierbasis" && git pull && git push && cd ~
+
+    update:
+      cd ~/repo/dotfiles && just bierzelt
+  '';
+
 	colorScheme = {
     slug = "oxocarbon";
     name = "Oxocarbon Dark";
