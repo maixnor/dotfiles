@@ -21,16 +21,18 @@
   };
 
   ### Networking Configuration
-  networking.useDHCP = false;
-  networking.defaultGateway = "10.0.30.1";
-  networking.interfaces.ens32.ipv4.addresses = [{
-    address = "10.0.30.13";
-    prefixLength = 24;
-  }];
+  networking.hostName = "wieselburg";
+  #networking.useDHCP = false;
+  #networking.defaultGateway = "10.0.30.1";
+  #networking.interfaces.ens32.ipv4.addresses = [{
+  #  address = "10.0.30.13";
+  #  prefixLength = 24;
+  #}];
 
   ### User Configuration
   users.users.maixnor = {
     isNormalUser = true;
+    # initialPassword = "vm-tests-only";
     extraGroups = [ "wheel" ];
     packages = with pkgs; [ gh ];
   };
@@ -56,7 +58,12 @@
   # Uncomment and configure these services if needed
   # services.jitsi-meet = { enable = true; hostName = "gehinoasch"; };
   # services.mattermost = { enable = true; };
-  # services.nextcloud = { enable = true; hostName = "gehinoasch"; };
+  # services.nextcloud = { 
+  #   enable = true; 
+  #   hostName = "wieselburg"; 
+  #   config.adminpassFile = "./admin.pwd";
+  #   configureRedis = true;
+  # };
 
   ### Let's Encrypt (ACME) Configuration
   #security.acme.acceptTerms = true;

@@ -1,8 +1,7 @@
 { pkgs, ... }:
 
-let
-in
 {
+
   programs.tmux = {
     enable = true;
     shell = "${pkgs.zsh}/bin/zsh";
@@ -20,6 +19,10 @@ in
 				  plugin = tmuxPlugins.fuzzback;
 				  extraConfig = "set -g @fuzzback-bind k";
 				}
+        {
+          plugin = tmuxPlugins.session-wizard;
+          extraConfig = "set -g @session-wizard 'e'";
+        }
 				{ 
 				  plugin = tmuxPlugins.tmux-fzf;
 				  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';

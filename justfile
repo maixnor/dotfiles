@@ -1,9 +1,12 @@
 
 home host: 
-  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/dotfiles#{{host}} --impure -b backup --extra-experimental-features nix-command --extra-experimental-features flakes
+  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup --extra-experimental-features nix-command --extra-experimental-features flakes
 
 nixos host:
-	sudo nixos-rebuild switch --flake ~/dotfiles#{{host}} 
+	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}} 
+
+nixos-vm host:
+	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
 
 bierzelt:
   just nixos bierzelt home bierzelt
