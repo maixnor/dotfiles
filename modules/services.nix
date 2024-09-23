@@ -3,6 +3,8 @@
 {
 
   config = {
+    services.onedrive.enable = true;
+
     services.searx.enable = true;
     services.searx.settings = {
       server.port = 6666;

@@ -5,7 +5,7 @@
     inputs.disko.nixosModules.default
     inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
-    (import ../disko.nix { device = "/dev/vda"; })
+    (import ./disko.nix { device = "/dev/sda"; })
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
   ];
@@ -14,23 +14,21 @@
 
   ### Bootloader Configuration
   boot.loader.systemd-boot.enable = true;
-  boot.loader.canTouchEfiVariables = true;
-  #boot.loader.grub.enable = true;  # Enables GRUB bootloader
-  #boot.loader.grub.devices = [ "/dev/sda" ];  # Install GRUB to /dev/sda
-  #boot.loader.grub.useOSProber = true;        # Enables OS prober if multi-booting
+  boot.loader.efi.canTouchEfiVariables = true;
 
   ### Networking Configuration
   networking.hostName = "wieselburg";
-  networking.defaultGateway = "10.0.30.1";
-  networking.interfaces.ens32.ipv4.addresses = [{
-    address = "10.0.30.13";
-    prefixLength = 24;
-  }];
+  # these options do not work with a VM
+  #networking.defaultGateway = "10.0.30.1";
+  #networking.interfaces.ens32.ipv4.addresses = [{
+  #  address = "10.0.30.13";
+  #  prefixLength = 24;
+  #}];
 
   ### User Configuration
   users.users.maixnor = {
     isNormalUser = true;
-    # initialPassword = "vm-tests-only";
+    initialPassword = "vm-tests-only";
     extraGroups = [ "wheel" ];
     packages = with pkgs; [ just gh ];
   };
@@ -86,12 +84,12 @@
   services.openssh.enable = true;  
   services.zerotierone = { enable = true; joinNetworks = ["8056C2E21CF844AA"]; };
 
-  #services.searx.enable = true;
-  #services.searx.settings = {
-  #  server.port = 6666;
-  #  server.bind_address = "0.0.0.0";
-  #  server.secret_key = "definetelysecret";
-  #};
+  services.searx.enable = true;
+  services.searx.settings = {
+    server.port = 6666;
+    server.bind_address = "0.0.0.0";
+    server.secret_key = "definetelysecret";
+  };
 
   ### System Packages
   environment.systemPackages = with pkgs; [ 
@@ -113,5 +111,5 @@
   ### Let's Encrypt (ACME) Configuration
   #security.acme.acceptTerms = true;
 
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 }

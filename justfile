@@ -5,7 +5,7 @@ home host:
 nixos host:
 	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}} 
 
-nixos-vm host:
+vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
 
 bierzelt:
