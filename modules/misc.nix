@@ -17,6 +17,7 @@
       krita
       mpv
       anki
+      nix-index
 
       # kde
       kate

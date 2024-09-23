@@ -11,39 +11,13 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "tmpfs";
-      fsType = "tmpfs";
-    };
-
-  fileSystems."/iso" =
-    { device = "/dev/disk/by-uuid/1980-01-01-00-00-00-00";
-      fsType = "iso9660";
-    };
-
-  fileSystems."/nix/.ro-store" =
-    { device = "/iso/nix-store.squashfs";
-      fsType = "squashfs";
-      options = [ "loop" ];
-    };
-
-  fileSystems."/nix/.rw-store" =
-    { device = "tmpfs";
-      fsType = "tmpfs";
-    };
-
-  fileSystems."/nix/store" =
-    { device = "overlay";
-      fsType = "overlay";
-    };
-
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
+  networking.useDHCP = lib.mkDefault false;
   # networking.interfaces.ens32.useDHCP = lib.mkDefault true;
   # networking.interfaces.ztmjfdvjvw.useDHCP = lib.mkDefault true;
 

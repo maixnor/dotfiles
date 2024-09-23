@@ -7,6 +7,13 @@
 			url = "github:nix-community/nixvim";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
+    disko = { 
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    impermanence = { 
+      url = "github:nix-community/impermanence";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,7 +27,7 @@
     nixpkgs-mozilla.url = "github:mozilla/nixpkgs-mozilla";
   };
 
-  outputs = { nixpkgs, home-manager, nixvim, ... } @inputs :
+  outputs = { nixpkgs, home-manager, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
@@ -30,6 +37,7 @@
             allowUnfree = true;
         };
       };
+# TODO build utility function with loop
     in {
       nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system; inherit inputs; };

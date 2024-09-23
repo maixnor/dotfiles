@@ -19,7 +19,7 @@
 			};
 			live_config_reload = true;
 			shell = {
-				program = "${pkgs.tmux}/bin/tmux";
+				program = "${pkgs.zsh}/bin/zsh";
 			};
 			colors = {
         draw_bold_text_with_bright_colors = true;

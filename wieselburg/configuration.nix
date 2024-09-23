@@ -1,8 +1,11 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
 
 {
   imports = [ 
+    inputs.disko.nixosModules.default
+    inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
+    (import ../disko.nix { device = "/dev/vda"; })
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
   ];
@@ -10,31 +13,73 @@
   nixpkgs.config.allowUnfree = true;
 
   ### Bootloader Configuration
-  boot.loader.grub.enable = true;  # Enables GRUB bootloader
-  boot.loader.grub.devices = [ "/dev/sda" ];  # Install GRUB to /dev/sda
-  boot.loader.grub.useOSProber = true;        # Enables OS prober if multi-booting
-
-  ### FileSystem Configuration
-  fileSystems."/mnt/mass" = {
-    device = "/dev/sda";
-    fsType = "ext4";
-  };
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.canTouchEfiVariables = true;
+  #boot.loader.grub.enable = true;  # Enables GRUB bootloader
+  #boot.loader.grub.devices = [ "/dev/sda" ];  # Install GRUB to /dev/sda
+  #boot.loader.grub.useOSProber = true;        # Enables OS prober if multi-booting
 
   ### Networking Configuration
   networking.hostName = "wieselburg";
-  #networking.useDHCP = false;
-  #networking.defaultGateway = "10.0.30.1";
-  #networking.interfaces.ens32.ipv4.addresses = [{
-  #  address = "10.0.30.13";
-  #  prefixLength = 24;
-  #}];
+  networking.defaultGateway = "10.0.30.1";
+  networking.interfaces.ens32.ipv4.addresses = [{
+    address = "10.0.30.13";
+    prefixLength = 24;
+  }];
 
   ### User Configuration
   users.users.maixnor = {
     isNormalUser = true;
     # initialPassword = "vm-tests-only";
     extraGroups = [ "wheel" ];
-    packages = with pkgs; [ gh ];
+    packages = with pkgs; [ just gh ];
+  };
+
+  users.users."nixos" = {
+    isNormalUser = true;
+    initialPassword = "nixos";
+    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+  };
+
+  boot.initrd.postDeviceCommands = lib.mkAfter ''
+    mkdir /btrfs_tmp
+    mount /dev/root_vg/root /btrfs_tmp
+    if [[ -e /btrfs_tmp/root ]]; then
+        mkdir -p /btrfs_tmp/old_roots
+        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+    fi
+
+    delete_subvolume_recursively() {
+        IFS=$'\n'
+        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+            delete_subvolume_recursively "/btrfs_tmp/$i"
+        done
+        btrfs subvolume delete "$1"
+    }
+
+    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +10); do
+        delete_subvolume_recursively "$i"
+    done
+
+    btrfs subvolume create /btrfs_tmp/root
+    umount /btrfs_tmp
+  '';
+
+  fileSystems."/persist".neededForBoot = true;
+  environment.persistence."/persist/system" = {
+    hideMounts = true;
+    directories = [
+      "/etc/nixos"
+      "/etc/dotfiles"
+      "/var/log"
+      "/var/lib/nixos"
+      "/var/lib/systemd/coredump"
+    ];
+    files = [
+      "/etc/machine-id"
+      { file = "/var/keys/secret_file"; parentDirectory = { mode = "u=rwx,g=,o="; }; }
+    ];
   };
 
   ### Services Configuration
@@ -50,8 +95,8 @@
 
   ### System Packages
   environment.systemPackages = with pkgs; [ 
-    git 
-    #wormhole-william
+    git gh just
+    wormhole-william
     #appflowy
   ];
 
