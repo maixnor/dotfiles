@@ -5,7 +5,7 @@
     inputs.disko.nixosModules.default
     inputs.impermanence.nixosModules.impermanence
     ./hardware-configuration.nix
-    (import ./disko.nix { device = "/dev/sda"; })
+    (import ./disko.nix { device = "/dev/vda"; })
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
   ];
