@@ -2,9 +2,10 @@
 
 {
 
-	home.packages = [
-    pkgs.fira-code
-		pkgs.just
+	home.packages = with pkgs; [
+    fira-code
+		just
+    fira-code-nerdfont
 	];
 
 	programs.alacritty = {

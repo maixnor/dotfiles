@@ -1,10 +1,6 @@
-{ config, lib, pkgs, nixvim, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-
-  environment.systemPackages = with pkgs; [
-    wl-clipboard
-  ];
 
   programs.nixvim = {
     enable = true;
@@ -12,8 +8,8 @@
     viAlias = true;
     vimAlias = true;
 
-    extraPackages = with pkgs; [ ripgrep parallel fd fzf ];
-    clipboard.providers.wl-copy.enable = true;
+    extraPackages = with pkgs; [ ripgrep parallel fd fzf bat fira-code-nerdfont ];
+    #clipboard.providers.wl-copy.enable = true;
 
     opts = {
       number = true;         
@@ -33,20 +29,22 @@
 
     colorschemes.oxocarbon.enable = true;
 
-    plugins.cmp.enable = true;
-    plugins.cmp.settings.mapping = {
-      "<C-Space>" = "cmp.mapping.complete()";
-      "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-      "<C-c>" = "cmp.mapping.close()";
-      "<C-u>" = "cmp.mapping.scroll_docs(4)";
-      "<CR>" = "cmp.mapping.confirm({ select = true })";
-      "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
-      "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
-    };
+    #plugins.cmp.enable = true;
+    #plugins.cmp.settings.mapping = {
+    #  "<C-Space>" = "cmp.mapping.complete()";
+    #  "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+    #  "<C-c>" = "cmp.mapping.close()";
+    #  "<C-u>" = "cmp.mapping.scroll_docs(4)";
+    #  "<CR>" = "cmp.mapping.confirm({ select = true })";
+    #  "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+    #  "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+    #};
 
     plugins = {
       lualine.enable = true;
       fugitive.enable = true;
+      git-worktree.enable = true;
+      git-conflict.enable = true;
       tmux-navigator.enable = true;
       treesitter.enable = true;
       treesitter-context.enable = true;
@@ -54,6 +52,7 @@
       undotree.enable = true;
       nvim-colorizer.enable = true;
       fzf-lua.enable = true;
+      fzf-lua.profile = "fzf-vim";
       emmet.enable = true;
       direnv.enable = true;
       ollama = { 
