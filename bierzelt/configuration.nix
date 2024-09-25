@@ -8,6 +8,7 @@
 {
   imports =
     [
+      inputs.stylix.nixosModules.stylix
       ./hardware-configuration.nix
       ../modules/services.nix
       ../modules/dev.nix
@@ -130,6 +131,6 @@
     #dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
 
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 
 }

@@ -61,7 +61,7 @@ config = {
     package = pkgs.kdePackages.kdeconnect-kde;
   };
 
-  home.stateVersion = "24.05";
+  home.stateVersion = "24.11";
 
   home.sessionVariables = {
     EDITOR = "nvim";
