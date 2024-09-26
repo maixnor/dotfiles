@@ -7,15 +7,11 @@
 {
   imports =
     [ 
-      inputs.stylix.nixosModules.stylix
-      inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
       ./nvidia.nix
       ./gaming.nix
       ../modules/services.nix
       ../modules/dev.nix
-      ../modules/stylix.nix
-      ../modules/nixvim.nix
     ];
 
   nixpkgs.config.allowUnfree = true;

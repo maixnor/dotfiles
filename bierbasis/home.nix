@@ -17,10 +17,12 @@
 
   imports = [
     inputs.stylix.homeManagerModules.stylix
+    inputs.nixvim.homeManagerModules.nixvim
     ../modules/tmux.nix
     ../modules/terminal.nix
     ../modules/office.nix
     ../modules/misc.nix
+    ../modules/nixvim.nix
     ../modules/zsh.nix
     ../modules/ollama.nix
     ../modules/graphics.nix
@@ -54,7 +56,7 @@
     fonts = {
       monospace = {
         name = "Fira Code";
-        package = pkgs.fira-code;
+        package = pkgs.nerdfonts;
       };
       sizes = {
         desktop = 14;

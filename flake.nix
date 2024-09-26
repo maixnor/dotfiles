@@ -50,6 +50,7 @@
 			};
 
 			nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
 				specialArgs = { inherit system; inherit inputs; };
 				modules = [ ./wieselburg/configuration.nix ];
 			};

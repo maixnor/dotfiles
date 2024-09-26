@@ -8,6 +8,9 @@ nixos host:
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
 
+anywhere-vm host:
+  nix run github:nix-community/nixos-anywhere -- --flake ~/repo/dotfiles#{{host}} --vm-test
+
 bierzelt:
   just nixos bierzelt home bierzelt
 

@@ -13,8 +13,10 @@
   nixpkgs.config.allowUnfree = true;
 
   ### Bootloader Configuration
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub = {
+    efiSupport = true;
+    efiInstallAsRemovable = true;
+  };
 
   ### Networking Configuration
   networking.hostName = "wieselburg";
@@ -25,18 +27,16 @@
   #  prefixLength = 24;
   #}];
 
+  services.openssh.enable = true;  
+
   ### User Configuration
   users.users.maixnor = {
     isNormalUser = true;
-    initialPassword = "vm-tests-only";
     extraGroups = [ "wheel" ];
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDA2UypJYZ7g0TWU1F3PlOkZNwdrFRHPs1pUGmG7kqTTxT0I5NZroQZn1NKKqqFc8H/75bVtja2n0SvpO5PLN2lwaCp60rG1Jz5RCiZ/Fg10VRmawKnx8yOePlOmmchE0ldT5RX84oYKtZbJuLjETMdy/poizyGrBVDQjx8/neI9QEgrbgIZ0WyWu6Cv5Jh2oqZRycVI3ip3oYcEjostLDHmVDW1uaV8qAzIBeL1cGYomW9PxD+pKIelZsPpaBGZrJkjr+1h1FXV1Uh/HQenbMO/qP9ydQzhwpGZ+t6DIy2gwrY2C7WdaJIdWCe6gMk5gPITsYPgS+1Vi58nUGlxOR+VucwYPICIVGYTVFdOr0f9jWrFxtUNuOSyEHExzxlLZJ0EQgRykzNI5rJwMvCBewpnAnaVyHaPM74UKKSXrvjBaYBvJwcwDJDYxn3jkB0YCj0RPsZEBXZzimj7Mh+0oJJ+NGtJ32VtdNDY0bYJoI16sAqIojkYYqEvrOykWwTkfs= maixnor@Bierbasis"
+    ];
     packages = with pkgs; [ just gh ];
-  };
-
-  users.users."nixos" = {
-    isNormalUser = true;
-    initialPassword = "nixos";
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   };
 
   boot.initrd.postDeviceCommands = lib.mkAfter ''
@@ -75,13 +75,12 @@
       "/var/lib/systemd/coredump"
     ];
     files = [
-      "/etc/machine-id"
-      { file = "/var/keys/secret_file"; parentDirectory = { mode = "u=rwx,g=,o="; }; }
+      #"/etc/machine-id"
+      #{ file = "/var/keys/secret_file"; parentDirectory = { mode = "u=rwx,g=,o="; }; }
     ];
   };
 
   ### Services Configuration
-  services.openssh.enable = true;  
   services.zerotierone = { enable = true; joinNetworks = ["8056C2E21CF844AA"]; };
 
   services.searx.enable = true;
