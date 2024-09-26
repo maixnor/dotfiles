@@ -1,11 +1,13 @@
-{ config, pkgs, inputs, lib, ... }:
+{ modulesPath, config, pkgs, inputs, lib, ... }:
 
 {
   imports = [ 
     inputs.disko.nixosModules.default
     inputs.impermanence.nixosModules.impermanence
+    (modulesPath + "/installer/scan/not-detected.nix")
+    (modulesPath + "/profiles/qemu-guest.nix")
+    (import ./disko.nix { device = "/dev/sda"; })
     ./hardware-configuration.nix
-    (import ./disko.nix { device = "/dev/vda"; })
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
   ];
@@ -27,7 +29,7 @@
   #  prefixLength = 24;
   #}];
 
-  services.openssh.enable = true;  
+  services.openssh.enable = true;
 
   ### User Configuration
   users.users.maixnor = {
