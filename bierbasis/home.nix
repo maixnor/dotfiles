@@ -7,7 +7,7 @@
 
   home.file."justfile".text = ''
     sync-wu-quartz:
-      cd ~/repo/obsidian/submodules/wu-quartz/content && git add -p . && git commit -m "backup bierbasis" && git pull && git push && cd ~
+      cd ~/repo/obsidian/submodules/wu-quartz/content && git add . && git commit -m "backup bierbasis" && git pull && git push && cd ~
 
     update:
       cd ~/repo/dotfiles && just bierbasis
