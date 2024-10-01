@@ -77,7 +77,7 @@
             installRustc = false;
           };
 					bashls.enable = true;
-					tsserver.enable = true;
+					ts-ls.enable = true;
 					marksman.enable = true;
           ltex = {
             enable = true;
