@@ -3,7 +3,7 @@
 {
 
   config = {
-    services.onedrive.enable = true;
+    #services.onedrive.enable = true;
 
     services.searx.enable = true;
     services.searx.settings = {
