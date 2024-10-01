@@ -6,15 +6,14 @@
     home.packages = with pkgs; [
       openconnect
       traceroute
-      gh
       wget xh
       freshfetch
       spotify
       btop iftop iotop
-      pandoc
+      inotify-tools
       ripgrep-all
-      geogebra6
-      krita
+      # geogebra6
+      # krita
       mpv
       anki
       nix-index
@@ -23,7 +22,7 @@
       kate
       okular
       spectacle
-      kmail
+      kdePackages.kmail
       kdePackages.korganizer
       kdePackages.kontact
       kdePackages.kmail-account-wizard
@@ -37,9 +36,10 @@
       unrar # ark dependency
 
       # general development stuff
-      remmina
+      gh
       vscodium
-      inotify-tools
+      # remmina
+      # pandoc
 
       # unfree
       (writeShellApplication {
