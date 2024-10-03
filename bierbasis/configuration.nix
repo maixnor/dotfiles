@@ -60,12 +60,8 @@
 
   services.xserver.enable = true;
   services.displayManager.enable = true;
-  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true; # still needs X11
   services.desktopManager.plasma6.enable = true;
-
-#  programs.hyprland = {
-#    enable = true;
-#  };
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
@@ -103,6 +99,7 @@
     #jack.enable = true;
   };
 
+  nix.settings.trusted-users = [ "@wheel" "maixnor" ];
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
@@ -182,6 +179,6 @@
   
   services.openssh.enable = true;
 
-  system.stateVersion = "24.05";
+  system.stateVersion = "24.11";
 
 }

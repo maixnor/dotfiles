@@ -31,6 +31,7 @@
   services.openssh.enable = true;
 
   ### User Configuration
+  nix.settings.trusted-users = [ "@wheel" "maixnor" ];
   users.users.maixnor = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
