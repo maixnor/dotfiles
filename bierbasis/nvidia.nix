@@ -20,9 +20,9 @@
   hardware.nvidia = {
     # Required
     modesetting.enable = true;
-    powerManagement.enable = true;
+    powerManagement.enable = false;
     powerManagement.finegrained = false;
-    forceFullCompositionPipeline = true;
+    #forceFullCompositionPipeline = true;
 
     # Use the NVidia open source kernel module (not to be confused with the
     # independent third-party "nouveau" open source driver).
@@ -34,7 +34,7 @@
     open = false;
     nvidiaSettings = true;
 
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
   # Set environment variables related to NVIDIA graphics

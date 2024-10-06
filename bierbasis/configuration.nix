@@ -40,7 +40,7 @@
 
   services.zerotierone = {
     enable = true;
-    joinNetworks = ["8056C2E21CF844AA"];
+    joinNetworks = ["8056C2E21CF844AA" "856127940c5dae71"];
   };
 
   time.timeZone = "Europe/Vienna";
@@ -58,21 +58,16 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
-  services.xserver.enable = true;
-  services.displayManager.enable = true;
-  services.displayManager.sddm.enable = true; # still needs X11
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
+
+  services.teamviewer.enable = true;
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
+    teamviewer # only works with service.teamviewer
   ];
-
-  security.pam.services.swaylock = {};
-
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "workman";
-  };
 
   services.printing.enable = true;
   services.avahi = {
@@ -131,7 +126,7 @@
   #   acceleration = "cuda";
   #   environmentVariables = {
   #     HOME = "/tmp/ollama";
-  #     FLAKE = "/home/maixnor/dotfiles";
+  #     FLAKE = "/home/maixnor/repo/dotfiles";
   #   };
   # };
 
