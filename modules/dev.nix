@@ -2,6 +2,13 @@
 
 {
   config = {
+
+    services.languagetool = {
+      enable = true;
+      port = 6767;
+      settings.cacheSize = 5000;
+    };
+
     environment.systemPackages = with pkgs; [
       rustup
       bacon

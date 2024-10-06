@@ -53,12 +53,7 @@
       nvim-colorizer.enable = true;
       fzf-lua.enable = true;
       fzf-lua.profile = "fzf-vim";
-      emmet.enable = true;
       direnv.enable = true;
-      ollama = { 
-        enable = true; 
-        model = "llama3";
-      };
       
       lsp = {
         enable = true;
@@ -78,13 +73,18 @@
           };
 					bashls.enable = true;
 					ts-ls.enable = true;
+
 					marksman.enable = true;
           ltex = {
             enable = true;
-            settings.enabled = true;
-            settings.checkFrequency = "edit";
-            settings.language = "de-AT";
-            settings.statusBarItem = true;
+            settings = {
+              enable = [ "latex" "markdown" "html" ];
+              checkFrequency = "edit";
+              language = "en-US";
+              statusBarItem = true;
+              completionEnabled = true;
+              languageToolHttpServerUri = "http://127.0.0.1:6767/";
+            };
           };
 
           html.enable = true;
