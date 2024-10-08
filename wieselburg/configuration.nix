@@ -32,6 +32,7 @@
 
   ### User Configuration
   nix.settings.trusted-users = [ "@wheel" "maixnor" ];
+  security.sudo.wheelNeedsPassword = false;
   users.users.maixnor = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
