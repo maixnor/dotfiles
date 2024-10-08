@@ -73,6 +73,8 @@
         desktopName = "Vivaldi";
       })
 
+      discord-canary
+
       # discord unfree
       (writeShellApplication {
         name = "discord";
