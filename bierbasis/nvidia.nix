@@ -20,7 +20,7 @@
   hardware.nvidia = {
     # Required
     modesetting.enable = true;
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
     #forceFullCompositionPipeline = true;
 
