@@ -8,8 +8,7 @@
     viAlias = true;
     vimAlias = true;
 
-    extraPackages = with pkgs; [ ripgrep parallel fd fzf bat fira-code-nerdfont ];
-    #clipboard.providers.wl-copy.enable = true;
+    # extraPackages = with pkgs; [ ripgrep parallel fd fzf bat fira-code-nerdfont ];
 
     opts = {
       number = true;         
@@ -27,8 +26,6 @@
 
     globals.mapleader = " ";
 
-    colorschemes.oxocarbon.enable = true;
-
     #plugins.cmp.enable = true;
     #plugins.cmp.settings.mapping = {
     #  "<C-Space>" = "cmp.mapping.complete()";
@@ -41,58 +38,70 @@
     #};
 
     plugins = {
+      tmux-navigator.enable = true;
       lualine.enable = true;
       fugitive.enable = true;
-      git-worktree.enable = true;
-      git-conflict.enable = true;
-      tmux-navigator.enable = true;
-      treesitter.enable = true;
-      treesitter-context.enable = true;
-      treesitter-textobjects.enable = true;
-      undotree.enable = true;
-      nvim-colorizer.enable = true;
-      fzf-lua.enable = true;
-      fzf-lua.profile = "fzf-vim";
-      direnv.enable = true;
-      
-      lsp = {
-        enable = true;
-        servers = {
-          nixd.enable = true;
-          lua-ls.enable = true;
-          omnisharp = {
-            enable = true;
-            settings.enableImportCompletion = true;
-            settings.organizeImportsOnFormat = true;
-          };
-          java-language-server.enable = true;
-          rust-analyzer = {
-            enable = true;
-            installCargo = false;
-            installRustc = false;
-          };
-					bashls.enable = true;
-					ts-ls.enable = true;
-
-					marksman.enable = true;
-          ltex = {
-            enable = true;
-            settings = {
-              enable = [ "latex" "markdown" "html" ];
-              checkFrequency = "edit";
-              language = "en-US";
-              statusBarItem = true;
-              completionEnabled = true;
-              languageToolHttpServerUri = "http://127.0.0.1:6767/";
-            };
-          };
-
-          html.enable = true;
-          jsonls.enable = true;
-          yamlls.enable = true;
-        };
-      };
+      #treesitter.enable = true;
+      #treesitter-textobjects.enable = true;
+      #fzf-lua.enable = true;
+      #lsp.enable = true;
+      #lsp.servers = {
+      #  nixd.enable = true;
+      #};
     };
+
+    #plugins = {
+    #  lualine.enable = true;
+    #  fugitive.enable = true;
+    #  git-worktree.enable = true;
+    #  git-conflict.enable = true;
+    #  tmux-navigator.enable = true;
+    #  treesitter-context.enable = true;
+    #  treesitter-textobjects.enable = true;
+    #  undotree.enable = true;
+    #  nvim-colorizer.enable = true;
+    #  fzf-lua.enable = true;
+    #  fzf-lua.profile = "fzf-vim";
+    #  direnv.enable = true;
+      
+      # lsp = {
+      #   enable = true;
+      #   servers = {
+      #     nixd.enable = true;
+      #     lua-ls.enable = true;
+      #     omnisharp = {
+      #       enable = true;
+      #       settings.enableImportCompletion = true;
+      #       settings.organizeImportsOnFormat = true;
+      #     };
+      #     java-language-server.enable = true;
+      #     rust-analyzer = {
+      #       enable = true;
+      #       installCargo = false;
+      #       installRustc = false;
+      #     };
+			# 		bashls.enable = true;
+			# 		ts-ls.enable = true;
+
+			# 		marksman.enable = true;
+      #     ltex = {
+      #       enable = true;
+      #       settings = {
+      #         enable = [ "latex" "markdown" "html" ];
+      #         checkFrequency = "edit";
+      #         language = "en-US";
+      #         statusBarItem = true;
+      #         completionEnabled = true;
+      #         languageToolHttpServerUri = "http://127.0.0.1:6767/";
+      #       };
+      #     };
+
+      #     html.enable = true;
+      #     jsonls.enable = true;
+      #     yamlls.enable = true;
+      #   };
+      # };
+    #};
 
     highlightOverride = {
       Comment.fg = "#f47ac9";

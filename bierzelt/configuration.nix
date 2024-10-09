@@ -9,7 +9,9 @@
   imports =
     [
       inputs.stylix.nixosModules.stylix
+      inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
+      ../modules/nixvim.nix
       ../modules/services.nix
       ../modules/dev.nix
     ];
@@ -27,10 +29,11 @@
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
   hardware.bluetooth.enable = true;
+  hardware.enableRedistributableFirmware = true;
 
   services.zerotierone = {
     enable = true;
-    joinNetworks = ["8056C2E21CF844AA"];
+    joinNetworks = ["8056C2E21CF844AA" "856127940c5dae71"];
   };
 
   networking.hostName = "bierzelt";
@@ -72,6 +75,19 @@
     layout = "us";
     variant = "workman";
   };
+
+  # Battery saving
+  services.power-profiles-daemon.enable = false;
+  services.thermald.enable = true;
+  services.tlp = {
+    settings = {
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 0;
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+    };
+  };
+  powerManagement.cpuFreqGovernor = "schedutil";
 
   services.printing.enable = true;
   services.avahi = {

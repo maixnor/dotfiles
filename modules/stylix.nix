@@ -5,6 +5,6 @@
   stylix.targets = {
     gnome.enable = false;
     gtk.enable = false;
-    plymouth.enable = false;
+    # plymouth.enable = false;
   };
 }
