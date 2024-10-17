@@ -53,7 +53,7 @@
   };
 
   ### Services Configuration
-  services.zerotierone = { enable = true; joinNetworks = ["8056C2E21CF844AA" "856127940c7eb96b"]; };
+  services.zerotierone = { enable = true; joinNetworks = [ "8056C2E21CF844AA" "856127940c7eb96b" ]; };
 
   services.searx.enable = true;
   services.searx.settings = {

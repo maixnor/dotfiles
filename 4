@@ -27,6 +27,7 @@
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "nvidia_drm.modeset=1" "nvidia-drm.fbdev=1" ];
 
   hardware.bluetooth.enable = true;
 
@@ -39,7 +40,7 @@
 
   services.zerotierone = {
     enable = true;
-    joinNetworks = [ "8056C2E21CF844AA" "856127940c5dae71" "856127940c7eb96b" ];
+    joinNetworks = ["8056C2E21CF844AA" "856127940c5dae71"];
   };
 
   time.timeZone = "Europe/Vienna";
@@ -57,16 +58,20 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  #services.xserver.enable = true;
+  services.displayManager.enable = true;
+  services.displayManager.sddm.enable = true; # still needs X11
+  services.displayManager.sddm.wayland.enable = true; # still needs X11
   services.desktopManager.plasma6.enable = true;
 
   services.teamviewer.enable = true;
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    teamviewer # only works with service.teamviewer
+    teamviewer
   ];
+
+  security.pam.services.swaylock = {};
 
   services.printing.enable = true;
   services.avahi = {
@@ -125,7 +130,7 @@
   #   acceleration = "cuda";
   #   environmentVariables = {
   #     HOME = "/tmp/ollama";
-  #     FLAKE = "/home/maixnor/repo/dotfiles";
+  #     FLAKE = "/home/maixnor/dotfiles";
   #   };
   # };
 
