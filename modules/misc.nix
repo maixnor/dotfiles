@@ -16,6 +16,7 @@
       # krita
       mpv
       anki
+      thunderbird
 
       # nixos
       nix-index
@@ -26,9 +27,11 @@
       okular
       spectacle
       kdePackages.kmail
+      kdePackages.kmailtransport
+      kdePackages.kdepim-addons
+      kdePackages.kmail-account-wizard
       kdePackages.korganizer
       kdePackages.kontact
-      kdePackages.kmail-account-wizard
       kdePackages.plasma-disks
       konsole
       krusader
