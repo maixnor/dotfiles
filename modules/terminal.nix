@@ -6,6 +6,7 @@
     fira-code
 		just
     fira-code-nerdfont
+    ranger
 	];
 
 	programs.alacritty = {

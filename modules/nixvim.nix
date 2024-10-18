@@ -42,28 +42,21 @@
       lualine.enable = true;
       fugitive.enable = true;
       wakatime.enable = true;
-      #treesitter.enable = true;
-      #treesitter-textobjects.enable = true;
-      #fzf-lua.enable = true;
-      #lsp.enable = true;
-      #lsp.servers = {
-      #  nixd.enable = true;
-      #};
+      undotree.enable = true;
+      nvim-colorizer.enable = true;
+      treesitter.enable = true;
+      treesitter-textobjects.enable = true;
+      fzf-lua.enable = true;
+      lsp.enable = true;
+      lsp.servers = {
+        nixd.enable = true;
+      };
     };
 
     #plugins = {
-    #  lualine.enable = true;
-    #  fugitive.enable = true;
     #  git-worktree.enable = true;
     #  git-conflict.enable = true;
-    #  tmux-navigator.enable = true;
-    #  treesitter-context.enable = true;
-    #  treesitter-textobjects.enable = true;
-    #  undotree.enable = true;
-    #  nvim-colorizer.enable = true;
-    #  fzf-lua.enable = true;
     #  fzf-lua.profile = "fzf-vim";
-    #  direnv.enable = true;
       
       # lsp = {
       #   enable = true;
