@@ -41,6 +41,7 @@
       tmux-navigator.enable = true;
       lualine.enable = true;
       fugitive.enable = true;
+      wakatime.enable = true;
       #treesitter.enable = true;
       #treesitter-textobjects.enable = true;
       #fzf-lua.enable = true;
