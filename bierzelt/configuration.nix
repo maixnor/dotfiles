@@ -121,12 +121,15 @@
     packages = with pkgs; [ ];
   };
 
-  # virtualisation.docker.enable = true;
-  # virtualisation.libvirtd.enable = true;
+  services.teamviewer.enable = true;
+
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    kdePackages.kdeconnect-kde
+    teamviewer # only works with service.teamviewer
   ];
+
+  # virtualisation.docker.enable = true;
+  # virtualisation.libvirtd.enable = true;
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against chrome and electron apps flickering on wayland

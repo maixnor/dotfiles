@@ -38,7 +38,6 @@
     #};
 
     plugins = {
-      tmux-navigator.enable = true;
       lualine.enable = true;
       fugitive.enable = true;
       wakatime.enable = true;

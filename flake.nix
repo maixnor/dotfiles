@@ -3,16 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
+    stable.url = "github:NixOS/nixpkgs/nixos-24.05";
 		nixvim = {
 			url = "github:nix-community/nixvim";
-			inputs.nixpkgs.follows = "nixpkgs";
+			inputs.nixpkgs.follows = "stable";
 		};
     disko = { 
       url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    impermanence = { 
-      url = "github:nix-community/impermanence";
+      inputs.nixpkgs.follows = "stable";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -22,6 +20,7 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impermanence.url = "github:nix-community/impermanence";
     nix-colors.url = "github:misterio77/nix-colors";
     stylix.url = "github:danth/stylix";
     nixpkgs-mozilla.url = "github:mozilla/nixpkgs-mozilla";

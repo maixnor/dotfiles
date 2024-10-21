@@ -7,8 +7,10 @@
 {
   imports =
     [ 
+      inputs.disko.nixosModules.default
       ./hardware-configuration.nix
-      ./nvidia.nix
+      (import ./disko.nix { device = "/dev/sdc"; })
+      #./nvidia.nix
       ./gaming.nix
       ../modules/services.nix
       ../modules/dev.nix
@@ -28,7 +30,7 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  hardware.bluetooth.enable = true;
+  #hardware.bluetooth.enable = true;
 
   networking = {
     hostName = "bierbasis";
@@ -61,11 +63,11 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  services.teamviewer.enable = true;
+  #services.teamviewer.enable = true;
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    teamviewer # only works with service.teamviewer
+    #teamviewer # only works with service.teamviewer
   ];
 
   services.printing.enable = true;
@@ -104,16 +106,23 @@
     ];
   };
 
+  users.users.adrl = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    initialPassword = "adrl";
+    packages = [ pkgs.git ];
+  };
+
   networking.nftables.enable = false;
-  networking.firewall = { 
-    enable = false;
-    allowedTCPPortRanges = [ 
-      { from = 1714; to = 1764; } # KDE Connect
-    ];  
-    allowedUDPPortRanges = [ 
-      { from = 1714; to = 1764; } # KDE Connect
-    ];  
-  }; 
+  #networking.firewall = { 
+  #  enable = false;
+  #  allowedTCPPortRanges = [ 
+  #    { from = 1714; to = 1764; } # KDE Connect
+  #  ];  
+  #  allowedUDPPortRanges = [ 
+  #    { from = 1714; to = 1764; } # KDE Connect
+  #  ];  
+  #}; 
 
   virtualisation.docker.enable = true;
   virtualisation.docker.enableOnBoot = false; # boot performance
