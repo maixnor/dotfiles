@@ -49,6 +49,10 @@ in
         simple-translate
         add-custom-search-engine
         gesturefy
+        side-view
+        bionic-reader
+        tranquility-1
+        wakatimes
       ];
     };
     policies = {
