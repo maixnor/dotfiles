@@ -106,13 +106,6 @@
     ];
   };
 
-  users.users.adrl = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    initialPassword = "adrl";
-    packages = [ pkgs.git ];
-  };
-
   networking.nftables.enable = false;
   #networking.firewall = { 
   #  enable = false;
