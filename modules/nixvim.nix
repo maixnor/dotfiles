@@ -40,6 +40,7 @@
     plugins = {
       lualine.enable = true;
       fugitive.enable = true;
+      git-conflict.enable = true;
       wakatime.enable = true;
       undotree.enable = true;
       nvim-colorizer.enable = true;
@@ -49,6 +50,9 @@
       lsp.enable = true;
       lsp.servers = {
         nixd.enable = true;
+        bashls.enable = true;
+        lua_ls.enable = true;
+        marksman.enable = true;
       };
     };
 
@@ -60,8 +64,6 @@
       # lsp = {
       #   enable = true;
       #   servers = {
-      #     nixd.enable = true;
-      #     lua-ls.enable = true;
       #     omnisharp = {
       #       enable = true;
       #       settings.enableImportCompletion = true;
