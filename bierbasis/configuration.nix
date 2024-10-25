@@ -7,10 +7,10 @@
 {
   imports =
     [ 
-      inputs.disko.nixosModules.default
+      #inputs.disko.nixosModules.default
+      #(import ./disko.nix { device = "/dev/sdc"; })
       ./hardware-configuration.nix
-      (import ./disko.nix { device = "/dev/sdc"; })
-      #./nvidia.nix
+      ./nvidia.nix
       ./gaming.nix
       ../modules/services.nix
       ../modules/dev.nix
@@ -23,8 +23,8 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # faster boot, don't wait on network
-  systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
-  systemd.services.NetworkManager-wait-online.enable = false;
+  #systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
+  #systemd.services.NetworkManager-wait-online.enable = false;
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
@@ -35,8 +35,8 @@
   networking = {
     hostName = "bierbasis";
     networkmanager.enable = true;
-    dhcpcd.extraConfig = "noarp";
-    dhcpcd.wait = "background";
+    #dhcpcd.extraConfig = "noarp";
+    #dhcpcd.wait = "background";
   };
 
   services.zerotierone = {
