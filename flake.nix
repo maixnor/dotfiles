@@ -3,14 +3,13 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/master";
-    stable.url = "github:NixOS/nixpkgs/nixos-24.05";
 		nixvim = {
 			url = "github:nix-community/nixvim";
-			inputs.nixpkgs.follows = "stable";
+			inputs.nixpkgs.follows = "nixpkgs";
 		};
     disko = { 
       url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "stable";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
