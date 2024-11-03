@@ -7,6 +7,7 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     (import ./disko.nix { device = "/dev/sda"; })
     ./hardware-configuration.nix
+    ../modules/zerotier.nix
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
   ];
@@ -52,9 +53,7 @@
     packages = with pkgs; [ just gh ];
   };
 
-  ### Services Configuration
-  services.zerotierone = { enable = true; joinNetworks = [ "8056C2E21CF844AA" "856127940c7eb96b" ]; };
-
+  ### Services
   services.searx.enable = true;
   services.searx.settings = {
     server.port = 6666;
@@ -80,7 +79,7 @@
   # };
 
   ### Let's Encrypt (ACME) Configuration
-  #security.acme.acceptTerms = true;
+  security.acme.acceptTerms = true;
 
   system.stateVersion = "24.11";
 }

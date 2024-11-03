@@ -9,11 +9,10 @@
   imports =
     [
       inputs.stylix.nixosModules.stylix
-      inputs.nixvim.nixosModules.nixvim
       ./hardware-configuration.nix
-      ../modules/nixvim.nix
       ../modules/services.nix
       ../modules/dev.nix
+      ../modules/zerotier.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -30,11 +29,6 @@
 
   hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;
-
-  services.zerotierone = {
-    enable = true;
-    joinNetworks = [ "8056C2E21CF844AA" "856127940c7eb96b" ];
-  };
 
   networking.hostName = "bierzelt";
   networking.networkmanager.enable = true;

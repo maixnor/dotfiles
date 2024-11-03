@@ -3,17 +3,17 @@
 
 {
   
-	imports = [
+  imports = [
     inputs.stylix.homeManagerModules.stylix
-    #inputs.nixvim.homeManagerModules.nixvim
-    #../modules/nixvim.nix
+    inputs.nixvim.homeManagerModules.nixvim
+    ../modules/nixvim.nix
     ../modules/tmux.nix
-		../modules/terminal.nix
-		../modules/office.nix
-		../modules/misc.nix
-		../modules/zsh.nix
-		../modules/ollama.nix
-		../modules/graphics.nix
+    ../modules/terminal.nix
+    ../modules/office.nix
+    ../modules/misc.nix
+    ../modules/zsh.nix
+    ../modules/ollama.nix
+    ../modules/graphics.nix
     ../modules/firefox.nix
   ];
 

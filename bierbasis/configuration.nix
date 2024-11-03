@@ -14,6 +14,7 @@
       ./gaming.nix
       ../modules/services.nix
       ../modules/dev.nix
+      ../modules/zerotier.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -37,11 +38,6 @@
     networkmanager.enable = true;
     #dhcpcd.extraConfig = "noarp";
     #dhcpcd.wait = "background";
-  };
-
-  services.zerotierone = {
-    enable = true;
-    joinNetworks = [ "8056C2E21CF844AA" "856127940c5dae71" "856127940c7eb96b" ];
   };
 
   time.timeZone = "Europe/Vienna";
