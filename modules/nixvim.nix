@@ -8,7 +8,7 @@
     viAlias = true;
     vimAlias = true;
 
-    # extraPackages = with pkgs; [ ripgrep parallel fd fzf bat fira-code-nerdfont ];
+    extraPackages = with pkgs; [ lua ripgrep parallel fd fzf bat fira-code-nerdfont ];
 
     opts = {
       number = true;         
@@ -26,41 +26,52 @@
 
     globals.mapleader = " ";
 
-    #plugins.cmp.enable = true;
-    #plugins.cmp.settings.mapping = {
-    #  "<C-Space>" = "cmp.mapping.complete()";
-    #  "<C-d>" = "cmp.mapping.scroll_docs(-4)";
-    #  "<C-c>" = "cmp.mapping.close()";
-    #  "<C-u>" = "cmp.mapping.scroll_docs(4)";
-    #  "<CR>" = "cmp.mapping.confirm({ select = true })";
-    #  "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
-    #  "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
-    #};
-
     plugins = {
+
+      cmp = {
+        enable = true;
+        autoEnableSources = false;
+        settings.sources = [
+          { name = "nvim_lsp"; }
+          { name = "path"; }
+          { name = "buffer"; }
+        ];
+        settings.mapping = {
+          "<C-Space>" = "cmp.mapping.complete()";
+          "<C-d>" = "cmp.mapping.scroll_docs(-4)";
+          "<C-c>" = "cmp.mapping.close()";
+          "<C-u>" = "cmp.mapping.scroll_docs(4)";
+          "<CR>" = "cmp.mapping.confirm({ select = true })";
+          "<S-Tab>" = "cmp.mapping(cmp.mapping.select_prev_item(), {'i', 's'})";
+          "<Tab>" = "cmp.mapping(cmp.mapping.select_next_item(), {'i', 's'})";
+        };
+        settings.view.docs.auto_open = true;
+      };
+      cmp-nvim-lsp.enable = true;
+      cmp-path.enable = true;
+
+      tmux-navigator.enable = true;
       lualine.enable = true;
       fugitive.enable = true;
+      git-worktree.enable = true;
       git-conflict.enable = true;
       wakatime.enable = true;
       undotree.enable = true;
       nvim-colorizer.enable = true;
       treesitter.enable = true;
+      treesitter.grammarPackages = pkgs.vimPlugins.nvim-treesitter.passthru.allGrammars;
       treesitter-textobjects.enable = true;
       fzf-lua.enable = true;
-      lsp.enable = true;
-      lsp.servers = {
-        nixd.enable = true;
-        bashls.enable = true;
-        lua_ls.enable = true;
-        marksman.enable = true;
-      };
+      #lsp.enable = true;
+      #lsp.servers = {
+      #  nixd.enable = true;
+      #  bashls.enable = true;
+      #  lua_ls.enable = true;
+      #  marksman.enable = true;
+      #};
     };
 
     #plugins = {
-    #  git-worktree.enable = true;
-    #  git-conflict.enable = true;
-    #  fzf-lua.profile = "fzf-vim";
-      
       # lsp = {
       #   enable = true;
       #   servers = {
@@ -75,10 +86,8 @@
       #       installCargo = false;
       #       installRustc = false;
       #     };
-			# 		bashls.enable = true;
 			# 		ts-ls.enable = true;
 
-			# 		marksman.enable = true;
       #     ltex = {
       #       enable = true;
       #       settings = {
