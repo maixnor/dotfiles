@@ -95,7 +95,7 @@
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
     packages = with pkgs; [
       nh
       # pkgs go here
@@ -118,14 +118,14 @@
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
-  # services.ollama = {
-  #   enable = true;
-  #   acceleration = "cuda";
-  #   environmentVariables = {
-  #     HOME = "/tmp/ollama";
-  #     FLAKE = "/home/maixnor/repo/dotfiles";
-  #   };
-  # };
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+    environmentVariables = {
+      HOME = "/var/data/ollama";
+      FLAKE = "/home/maixnor/repo/dotfiles";
+    };
+  };
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland

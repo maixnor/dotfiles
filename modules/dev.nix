@@ -22,6 +22,8 @@
       tectonic
 
       R
+      rstudio
+      vscode
       rPackages.rmarkdown
       rPackages.knitr
       rPackages.vioplot

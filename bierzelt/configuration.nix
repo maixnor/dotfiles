@@ -111,7 +111,7 @@
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
     packages = with pkgs; [ ];
   };
 
