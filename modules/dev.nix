@@ -15,6 +15,8 @@
 
       gcc
 
+      deno jetbrains.webstorm
+
       dotnet-sdk_8
       dotnet-runtime_8
       dotnet-aspnetcore_8
@@ -26,8 +28,6 @@
       vscode
       rPackages.rmarkdown
       rPackages.knitr
-      rPackages.vioplot
-      rPackages.emdbook
       pandoc
       # only for Rstudio, normally use tectonic
       texlive.combined.scheme-medium 

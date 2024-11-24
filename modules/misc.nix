@@ -14,6 +14,7 @@
       ripgrep-all
       # geogebra6
       # krita
+      inkscape
       mpv
       anki
       thunderbird
@@ -38,6 +39,7 @@
       kompare
       krename
       ktimetracker
+      quota
       p7zip # ark dependency
       unrar # ark dependency
 

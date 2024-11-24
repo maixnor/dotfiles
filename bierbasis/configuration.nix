@@ -63,6 +63,7 @@
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
+    docker-compose
     #teamviewer # only works with service.teamviewer
   ];
 
@@ -103,16 +104,17 @@
   };
 
   networking.nftables.enable = false;
-  #networking.firewall = { 
-  #  enable = false;
-  #  allowedTCPPortRanges = [ 
-  #    { from = 1714; to = 1764; } # KDE Connect
-  #  ];  
-  #  allowedUDPPortRanges = [ 
-  #    { from = 1714; to = 1764; } # KDE Connect
-  #  ];  
-  #}; 
+  networking.firewall = { 
+    enable = false;
+    allowedTCPPortRanges = [ 
+      { from = 1714; to = 1764; } # KDE Connect
+    ];  
+    allowedUDPPortRanges = [ 
+      { from = 1714; to = 1764; } # KDE Connect
+    ];  
+  }; 
 
+  # virtualisation.podman.enable = true;
   virtualisation.docker.enable = true;
   virtualisation.docker.enableOnBoot = false; # boot performance
   # virtualisation.libvirtd.enable = true;
