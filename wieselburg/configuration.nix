@@ -21,21 +21,7 @@
     efiInstallAsRemovable = true;
   };
 
-  ### Networking Configuration
-  networking.hostName = "wieselburg";
-  # these options do not work with a VM
-  networking.defaultGateway = "10.0.30.1";
-  networking.nameservers = [ "10.0.30.3" ];
-  networking.interfaces.ens32.ipv4.addresses = [{
-    address = "10.0.30.200";
-    prefixLength = 24;
-  }];
-
   services.openssh.enable = true;
-
-  ### User Configuration
-  security.sudo.wheelNeedsPassword = false;
-  nix.settings.trusted-users = [ "@wheel" "maixnor" "backup" ];
 
   users.users.backup = {
     initialPassword = "backup";
@@ -68,6 +54,9 @@
     #appflowy
   ];
 
+  ### User Configuration
+  security.sudo.wheelNeedsPassword = false;
+  nix.settings.trusted-users = [ "@wheel" "maixnor" "backup" ];
   # Uncomment and configure these services if needed
   # services.jitsi-meet = { enable = true; hostName = "gehinoasch"; };
   # services.mattermost = { enable = true; };

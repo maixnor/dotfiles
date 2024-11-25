@@ -12,9 +12,9 @@
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/zsh.nix
-    ../modules/ollama.nix
     ../modules/graphics.nix
     ../modules/firefox.nix
+    ../modules/myzaney/home.nix
   ];
 
   config = {
@@ -40,10 +40,11 @@
       base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
       fonts = {
         monospace = {
-          name = "Fira Code";
+          name = "Iosevka";
           package = pkgs.fira-code-nerdfont;
         };
         sizes = {
+          #application = 14;
           desktop = 14;
           popups = 14;
           terminal = 12;

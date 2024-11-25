@@ -13,6 +13,7 @@
       ../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      ../modules/myzaney/config.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -61,8 +62,7 @@
 
   services.openssh.enable = true;
 
-  services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.xserver.videoDrivers = [ "displaylink" "modesetting" ];
   services.xserver.xkb = {
@@ -94,7 +94,7 @@
     automatic = true;
     persistent = true;
     dates = "weekly";
-    options = "--delete-older-than 10d";
+    options = "--delete-older-than 7d";
   };
 
   hardware.pulseaudio.enable = false;

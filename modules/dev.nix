@@ -25,12 +25,19 @@
 
       R
       rstudio
+<<<<<<< Updated upstream
       vscode
       rPackages.rmarkdown
       rPackages.knitr
+=======
+>>>>>>> Stashed changes
       pandoc
       # only for Rstudio, normally use tectonic
       texlive.combined.scheme-medium 
+
+      jetbrains.idea-ultimate
+      vscodium
+      vscode
     ];
   };
 }
