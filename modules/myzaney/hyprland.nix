@@ -12,6 +12,7 @@ let
     terminal
     extraMonitorSettings
     keyboardLayout
+    username
     ;
 in
 with lib;

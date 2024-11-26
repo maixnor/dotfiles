@@ -30,33 +30,66 @@
         cd ~/repo/dotfiles && just bierzelt
     '';
 
-    stylix = {
+    # Styling Options
+    gtk = {
+      iconTheme = {
+        name = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme;
+      };
+      gtk3.extraConfig = {
+        gtk-application-prefer-dark-theme = 1;
+      };
+      gtk4.extraConfig = {
+        gtk-application-prefer-dark-theme = 1;
+      };
+    };
+    qt = {
       enable = true;
+      style.name = "adwaita-dark";
+      platformTheme.name = "gtk3";
+    };
+    stylix = {
       image = pkgs.fetchurl {
         url = "https://upload.wikimedia.org/wikipedia/commons/3/36/Golden_Horn_Metro_Bridge_Mars_2013.jpg";
         sha256 = "sha256-pcTdVAjM2cPJrwHdS61wvpH4pJJlTcE5LlDbJHe1Kno=";
       };
+      #base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
       polarity = "dark";
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
       fonts = {
         monospace = {
+          package = pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; };
           name = "Iosevka";
-          package = pkgs.fira-code-nerdfont;
+        };
+        sansSerif = {
+          package = pkgs.montserrat;
+          name = "Montserrat";
+        };
+        serif = {
+          package = pkgs.montserrat;
+          name = "Montserrat";
         };
         sizes = {
-          #application = 14;
-          desktop = 14;
-          popups = 14;
-          terminal = 12;
+          applications = 12;
+          terminal = 15;
+          desktop = 11;
+          popups = 12;
         };
       };
+      targets = {
+        waybar.enable = false;
+        rofi.enable = false;
+        hyprland.enable = false;
+        nixvim.transparentBackground.main = true;
+        nixvim.transparentBackground.signColumn = true;
+      };
+      cursor.package = pkgs.bibata-cursors;
+      cursor.name = "Bibata-Modern-Ice";
+      cursor.size = 24;
       opacity = {
         terminal = 0.8;
         desktop = 0.95;
         popups = 0.8;
       };
-      targets.nixvim.transparentBackground.main = true;
-      targets.nixvim.transparentBackground.signColumn = true;
     };
 
     services.kdeconnect = {

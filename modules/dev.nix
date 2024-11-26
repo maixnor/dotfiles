@@ -10,27 +10,24 @@
     };
 
     environment.systemPackages = with pkgs; [
-      rustup
+      rustup jetbrains.rust-rover
       bacon
 
       gcc
 
       deno jetbrains.webstorm
 
-      dotnet-sdk_8
+      dotnet-sdk_8 jetbrains.rider
       dotnet-runtime_8
       dotnet-aspnetcore_8
 
       tectonic
 
       R
-      rstudio
-<<<<<<< Updated upstream
-      vscode
       rPackages.rmarkdown
       rPackages.knitr
-=======
->>>>>>> Stashed changes
+      rstudio
+      vscode
       pandoc
       # only for Rstudio, normally use tectonic
       texlive.combined.scheme-medium 

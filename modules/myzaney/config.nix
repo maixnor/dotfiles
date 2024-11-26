@@ -12,32 +12,6 @@ in
 {
 
   # Styling Options
-  stylix = {
-    cursor.package = pkgs.bibata-cursors;
-    cursor.name = "Bibata-Modern-Ice";
-    cursor.size = 24;
-    fonts = {
-      monospace = {
-        package = pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; };
-        name = "Iosevka";
-      };
-      sansSerif = {
-        package = pkgs.montserrat;
-        name = "Montserrat";
-      };
-      serif = {
-        package = pkgs.montserrat;
-        name = "Montserrat";
-      };
-      sizes = {
-        applications = 12;
-        terminal = 15;
-        desktop = 11;
-        popups = 12;
-      };
-    };
-  };
-
   programs = {
     dconf.enable = true;
     seahorse.enable = true;

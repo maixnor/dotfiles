@@ -3,7 +3,6 @@
 {
 
   imports = [
-    ./config.nix
     ./home.nix
   ];
 
