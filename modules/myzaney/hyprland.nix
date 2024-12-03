@@ -60,6 +60,8 @@ with lib;
           }
           input {
             kb_layout = ${keyboardLayout}
+            kb_variant = workman
+            kb_options = caps:swapescape
             kb_options = grp:alt_shift_toggle
             kb_options = caps:super
             follow_mouse = 1

@@ -16,11 +16,11 @@ in
     MOZ_ENABLE_WAYLAND = "1 firefox";
   };
 
-  home.packages = with pkgs; [ firefox-bin ];
+  #home.packages = with pkgs; [ firefox-bin ];
 
   programs.firefox = {
     enable = true;
-    package = pkgs.latest.firefox-nightly-bin;
+    package = pkgs.firefox-bin;
     profiles.post = {
       id = 10;
       name = "post";
