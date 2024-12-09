@@ -31,7 +31,15 @@ in
     };
   };
 
+  security.pam.services.kwallet = {
+    name = "kwallet";
+    enableKwallet = true;
+  };
+
   environment.systemPackages = with pkgs; [
+    # custom begin
+    # custom end 
+
     vim
     wget
     killall

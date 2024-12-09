@@ -63,7 +63,7 @@ with lib;
             kb_variant = workman
             kb_options = caps:swapescape
             kb_options = grp:alt_shift_toggle
-            kb_options = caps:super
+            numlock_by_default = true
             follow_mouse = 1
             touchpad {
               natural_scroll = true
@@ -109,10 +109,6 @@ with lib;
           }
           decoration {
             rounding = 10
-            drop_shadow = true
-            shadow_range = 4
-            shadow_render_power = 3
-            col.shadow = rgba(1a1a1aee)
             blur {
                 enabled = true
                 size = 5
@@ -135,15 +131,13 @@ with lib;
           bind = ${modifier}ALT,W,exec,wallsetter
           bind = ${modifier}SHIFT,N,exec,swaync-client -rs
           bind = ${modifier},W,exec,${browser}
-          bind = ${modifier},E,exec,emopicker9000
+          bind = ${modifier},.,exec,emopicker9000
           bind = ${modifier},S,exec,screenshootin
-          bind = ${modifier},D,exec,discord
-          bind = ${modifier},O,exec,obs
+          bind = ${modifier},D,exec,exec,rofi-launcher
+          bind = ${modifier},O,exec,obsidian
           bind = ${modifier},C,exec,hyprpicker -a
-          bind = ${modifier},G,exec,gimp
-          bind = ${modifier}SHIFT,G,exec,godot4
-          bind = ${modifier},T,exec,thunar
-          bind = ${modifier},M,exec,spotify
+          bind = ${modifier},G,exec,libreoffice
+          bind = ${modifier},T,exec,thunderbird
           bind = ${modifier},Q,killactive,
           bind = ${modifier},P,pseudo,
           bind = ${modifier}SHIFT,I,togglesplit,

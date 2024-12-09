@@ -7,7 +7,7 @@
   username = "maixnor";
 
   # Program Options
-  browser = "brave"; # Set Default Browser (google-chrome-stable for google-chrome)
+  browser = "firefox"; # Set Default Browser (google-chrome-stable for google-chrome)
   terminal = "kitty"; # Set Default System Terminal
   keyboardLayout = "us";
 }
