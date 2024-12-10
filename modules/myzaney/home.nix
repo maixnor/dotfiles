@@ -128,12 +128,15 @@ in
         tab_fade 1
         active_tab_font_style   bold
         inactive_tab_font_style bold
+        background_opacity 0.6
+        background_blur    5
+
       '';
     };
-     starship = {
-            enable = true;
-            package = pkgs.starship;
-     };
+    starship = {
+      enable = true;
+      package = pkgs.starship;
+    };
     bash = {
       enable = true;
       enableCompletion = true;

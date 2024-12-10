@@ -136,7 +136,8 @@ with lib;
           bind = ${modifier},D,exec,exec,rofi-launcher
           bind = ${modifier},O,exec,obsidian
           bind = ${modifier},C,exec,hyprpicker -a
-          bind = ${modifier},G,exec,libreoffice
+          bind = ${modifier},L,exec,libreoffice
+          bind = ${modifier},E,exec,ranger
           bind = ${modifier},T,exec,thunderbird
           bind = ${modifier},Q,killactive,
           bind = ${modifier},P,pseudo,
