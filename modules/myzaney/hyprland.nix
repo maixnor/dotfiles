@@ -137,7 +137,8 @@ with lib;
           bind = ${modifier},O,exec,obsidian
           bind = ${modifier},C,exec,hyprpicker -a
           bind = ${modifier},L,exec,libreoffice
-          bind = ${modifier},E,exec,ranger
+          bind = ${modifier},E,exec,kitty ranger
+          bind = ${modifier},B,exec,kitty btop
           bind = ${modifier},T,exec,thunderbird
           bind = ${modifier},Q,killactive,
           bind = ${modifier},P,pseudo,
