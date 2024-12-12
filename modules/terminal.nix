@@ -3,9 +3,7 @@
 {
 
 	home.packages = with pkgs; [
-    fira-code
 		just
-    fira-code-nerdfont
     ranger
 	];
 

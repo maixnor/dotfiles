@@ -8,7 +8,7 @@
     viAlias = true;
     vimAlias = true;
 
-    extraPackages = with pkgs; [ lua ripgrep parallel fd fzf bat fira-code-nerdfont ];
+    extraPackages = with pkgs; [ lua ripgrep parallel fd fzf bat ];
 
     opts = {
       number = true;         
