@@ -3,6 +3,7 @@
   username,
   host,
   config,
+  pkgs,
   ...
 }:
 
@@ -47,6 +48,7 @@ with lib;
           exec-once = nm-applet --indicator
           exec-once = lxqt-policykit-agent
           exec-once = sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/beautifulmountainscape.jpg
+          exec-once = startup
           monitor=,preferred,auto,1
           ${extraMonitorSettings}
           general {
@@ -133,7 +135,7 @@ with lib;
           bind = ${modifier},W,exec,${browser}
           bind = ${modifier},.,exec,emopicker9000
           bind = ${modifier},S,exec,screenshootin
-          bind = ${modifier},D,exec,exec,rofi-launcher
+          bind = ${modifier},D,exec,rofi-launcher
           bind = ${modifier},O,exec,obsidian
           bind = ${modifier},C,exec,hyprpicker -a
           bind = ${modifier},L,exec,libreoffice
