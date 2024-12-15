@@ -24,6 +24,7 @@
       nixos-anywhere
 
       # kde
+      kile
       kate
       okular
       spectacle
