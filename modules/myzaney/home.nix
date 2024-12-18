@@ -1,12 +1,10 @@
 {
   pkgs,
-  username,
-  host,
+  lib,
   ...
 }:
 let
-  username = "maixnor";
-  host = "bierzelt";
+  inherit (import ./variables.nix) username host;
 in
 {
 
@@ -167,7 +165,7 @@ in
     home-manager.enable = true;
     hyprlock = {
       enable = true;
-      settings = {
+      settings = lib.mkForce {
         general = {
           disable_loading_bar = true;
           grace = 10;

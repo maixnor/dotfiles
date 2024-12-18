@@ -8,10 +8,10 @@
       sha256 = "sha256-pcTdVAjM2cPJrwHdS61wvpH4pJJlTcE5LlDbJHe1Kno=";
     };
     polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
+    #base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
     fonts = {
       monospace = {
-        package = pkgs.nerd-fonts.Iosevka;
+        package = pkgs.nerd-fonts.iosevka;
         name = "Iosevka";
       };
       sansSerif = {
@@ -33,19 +33,24 @@
       desktop = 0.95;
       popups = 0.8;
     };
-    cursor.package = pkgs.bibata-cursors;
-    cursor.name = "Bibata-Modern-Ice";
-    cursor.size = 24;
+    cursor = {
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Ice";
+      size = 24;
+    };
 
-    targets.nixvim.transparentBackground.main = true;
-    targets.nixvim.transparentBackground.signColumn = true;
+    targets = {
+      nixvim.transparentBackground.main = true;
+      nixvim.transparentBackground.signColumn = true;
 
-    targets.gnome.enable = true;
-    targets.gtk.enable = true;
+      gnome.enable = true;
+      gtk.enable = true;
+      kde.enable = false;
 
-    # zaney does that instead
-    waybar.enable = false;
-    rofi.enable = false;
-    hyprland.enable = false;
+      # zaney does that instead
+      waybar.enable = false;
+      rofi.enable = false;
+      hyprland.enable = false;
+    };
   };
 }

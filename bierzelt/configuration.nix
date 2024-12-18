@@ -8,7 +8,6 @@
 {
   imports =
     [
-      inputs.stylix.nixosModules.stylix
       ./hardware-configuration.nix
       ../modules/services.nix
       ../modules/dev.nix
