@@ -57,7 +57,7 @@
       git-conflict.enable = true;
       wakatime.enable = true;
       undotree.enable = true;
-      colorizer.enable = true;
+      nvim-colorizer.enable = true;
       treesitter.enable = true;
       treesitter.grammarPackages = pkgs.vimPlugins.nvim-treesitter.passthru.allGrammars;
       treesitter-textobjects.enable = true;
