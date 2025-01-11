@@ -21,19 +21,6 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.firefox-bin;
-    profiles.post = {
-      id = 10;
-      name = "post";
-      extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
-        darkreader
-        ublock-origin
-        decentraleyes
-        privacy-badger
-        vimium
-        tree-style-tab
-        add-custom-search-engine
-      ];
-    };
     profiles.maixnor = {
       id = 0;
       name = "maixnor";
@@ -45,7 +32,6 @@ in
         privacy-badger
         youtube-recommended-videos
         vimium
-        tree-style-tab
         simple-translate
         add-custom-search-engine
         gesturefy
