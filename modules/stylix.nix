@@ -11,8 +11,8 @@
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
     fonts = {
       monospace = {
-        package = pkgs.nerd-fonts.iosevka;
-        name = "Iosevka";
+        package = pkgs.nerd-fonts.fira-code;
+        name = "Fira Code";
       };
       sansSerif = {
         package = pkgs.montserrat;
@@ -24,7 +24,7 @@
       };
       sizes = {
         applications = 12;
-        terminal = 15;
+        terminal = 12;
         popups = 12;
       };
     };

@@ -62,13 +62,13 @@
       treesitter.grammarPackages = pkgs.vimPlugins.nvim-treesitter.passthru.allGrammars;
       treesitter-textobjects.enable = true;
       fzf-lua.enable = true;
-      #lsp.enable = true;
-      #lsp.servers = {
-      #  nixd.enable = true;
-      #  bashls.enable = true;
-      #  lua_ls.enable = true;
-      #  marksman.enable = true;
-      #};
+      lsp.enable = true;
+      lsp.servers = {
+        nixd.enable = true;
+        bashls.enable = true;
+        lua_ls.enable = true;
+        marksman.enable = true;
+      };
     };
 
     #plugins = {

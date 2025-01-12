@@ -129,7 +129,6 @@ in
         inactive_tab_font_style bold
         background_opacity 0.6
         background_blur    5
-
       '';
     };
     starship = {
