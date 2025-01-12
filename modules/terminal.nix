@@ -11,7 +11,7 @@
 		enable = true;
 		settings = {
 			window = {
-				startup_mode = "Fullscreen";
+				startup_mode = "Maximized";
 				decorations = "full";
 			};
 			scrolling = {
