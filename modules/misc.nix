@@ -8,6 +8,7 @@
       traceroute
       wget xh
       freshfetch
+      calc
       spotify
       btop iftop iotop
       inotify-tools

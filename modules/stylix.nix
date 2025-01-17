@@ -11,8 +11,8 @@
     #base16Scheme = "${pkgs.base16-schemes}/share/themes/oxocarbon-dark.yaml";
     fonts = {
       monospace = {
-        package = pkgs.nerd-fonts.fira-code;
-        name = "Fira Code";
+        package = pkgs.nerd-fonts.iosevka-term;
+        name = "Iosevka";
       };
       sansSerif = {
         package = pkgs.montserrat;
