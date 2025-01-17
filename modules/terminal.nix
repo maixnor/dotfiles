@@ -11,14 +11,14 @@
 		enable = true;
 		settings = {
 			window = {
-				startup_mode = "Maximized";
+				startup_mode = "Windowed";
 				decorations = "full";
 			};
 			scrolling = {
 				history = 30000;
 			};
-			live_config_reload = true;
-			shell = {
+			general.live_config_reload = true;
+			terminal.shell = {
 				program = "${pkgs.zsh}/bin/zsh";
 			};
 			colors = {

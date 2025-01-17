@@ -48,7 +48,7 @@
     wl-clipboard # wl-copy wl-paste
 
     bat fd ripgrep delta lsd dust duf # modern replacements
-    choose sd cheat tldr gping procs dog # modern replacements
+    choose sd cheat tldr gping procs # dog # modern replacements
 
     clang coreutils just inotify-tools
 		jq jc jo gron yj yq pup # like jq but different formats

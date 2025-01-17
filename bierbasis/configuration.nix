@@ -81,7 +81,7 @@
     options = "--delete-older-than 10d";
   };
 
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
