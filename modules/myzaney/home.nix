@@ -105,6 +105,10 @@ in
     };
   };
 
+  # required for kitty 
+  # does not work, whole folder is copied and not just the 1 file required
+  #home.file."/home/maixnor/.nix-profile/share/fonts/truetype/".source = pkgs.nerd-fonts.iosevka;
+
   programs = {
     gh.enable = true;
     btop = {

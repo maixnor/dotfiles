@@ -1,8 +1,7 @@
 { pkgs }:
 
 pkgs.writeShellScriptBin "startup" ''
-  # start open-webui container on bierzelt
-  docker start 44bb
+  tmux start-server
   # Start Obsidian and move to workspace 1
   sleep .5
   hyprctl dispatch workspace 1
@@ -18,4 +17,6 @@ pkgs.writeShellScriptBin "startup" ''
   hyprctl dispatch workspace 8
   alacritty &
   sleep 1 # Wait for Kitty to start
+  # start open-webui container on bierzelt
+  docker start 44bb
 ''
