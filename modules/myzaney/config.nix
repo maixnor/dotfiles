@@ -245,12 +245,5 @@ in
     };
   };
 
-  # Virtualization / Containers
-  virtualisation.podman = {
-    enable = true;
-    dockerCompat = true;
-    defaultNetwork.settings.dns_enabled = true;
-  };
-
   console.keyMap = "us";
 }

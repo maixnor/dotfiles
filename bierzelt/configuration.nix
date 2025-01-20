@@ -88,7 +88,7 @@
       CPU_MAX_PERF_ON_BAT = 20;
 
      #Optional helps save long term battery health
-     START_CHARGE_THRESH_BAT0 = 40; # 40 and bellow it starts to charge
+     START_CHARGE_THRESH_BAT0 = 40; # 40 and below it starts to charge
      STOP_CHARGE_THRESH_BAT0 = 80; # 80 and above it stops charging
     };
   };
@@ -131,10 +131,20 @@
   environment.systemPackages = with pkgs; [ 
     wormhole-william
     teamviewer # only works with service.teamviewer
+    # qemu and virt-manager to work with libvirt
+    qemu
+    quickemu
+    virt-manager
   ];
 
-  # virtualisation.docker.enable = true;
-  # virtualisation.libvirtd.enable = true;
+  # Virtualization / Containers
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+  virtualisation.libvirtd.enable = true;
+	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against chrome and electron apps flickering on wayland
