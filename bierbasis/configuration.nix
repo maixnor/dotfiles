@@ -115,9 +115,12 @@
     ];  
   }; 
 
-  # virtualisation.podman.enable = true;
-  virtualisation.docker.enable = true;
-  virtualisation.docker.enableOnBoot = false; # boot performance
+  # Virtualization / Containers
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
   # virtualisation.libvirtd.enable = true;
 	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
