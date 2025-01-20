@@ -17,7 +17,7 @@
 
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.autoOptimiseStore = true;
+  nix.settings.auto-optimise-store = true;
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
@@ -135,13 +135,24 @@
     qemu
     quickemu
     virt-manager
+    open-webui
   ];
+
+  # open-webui
+
 
   # Virtualization / Containers
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
+  };
+  virtualisation.oci-containers = {
+    backend = "podman";
+
+    containers = {
+      open-webui = import ../containers/open-webui.nix;
+    };
   };
   virtualisation.libvirtd.enable = true;
 	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
