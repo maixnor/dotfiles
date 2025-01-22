@@ -1,18 +1,20 @@
-{ pkgs, lib }:
+{ pkgs, lib, ... }:
 
 {
 
   services.moodle = {
     enable = true;
-    initialPassword = "nicolasolsa";
+    initialPassword = "topsecret";
     database.createLocally = true;
     virtualHost = {
-      listen."6080".ip = true;
-      hostName = "localhost:6080";
-      adminAddr = "severin.heugabler@gmail.com";
-      forceSSL = true;
-      enableACME = true;
+      hostName = "localhost:80";
+      adminAddr = "benjamin@meixner.org";
+      #forceSSL = true;
+      #enableACME = true;
     };
   };
+
+  #security.acme.acceptTerms = true;
+  #security.acme.defaults.email = "benjamin@meixner.org";
 }
 
