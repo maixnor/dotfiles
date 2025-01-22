@@ -19,6 +19,7 @@
       mpv
       anki
       thunderbird
+      ngrok
 
       # nixos
       nix-index
