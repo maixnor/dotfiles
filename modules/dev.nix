@@ -10,14 +10,14 @@
     };
 
     environment.systemPackages = with pkgs; [
-      rustup jetbrains.rust-rover
+      rustup # jetbrains.rust-rover
       bacon
 
       gcc
 
-      deno jetbrains.webstorm
+      deno # jetbrains.webstorm
 
-      dotnet-sdk_8 jetbrains.rider
+      dotnet-sdk_8 # jetbrains.rider
       dotnet-runtime_8
       dotnet-aspnetcore_8
 
@@ -32,7 +32,7 @@
       # only for Rstudio, normally use tectonic
       texlive.combined.scheme-medium 
 
-      jetbrains.idea-ultimate
+      # jetbrains.idea-ultimate
       vscodium
       vscode
     ];
