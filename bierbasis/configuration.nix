@@ -12,6 +12,7 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./gaming.nix
+      #../modules/moodle.nix
       ../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
@@ -32,7 +33,7 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  #hardware.bluetooth.enable = true;
+  hardware.bluetooth.enable = true;
 
   networking = {
     hostName = "bierbasis";
@@ -152,27 +153,6 @@
     openssl
     curl
     expat
-		# place libraries here
-    glib
-    glibc
-    udev
-    nspr
-    cups
-    libdrm
-    mesa # libgbm.so.1
-    dbus.lib # libdbus-1.so.3
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libxcb
-    at-spi2-atk # libatk.so.1
-    libxkbcommon
-    pango
-    cairo
-    alsa-lib # libasound.so.1
 	];
   
   services.openssh.enable = true;
