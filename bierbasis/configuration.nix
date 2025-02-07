@@ -29,7 +29,7 @@
   #systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
   #systemd.services.NetworkManager-wait-online.enable = false;
 
-  boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
+  boot.supportedFilesystems = lib.mkForce [ "btrfs" ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -67,6 +67,7 @@
     wormhole-william
     docker-compose
     #teamviewer # only works with service.teamviewer
+    ntfs3g exfat exfatprogs # mounting hdd
   ];
 
   services.printing.enable = true;
