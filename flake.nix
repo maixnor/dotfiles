@@ -27,9 +27,13 @@
     nix-colors.url = "github:misterio77/nix-colors";
     stylix.url = "github:danth/stylix";
     nixpkgs-mozilla.url = "github:mozilla/nixpkgs-mozilla";
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, ... } @inputs :
+  outputs = { nixpkgs, home-manager, nixos-generators, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
@@ -73,6 +77,18 @@
         inherit pkgs;
         modules = [ ./wieselburg/home.nix ];
         extraSpecialArgs = { inherit inputs; };
+      };
+
+      packages.x86_64-linux = {
+        linode = nixos-generators.nixosGenerate {
+          system = "x86_64-linux";
+          modules = [
+            # you can include your own nixos configuration here, i.e.
+            # ./configuration.nix
+            ./linode/configuration.nix
+          ];
+          format = "linode";
+        };
       };
       
     };
