@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, ... }:
 
 {
   config = {
@@ -11,6 +11,7 @@
 
     environment.systemPackages = with pkgs; [
       jetbrains-toolbox
+
       # rustup 
       # jetbrains.rust-rover
       rustc cargo rustfmt clippy bacon
