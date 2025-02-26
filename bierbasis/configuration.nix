@@ -137,6 +137,7 @@
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland
+    PODMAN_COMPOSE_WARNING_LOGS = "false";
   };
 
   programs.gnupg.agent = {
