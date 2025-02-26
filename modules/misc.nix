@@ -58,6 +58,7 @@
       gh
       vscodium
       chromium
+      static-server
       # remmina
       # pandoc
 
