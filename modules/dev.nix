@@ -38,6 +38,8 @@
       # jetbrains.idea-ultimate
       vscodium
       vscode
+      postman
+      static-server
     ];
   };
 }

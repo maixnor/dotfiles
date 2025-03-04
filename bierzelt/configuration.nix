@@ -85,7 +85,7 @@
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
       CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 20;
+      CPU_MAX_PERF_ON_BAT = 60;
 
      #Optional helps save long term battery health
      START_CHARGE_THRESH_BAT0 = 40; # 40 and below it starts to charge
@@ -147,13 +147,14 @@
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
-  virtualisation.oci-containers = {
-    backend = "podman";
-
-    containers = {
-      open-webui = import ../containers/open-webui.nix;
-    };
-  };
+  # virtualisation.oci-containers = {
+  #   backend = "podman";
+  #   containers = {
+  #     open-webui = import ../containers/open-webui.nix;
+  #   };
+  # };
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
   virtualisation.libvirtd.enable = true;
 	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
