@@ -29,6 +29,8 @@
       R
       rPackages.rmarkdown
       rPackages.knitr
+      rPackages.ggplot2
+      rPackages.dplyr
       rstudio
       vscode
       pandoc
