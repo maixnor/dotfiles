@@ -29,7 +29,5 @@ in
     };
   };
 
-  xdg.configFile."nvim/" = {
-    source = nvchad;
-  };
+  xdg.configFile."nvim/".source = nvchad;
 }

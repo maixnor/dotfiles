@@ -27,6 +27,7 @@ in
       isDefault = true;
       extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
         darkreader
+        bitwarden-password-manager
         ublock-origin
         decentraleyes
         privacy-badger

@@ -135,12 +135,8 @@
     qemu
     quickemu
     virt-manager
-    open-webui
     podman-compose # drop in replacement for docker-compose
   ];
-
-  # open-webui
-
 
   # Virtualization / Containers
   virtualisation.podman = {
