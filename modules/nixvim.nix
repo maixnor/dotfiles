@@ -111,9 +111,9 @@
       Comment.fg = "#f47ac9";
       TreesitterContext.bg = "NONE";
 
-      Normal.bg = "NONE";
-      NonText.bg = "NONE";
-      Normal.ctermbg = "NONE";
+      #Normal.bg = "NONE";
+      #NonText.bg = "NONE";
+      #Normal.ctermbg = "NONE";
       NormalNC.bg = "NONE";
     };
 

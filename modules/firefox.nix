@@ -25,9 +25,9 @@ in
       id = 0;
       name = "maixnor";
       isDefault = true;
-      extensions = with inputs.firefox-addons.packages."x86_64-linux"; [
+      extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
         darkreader
-        bitwarden-password-manager
+        bitwarden
         ublock-origin
         decentraleyes
         privacy-badger

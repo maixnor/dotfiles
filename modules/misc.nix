@@ -27,9 +27,14 @@
 
       # kde
       kile
-      kate
-      okular
-      spectacle
+      krusader
+      krename
+      ktimetracker
+      kdePackages.kompare
+      kdePackages.konsole
+      kdePackages.spectacle
+      kdePackages.okular
+      kdePackages.kate
       kdePackages.kmail
       kdePackages.kmailtransport
       kdePackages.kdepim-addons
@@ -37,11 +42,7 @@
       kdePackages.korganizer
       kdePackages.kontact
       kdePackages.plasma-disks
-      konsole
-      krusader
-      kompare
-      krename
-      ktimetracker
+
       quota
       p7zip # ark dependency
       unrar # ark dependency
