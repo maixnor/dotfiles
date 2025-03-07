@@ -135,11 +135,8 @@
     qemu
     quickemu
     virt-manager
-    open-webui
+    podman-compose # drop in replacement for docker-compose
   ];
-
-  # open-webui
-
 
   # Virtualization / Containers
   virtualisation.podman = {
@@ -147,12 +144,6 @@
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
-  # virtualisation.oci-containers = {
-  #   backend = "podman";
-  #   containers = {
-  #     open-webui = import ../containers/open-webui.nix;
-  #   };
-  # };
   virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
   virtualisation.libvirtd.enable = true;

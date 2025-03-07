@@ -23,6 +23,7 @@
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/nixvim.nix
+    #../modules/neovim.nix
     ../modules/zsh.nix
     ../modules/graphics.nix
     ../modules/firefox.nix

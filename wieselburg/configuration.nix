@@ -18,7 +18,7 @@
   ### Bootloader Configuration
   boot.loader.grub = {
     efiSupport = true;
-    efiInstallAsRemovable = true;
+    #efiInstallAsRemovable = true;
   };
 
   services.openssh.enable = true;
@@ -45,6 +45,7 @@
     server.port = 6666;
     server.bind_address = "0.0.0.0";
     server.secret_key = "definetelysecret";
+    formats = [ "html" "json" "csv" ];
   };
 
   ### System Packages

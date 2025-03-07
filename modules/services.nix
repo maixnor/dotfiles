@@ -3,8 +3,6 @@
 {
 
   config = {
-    #services.onedrive.enable = true;
-
     services.searx.enable = true;
     services.searx.settings.server = {
       port = 6666;
@@ -14,7 +12,6 @@
 
     services.open-webui = {
       enable = true;
-      #stateDir = "/home/maixnor/.config/open-webui";
       port = 7080;
       environment = {
         ANONYMIZED_TELEMETRY = "False";

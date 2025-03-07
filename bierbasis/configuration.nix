@@ -65,7 +65,7 @@
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    docker-compose
+    podman-compose # drop in replacement for docker-compose
     #teamviewer # only works with service.teamviewer
     ntfs3g exfat exfatprogs # mounting hdd
   ];
@@ -137,6 +137,7 @@
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland
+    PODMAN_COMPOSE_WARNING_LOGS = "false";
   };
 
   programs.gnupg.agent = {
@@ -156,14 +157,6 @@
     expat
 
     # jetbrains tools
-    SDL
-    SDL2
-    SDL2_image
-    SDL2_mixer
-    SDL2_ttf
-    SDL_image
-    SDL_mixer
-    SDL_ttf
     alsa-lib
     at-spi2-atk
     at-spi2-core

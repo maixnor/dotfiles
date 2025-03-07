@@ -10,7 +10,22 @@
     };
 
     environment.systemPackages = with pkgs; [
+      # language servers
+      lua-language-server
+      gopls
+      wl-clipboard
+      luajitPackages.lua-lsp
+      nil
+      nixd
+      rust-analyzer
+      nodePackages.bash-language-server
+      yaml-language-server
+      pyright
+      marksman
+
       jetbrains-toolbox
+
+      python314
 
       # rustup 
       # jetbrains.rust-rover
