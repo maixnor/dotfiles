@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, lib, ... }:
 
 {
 
@@ -17,6 +17,7 @@
 			scrolling = {
 				history = 30000;
 			};
+      font.normal = lib.mkForce "Iosevka";
 			general.live_config_reload = true;
 			terminal.shell = {
 				program = "${pkgs.zsh}/bin/zsh";
