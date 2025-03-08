@@ -20,7 +20,7 @@ in
 
   programs.firefox = {
     enable = true;
-    package = pkgs.firefox-bin;
+    package = pkgs.librewolf;
     profiles.maixnor = {
       id = 0;
       name = "maixnor";

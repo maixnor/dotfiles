@@ -27,7 +27,7 @@
     #../modules/neovim.nix
     ../modules/zsh.nix
     ../modules/graphics.nix
-    ../modules/firefox.nix
+    ../modules/librewolf.nix
     ../modules/minecraft.nix
   ];
 

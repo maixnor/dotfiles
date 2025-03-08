@@ -14,7 +14,7 @@
     ../modules/stylix.nix
     ../modules/zsh.nix
     ../modules/graphics.nix
-    ../modules/firefox.nix
+    ../modules/librewolf.nix
     ../modules/myzaney/home.nix
   ];
 
