@@ -4,6 +4,8 @@
 
   config = {
     services.searx.enable = true;
+    #services.searx.redisCreateLocally = true;
+    services.searx.settings.formats = [ "html" "json" ];
     services.searx.settings.server = {
       port = 6666;
       bind_address = "0.0.0.0";

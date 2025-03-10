@@ -38,6 +38,7 @@
     LANG = "en_US.UTF-8";
   };
 
+  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
   stylix.fonts.sizes = {
     #application = 14;
     desktop = 14;

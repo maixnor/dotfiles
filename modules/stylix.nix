@@ -38,8 +38,8 @@
       nixvim.transparentBackground.main = true;
       nixvim.transparentBackground.signColumn = true;
 
-      gnome.enable = true;
-      gtk.enable = true;
+      gnome.enable = false;
+      gtk.enable = false;
       kde.enable = false;
 
       # zaney does that instead
