@@ -64,7 +64,7 @@
   qt = {
     enable = true;
     platformTheme = "kde";
-    style = "kvantum";
+    style = "breeze";
   };
 
   #services.teamviewer.enable = true;
