@@ -16,14 +16,14 @@
   nixpkgs.config.allowUnfree = true;
 
   imports = [
-    inputs.stylix.homeManagerModules.stylix
+    #inputs.stylix.homeManagerModules.stylix
     inputs.nixvim.homeManagerModules.nixvim
     ../modules/tmux.nix
     ../modules/terminal.nix
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/nixvim.nix
-    ../modules/stylix.nix
+    #../modules/stylix.nix
     #../modules/neovim.nix
     ../modules/zsh.nix
     ../modules/graphics.nix
@@ -38,13 +38,12 @@
     LANG = "en_US.UTF-8";
   };
 
-  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
-  stylix.fonts.sizes = {
-    #application = 14;
-    desktop = 14;
-    popups = 14;
-    terminal = 12;
-  };
+  #stylix.fonts.sizes = {
+  #  #application = 14;
+  #  desktop = 14;
+  #  popups = 14;
+  #  terminal = 12;
+  #};
 
   services.kdeconnect = {
     enable = true;

@@ -61,6 +61,12 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  qt = {
+    enable = true;
+    platformTheme = "kde";
+    style = "kvantum";
+  };
+
   #services.teamviewer.enable = true;
 
   environment.systemPackages = with pkgs; [ 
