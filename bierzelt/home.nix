@@ -1,5 +1,5 @@
 
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   
@@ -44,10 +44,10 @@
         gtk-application-prefer-dark-theme = 1;
       };
     };
-    qt = {
+    qt = lib.mkForce {
       enable = true;
-      style.name = "adwaita-dark";
-      platformTheme.name = "gtk3";
+      style.name = "breeze";
+      platformTheme.name = "kde";
     };
 
     services.kdeconnect = {
