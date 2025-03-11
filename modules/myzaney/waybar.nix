@@ -118,7 +118,7 @@ in
           tooltip = false;
           format = "";
           # exec = "rofi -show drun";
-          on-click = "sleep 0.1 && rofi-launcher";
+          on-click = "rofi-launcher";
         };
         "custom/hyprbindings" = {
           tooltip = false;
@@ -237,22 +237,22 @@ in
         margin: 4px 0px;
         margin-left: 7px;
         padding: 0px 18px;
-        background: #${config.lib.stylix.colors.base04};
+        background: #${config.lib.stylix.colors.base0E};
         color: #${config.lib.stylix.colors.base00};
         border-radius: 24px 10px 24px 10px;
       }
       #custom-startmenu {
-        color: #${config.lib.stylix.colors.base0B};
+        color: #${config.lib.stylix.colors.base0C};
         background: #${config.lib.stylix.colors.base02};
-        font-size: 28px;
+        font-size: 32px;
         margin: 0px;
-        padding: 0px 30px 0px 15px;
-        border-radius: 0px 0px 40px 0px;
+        padding: 0px 25px 0px 30px;
+        border-radius: 0px 0px 30px 0px;
       }
       #custom-hyprbindings, #network, #battery,
       #custom-notification, #tray, #custom-exit {
         font-weight: bold;
-        background: #${config.lib.stylix.colors.base0F};
+        background: #${config.lib.stylix.colors.base0E};
         color: #${config.lib.stylix.colors.base00};
         margin: 4px 0px;
         margin-right: 7px;
