@@ -41,11 +41,25 @@
 
       tectonic
 
-      R
-      rPackages.rmarkdown
-      rPackages.knitr
-      rPackages.ggplot2
+      # all the R stuff
+      R 
+      rPackages.rmarkdown 
+      rPackages.extraDistr
       rPackages.dplyr
+      rPackages.ggplot2
+      rPackages.ggthemes
+      rPackages.psych
+      rPackages.corrplot
+      rPackages.Hmisc
+      rPackages.apaTables
+      rPackages.nFactors
+      rPackages.qgraph
+      rPackages.xts
+      rPackages.lubridate
+      rPackages.tidyverse
+      rPackages.viridisLite
+      rPackages.Benchmarking
+
       rstudio
       vscode
       pandoc
