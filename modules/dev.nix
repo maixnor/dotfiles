@@ -1,6 +1,26 @@
 { pkgs, ... }:
 
-{
+let 
+  r-with-my-packages = with pkgs; rWrapper.override{ packages = with rPackages; [ 
+      rmarkdown 
+      extraDistr
+      dplyr
+      ggplot2
+      ggthemes
+      psych
+      corrplot
+      Hmisc
+      apaTables
+      nFactors
+      qgraph
+      xts
+      lubridate
+      tidyverse
+      viridisLite
+      Benchmarking
+    ];
+  };
+in {
   config = {
 
     services.languagetool = {
@@ -42,23 +62,9 @@
       tectonic
 
       # all the R stuff
+
       R 
-      rPackages.rmarkdown 
-      rPackages.extraDistr
-      rPackages.dplyr
-      rPackages.ggplot2
-      rPackages.ggthemes
-      rPackages.psych
-      rPackages.corrplot
-      rPackages.Hmisc
-      rPackages.apaTables
-      rPackages.nFactors
-      rPackages.qgraph
-      rPackages.xts
-      rPackages.lubridate
-      rPackages.tidyverse
-      rPackages.viridisLite
-      rPackages.Benchmarking
+      r-with-my-packages
 
       rstudio
       vscode
@@ -74,3 +80,4 @@
     ];
   };
 }
+

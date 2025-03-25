@@ -8,10 +8,10 @@ pkgs.writeShellScriptBin "startup" ''
   obsidian &
   sleep 2 # Wait for Obsidian to start
 
-  # Start Firefox and move to workspace 3
+  # Start browser and move to workspace 3
   hyprctl dispatch workspace 3
-  firefox &
-  sleep 2 # Wait for Firefox to start
+  librefolf &
+  sleep 2 # Wait for browser to start
 
   # Start Kitty and move to workspace 8
   hyprctl dispatch workspace 8
