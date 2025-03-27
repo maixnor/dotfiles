@@ -1,15 +1,5 @@
 { pkgs, inputs, ... }:
 
-let 
-  lock-false = {
-    Value = false;
-    Status = "locked";
-  };
-  lock-true = {
-    Value = true;
-    Status = "locked";
-  };
-in
 {
   home.sessionVariables = {
     MOZ_USE_XINPUT2 = "1";
@@ -18,75 +8,80 @@ in
 
   #home.packages = with pkgs; [ firefox-bin ];
 
-  programs.firefox = {
+  programs.librewolf = {
     enable = true;
-    package = pkgs.librewolf;
-    profiles.maixnor = {
-      id = 0;
-      name = "maixnor";
-      isDefault = true;
-      extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
-        darkreader
-        bitwarden
-        ublock-origin
-        decentraleyes
-        privacy-badger
-        youtube-recommended-videos
-        vimium
-        simple-translate
-        add-custom-search-engine
-        gesturefy
-        side-view
-        bionic-reader
-        tranquility-1
-        wakatimes
-      ];
-    };
-    policies = {
-      DisableTelemetry = true;
-      DisableFirefoxStudies = true;
-      EnableTrackingProtection = {
-        Value = true;
-        Locked = true;
-        Cryptomining = true;
-        Fingerprinting = true;
-      };
-      DisablePocket = true;
-      DisableFirefoxAccounts = false;
-      DisableAccounts = false;
-      DisableFirefoxScreenshots = false;
-      OverrideFirstRunPage = "";
-      OverridePostUpdatePage = "";
-      DontCheckDefaultBrowser = true;
-      DisplayBookmarksToolbar = "newtab"; # alternatives: "always" or "newtab"
-      DisplayMenuBar = "default-off"; # alternatives: "always", "never" or "default-on"
-      SearchBar = "unified"; # alternative: "separate"
+    /* ---- PREFERENCES ---- */
+    # Check about:config for options.
+    settings = { 
+      "webgl.disabled" = false;
+      "privacy.clearOnShutdown.history" = false;
+      "privacy.clearOnShutdown.cookies" = false;
 
-      /* ---- PREFERENCES ---- */
-      # Check about:config for options.
-      Preferences = { 
-        "browser.contentblocking.category" = { Value = "strict"; Status = "locked"; };
-        "extensions.pocket.enabled" = lock-false;
-        "extensions.screenshots.disabled" = lock-true;
-        "browser.topsites.contile.enabled" = lock-false;
-        "browser.formfill.enable" = lock-true;
-        "browser.search.suggest.enabled" = lock-false;
-        "browser.search.suggest.enabled.private" = lock-false;
-        "browser.urlbar.suggest.searches" = lock-true;
-        "browser.urlbar.showSearchSuggestionsFirst" = lock-false;
-        "browser.newtabpage.activity-stream.feeds.section.topstories" = lock-false;
-        "browser.newtabpage.activity-stream.feeds.snippets" = lock-false;
-        "browser.newtabpage.activity-stream.section.highlights.includePocket" = lock-false;
-        "browser.newtabpage.activity-stream.section.highlights.includeBookmarks" = lock-false;
-        "browser.newtabpage.activity-stream.section.highlights.includeDownloads" = lock-false;
-        "browser.newtabpage.activity-stream.section.highlights.includeVisited" = lock-false;
-        "browser.newtabpage.activity-stream.showSponsored" = lock-false;
-        "browser.newtabpage.activity-stream.system.showSponsored" = lock-false;
-        "browser.newtabpage.activity-stream.showSponsoredTopSites" = lock-false;
-        "network.security.ports.banned.override".Value = "1-10000";
-        "widget.use-xdg-desktop-portal.file-picker" = 1;
-      };
+      "browser.contentblocking.category" = "strict";
+      "extensions.pocket.enabled" = false;
+      "extensions.screenshots.disabled" = true;
+      "browser.topsites.contile.enabled" = false;
+      "browser.formfill.enable" = true;
+      "browser.search.suggest.enabled" = true;
+      "browser.search.suggest.enabled.private" = false;
+      "browser.urlbar.suggest.searches" = true;
+      "browser.urlbar.showSearchSuggestionsFirst" = false;
+      "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
+      "browser.newtabpage.activity-stream.feeds.snippets" = false;
+      "browser.newtabpage.activity-stream.section.highlights.includePocket" = false;
+      "browser.newtabpage.activity-stream.section.highlights.includeBookmarks" = false;
+      "browser.newtabpage.activity-stream.section.highlights.includeDownloads" = false;
+      "browser.newtabpage.activity-stream.section.highlights.includeVisited" = false;
+      "browser.newtabpage.activity-stream.showSponsored" = false;
+      "browser.newtabpage.activity-stream.system.showSponsored" = false;
+      "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
+      "network.security.ports.banned.override" = "1-10000";
+      "widget.use-xdg-desktop-portal.file-picker" = 1;
     };
+
+    # profiles.maixnor = {
+    #   id = 0;
+    #   name = "maixnor";
+    #   isDefault = true;
+    #   extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
+    #     darkreader
+    #     bitwarden
+    #     ublock-origin
+    #     decentraleyes
+    #     privacy-badger
+    #     youtube-recommended-videos
+    #     vimium
+    #     simple-translate
+    #     add-custom-search-engine
+    #     gesturefy
+    #     side-view
+    #     bionic-reader
+    #     tranquility-1
+    #     wakatimes
+    #   ];
+    # };
+
+    # policies = {
+    #   DisableTelemetry = true;
+    #   DisableFirefoxStudies = true;
+    #   EnableTrackingProtection = {
+    #     Value = true;
+    #     Locked = true;
+    #     Cryptomining = true;
+    #     Fingerprinting = true;
+    #   };
+    #   DisablePocket = true;
+    #   DisableFirefoxAccounts = false;
+    #   DisableAccounts = false;
+    #   DisableFirefoxScreenshots = false;
+    #   OverrideFirstRunPage = "";
+    #   OverridePostUpdatePage = "";
+    #   DontCheckDefaultBrowser = true;
+    #   DisplayBookmarksToolbar = "newtab"; # alternatives: "always" or "newtab"
+    #   DisplayMenuBar = "default-off"; # alternatives: "always", "never" or "default-on"
+    #   SearchBar = "unified"; # alternative: "separate"
+    # };
+
   };
 
 }

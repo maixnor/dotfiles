@@ -37,6 +37,7 @@
       kdePackages.kate
       kdePackages.kmail
       kdePackages.kmailtransport
+      kdePackages.mailimporter
       kdePackages.kdepim-addons
       kdePackages.kmail-account-wizard
       kdePackages.korganizer
