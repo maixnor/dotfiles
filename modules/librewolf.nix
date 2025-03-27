@@ -36,7 +36,7 @@
       "browser.newtabpage.activity-stream.system.showSponsored" = false;
       "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
       "network.security.ports.banned.override" = "1-10000";
-      "widget.use-xdg-desktop-portal.file-picker" = 1;
+      #"widget.use-xdg-desktop-portal.file-picker" = 1;
     };
 
     # profiles.maixnor = {
