@@ -4,6 +4,7 @@ let
   r-with-my-packages = with pkgs; rWrapper.override{ packages = with rPackages; [ 
       rmarkdown 
       extraDistr
+      margins
       dplyr
       ggplot2
       ggthemes
