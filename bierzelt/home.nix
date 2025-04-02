@@ -32,6 +32,11 @@
     '';
 
     # Styling Options
+    stylix.targets = {
+      gnome.enable = lib.mkForce true;
+      gtk.enable = lib.mkForce true;
+      kde.enable = lib.mkForce true;
+    };
     gtk = {
       iconTheme = {
         name = "Papirus-Dark";
