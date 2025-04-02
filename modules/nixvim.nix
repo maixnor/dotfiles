@@ -8,13 +8,13 @@
     viAlias = true;
     vimAlias = true;
 
-    extraPackages = with pkgs; [ lua ripgrep parallel fd fzf bat ];
+    extraPackages = with pkgs; [ ripgrep parallel fd fzf bat ];
 
     opts = {
       number = true;         
       relativenumber = true; 
 
-      shiftwidth = 2;        
+      shiftwidth = 2;
       tabstop = 2;
       expandtab = true;
       autoindent = true;
@@ -23,6 +23,9 @@
       undofile = true;
       termguicolors = true;
     };
+
+    clipboard.register = "unnamedplus";
+    clipboard.providers.wl-copy.enable = true;
 
     globals.mapleader = " ";
 
@@ -71,6 +74,29 @@
         bashls.enable = true;
         lua_ls.enable = true;
         marksman.enable = true;
+        html.enable = true;
+        jsonls.enable = true;
+        yamlls.enable = true;
+        rust_analyzer = {
+          enable = true;
+          installCargo = false;
+          installRustc = false;
+          settings = {
+            checkOnSave = true;
+            check = {
+              command = "clippy";
+            };
+            inlayHints = {
+              enable = true;
+              showParameterNames = true;
+              parameterHintsPrefix = "<- ";
+              otherHintsPrefix = "=> ";
+            };
+            procMacro = {
+              enable = true;
+            };
+          };
+        };
       };
     };
 
