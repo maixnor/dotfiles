@@ -73,6 +73,7 @@
         nixd.enable = true;
         bashls.enable = true;
         lua_ls.enable = true;
+        r_language_server.enable = true;
         marksman.enable = true;
         html.enable = true;
         jsonls.enable = true;

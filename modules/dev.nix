@@ -2,6 +2,7 @@
 
 let 
   r-with-my-packages = with pkgs; rWrapper.override{ packages = with rPackages; [ 
+      languageserver
       rmarkdown 
       extraDistr
       margins
