@@ -39,7 +39,6 @@ in {
       luajitPackages.lua-lsp
       nil
       nixd
-      rust-analyzer
       nodePackages.bash-language-server
       yaml-language-server
       pyright
@@ -52,6 +51,7 @@ in {
       # rustup 
       # jetbrains.rust-rover
       rustc cargo rustfmt clippy bacon
+      rust-analyzer
 
       gcc
 
