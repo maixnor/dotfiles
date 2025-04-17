@@ -31,7 +31,7 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" ];
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_zen;
 
   hardware.bluetooth.enable = true;
 
