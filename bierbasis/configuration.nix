@@ -61,6 +61,22 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  # wu-bachelor-thesis
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql;
+    ensureDatabases = [ "postgis" ];
+    authentication = pkgs.lib.mkOverride 10 ''
+      #type database DBuser origin-address auth-method
+      local all       all     trust
+      # ipv4
+      host  all      all     127.0.0.1/32   trust
+      # ipv6
+      host all       all     ::1/128        trust
+    '';
+    extensions = with pkgs.postgresql17Packages; [ postgis ];
+  };
+
   qt = {
     enable = true;
     platformTheme = "kde";
@@ -74,6 +90,18 @@
     podman-compose # drop in replacement for docker-compose
     #teamviewer # only works with service.teamviewer
     ntfs3g exfat exfatprogs # mounting hdd
+    virt-manager
+    virt-viewer
+    virtiofsd
+    spice 
+    spice-gtk
+    spice-protocol
+    win-virtio
+    win-spice
+    adwaita-icon-theme
+
+    osm2pgsql
+    qgis
   ];
 
   services.printing.enable = true;
@@ -129,8 +157,20 @@
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
-  # virtualisation.libvirtd.enable = true;
-	# programs.dconf.enable = true; # virt-manager requires dconf to remember settings
+
+  programs.dconf.enable = true;
+  virtualisation = {
+    libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+        ovmf.enable = true;
+        ovmf.packages = [ pkgs.OVMFFull.fd ];
+      };
+    };
+    spiceUSBRedirection.enable = true;
+  };
+
 
   services.ollama = {
     enable = true;

@@ -20,8 +20,8 @@ let
       tidyverse
       viridisLite
       Benchmarking
-
-      fs
+      # maps
+      sf
       rnaturalearth
       rnaturalearthdata
     ];
