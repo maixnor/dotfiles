@@ -61,6 +61,8 @@
       wakatime.enable = true;
       undotree.enable = true;
 
+      quarto.enable = true;
+
       colorizer.enable = true;
       treesitter.enable = true;
       treesitter.grammarPackages = pkgs.vimPlugins.nvim-treesitter.passthru.allGrammars;
@@ -74,6 +76,7 @@
         bashls.enable = true;
         lua_ls.enable = true;
         r_language_server.enable = true;
+        r_language_server.package = null;
         marksman.enable = true;
         html.enable = true;
         jsonls.enable = true;

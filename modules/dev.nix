@@ -20,6 +20,10 @@ let
       tidyverse
       viridisLite
       Benchmarking
+
+      fs
+      rnaturalearth
+      rnaturalearthdata
     ];
   };
 in {
@@ -61,14 +65,14 @@ in {
       dotnet-runtime_8
       dotnet-aspnetcore_8
 
-      tectonic
-
       # all the R stuff
 
       R 
       r-with-my-packages
 
       rstudio
+      tectonic
+      quarto
       vscode
       pandoc
       # only for Rstudio, normally use tectonic
