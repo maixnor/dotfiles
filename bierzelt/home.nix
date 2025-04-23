@@ -15,7 +15,7 @@
     ../modules/zsh.nix
     ../modules/graphics.nix
     ../modules/librewolf.nix
-    ../modules/myzaney/home.nix
+    #../modules/myzaney/home.nix
   ];
 
   config = {

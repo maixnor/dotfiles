@@ -61,9 +61,10 @@ in {
 
       deno # jetbrains.webstorm
 
-      dotnet-sdk_8 # jetbrains.rider
-      dotnet-runtime_8
-      dotnet-aspnetcore_8
+      jetbrains.rider
+      dotnet-sdk_9
+      dotnet-runtime_9
+      dotnet-aspnetcore_9
 
       # all the R stuff
 
