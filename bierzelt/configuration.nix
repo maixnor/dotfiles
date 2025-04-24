@@ -34,8 +34,6 @@
 
   networking.hostName = "bierzelt";
   networking.networkmanager.enable = true;
-  networking.useDHCP = lib.mkDefault true;
-  networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;
 
   #networking.nftables.enable = true;
   networking.firewall = { 
@@ -127,8 +125,6 @@
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
-  virtualisation.virtualbox.host.enable = true;
-  users.extraGroups.vboxusers.members = [ "user-with-access-to-virtualbox" ];
   virtualisation.libvirtd.enable = true;
 	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
