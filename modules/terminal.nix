@@ -7,6 +7,13 @@
     ranger
 	];
 
+  programs.wezterm = {
+    enable = true;
+    enableZshIntegration = true;
+    enableBashIntegration = true;
+    extraConfig = builtins.readFile ./wezterm.lua;
+  };
+
 	programs.alacritty = {
 		enable = true;
 		settings = {
@@ -17,7 +24,7 @@
 			scrolling = {
 				history = 30000;
 			};
-      font.normal = lib.mkForce "Iosevka";
+      font.normal = lib.mkForce { family = "monospace"; };
 			general.live_config_reload = true;
 			terminal.shell = {
 				program = "${pkgs.zsh}/bin/zsh";

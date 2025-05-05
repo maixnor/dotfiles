@@ -7,7 +7,7 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
     fonts = {
       monospace = {
-        package = pkgs.nerd-fonts.fira-code;
+        package = pkgs.nerd-fonts.iosevka;
         name = "Iosevka";
       };
       sansSerif = {
@@ -25,7 +25,7 @@
       };
     };
     opacity = {
-      terminal = 0.8;
+      terminal = 0.9;
       desktop = 0.95;
       popups = 0.8;
     };

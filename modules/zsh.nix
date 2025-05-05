@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ lib, config, pkgs, ... }:
 
 {
 
@@ -55,9 +55,6 @@
 	];
 
   programs.starship.enable = true;
-  home.file = {
-    ".config/starship.toml".source = ../starship.toml;
-  };
-
+  programs.starship.settings = builtins.fromTOML (builtins.readFile ../starship.toml);
 
 }

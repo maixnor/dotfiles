@@ -100,7 +100,7 @@
       bind-key -T copy-mode-vi 'C-\' select-pane -l
 
 			# true colors for Neovim
-			set-option -sa terminal-features ',XXX:RGB'
+			set-option -a terminal-features 'alacritty:RGB'
    '';
   };
 }
