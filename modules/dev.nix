@@ -16,6 +16,8 @@ let
       nFactors
       qgraph
       xts
+      plm
+      estimatr
       lubridate
       tidyverse
       viridisLite

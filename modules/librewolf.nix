@@ -16,6 +16,7 @@
       "webgl.disabled" = false;
       "privacy.clearOnShutdown.history" = false;
       "privacy.clearOnShutdown.cookies" = false;
+      "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
 
       "browser.contentblocking.category" = "strict";
       "extensions.pocket.enabled" = false;

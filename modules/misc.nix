@@ -20,6 +20,7 @@
       anki
       thunderbird
       ngrok
+      josm
 
       # nixos
       nix-index
