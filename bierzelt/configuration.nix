@@ -112,6 +112,7 @@
   environment.systemPackages = with pkgs; [ 
     wormhole-william
     teamviewer # only works with service.teamviewer
+    gnome-network-displays
     # qemu and virt-manager to work with libvirt
     qemu
     quickemu

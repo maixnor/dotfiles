@@ -15,7 +15,6 @@
     ../modules/zsh.nix
     ../modules/graphics.nix
     ../modules/librewolf.nix
-    #../modules/myzaney/home.nix
   ];
 
   config = {
@@ -57,11 +56,6 @@
 
     services.kdeconnect = {
       enable = true;
-      package = pkgs.kdePackages.kdeconnect-kde.overrideAttrs (oldAttrs: {
-        buildInputs = (oldAttrs.buildInputs or []) ++ [ pkgs.kdePackages.qtconnectivity ];
-        cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [ "-DBLUETOOTH_ENABLED=ON" ];
-      });
-
     };
 
     home.stateVersion = "24.11";

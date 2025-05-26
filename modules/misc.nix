@@ -9,6 +9,7 @@
       wget xh
       freshfetch
       calc
+      miraclecast
       spotify
       btop iftop iotop
       inotify-tools

@@ -38,17 +38,7 @@ in {
     };
 
     environment.systemPackages = with pkgs; [
-      # language servers
-      lua-language-server
-      gopls
       wl-clipboard
-      luajitPackages.lua-lsp
-      nil
-      nixd
-      nodePackages.bash-language-server
-      yaml-language-server
-      pyright
-      marksman
 
       jetbrains-toolbox
 
