@@ -144,6 +144,7 @@
   networking.nftables.enable = false;
   networking.firewall = { 
     enable = false;
+    allowedTCPPorts = [ 22 ];
     allowedTCPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
@@ -311,7 +312,15 @@
     zlib
 	];
   
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = true;
+      AllowUsers = [ "maixnor" ];
+      X11Forwarding = false;
+      PermitRootLogin = "no";
+    };
+  };
 
   system.stateVersion = "24.11";
 
