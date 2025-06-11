@@ -49,9 +49,12 @@ in {
       rustc cargo rustfmt clippy bacon
       rust-analyzer
 
+      ruby
+
       gcc
 
       deno # jetbrains.webstorm
+      nodejs_24
 
       jetbrains.rider
       dotnet-sdk_9
