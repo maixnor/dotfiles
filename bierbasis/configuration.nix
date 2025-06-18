@@ -144,7 +144,6 @@
   networking.nftables.enable = false;
   networking.firewall = { 
     enable = false;
-    allowedTCPPorts = [ 22 ];
     allowedTCPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
@@ -314,6 +313,7 @@
   
   services.openssh = {
     enable = true;
+    openFirewall = true;
     settings = {
       PasswordAuthentication = true;
       AllowUsers = [ "maixnor" ];

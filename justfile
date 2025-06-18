@@ -1,9 +1,9 @@
 
 home host: 
-  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup 
+  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup --option cores 7
 
 nixos host:
-	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}} 
+	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}} --option cores 7
 
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 

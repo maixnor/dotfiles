@@ -53,7 +53,8 @@ in {
 
       gcc
 
-      deno # jetbrains.webstorm
+      jetbrains.webstorm
+      deno 
       nodejs_24
 
       jetbrains.rider
