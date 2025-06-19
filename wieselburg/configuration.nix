@@ -52,6 +52,7 @@
   ];
 
   networking.firewall.allowedTCPPorts = [ 6666 ];
+  networking.hostName = "wieselburg";
 
   ### User Configuration
   security.sudo.wheelNeedsPassword = false;
