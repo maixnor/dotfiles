@@ -5,9 +5,11 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
+    ./languagebuddy-deps.nix
     inputs.nixvim.nixosModules.nixvim
     ../modules/nixvim.nix
     ../modules/zerotier.nix
+    
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -18,12 +20,6 @@
   services.openssh.authorizedKeysInHomedir = true;
 
   time.timeZone = "Europe/Amsterdam";
-
-  users.users.backup = {
-    initialPassword = "backup";
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-  };
 
   users.users.maixnor = {
     isNormalUser = true;
