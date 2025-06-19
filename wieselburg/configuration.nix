@@ -6,18 +6,12 @@
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
     ../modules/zerotier.nix
-    #inputs.nixvim.nixosModules.nixvim
-    #../modules/nixvim.nix
+    inputs.nixvim.nixosModules.nixvim
+    ../modules/nixvim.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
   virtualisation.vmware.guest.enable = true;
-
-  ### Bootloader Configuration
-  boot.loader.grub = {
-    efiSupport = true;
-    #efiInstallAsRemovable = true;
-  };
 
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
@@ -56,6 +50,8 @@
     wormhole-william
     #appflowy
   ];
+
+  networking.firewall.allowedTCPPorts = [ 6666 ];
 
   ### User Configuration
   security.sudo.wheelNeedsPassword = false;
