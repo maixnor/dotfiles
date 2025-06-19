@@ -5,9 +5,9 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
-    ../modules/zerotier.nix
     inputs.nixvim.nixosModules.nixvim
     ../modules/nixvim.nix
+    ../modules/zerotier.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -44,15 +44,28 @@
     formats = [ "html" "json" "csv" ];
   };
 
+  ### Nginx and Networking
+  services.nginx.enable = true;
+  services.nginx.virtualHosts."maixnor.com" = {
+      addSSL = true;
+      enableACME = true;
+      root = "/var/www/maixnor.com";
+  };
+
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "benjamin@meixner.org";
+  };
+
+  networking.firewall.allowedTCPPorts = [ 6666 ];
+  networking.hostName = "wieselburg";
+
   ### System Packages
   environment.systemPackages = with pkgs; [ 
     git gh just
     wormhole-william
     #appflowy
   ];
-
-  networking.firewall.allowedTCPPorts = [ 6666 ];
-  networking.hostName = "wieselburg";
 
   ### User Configuration
   security.sudo.wheelNeedsPassword = false;
@@ -66,9 +79,6 @@
   #   config.adminpassFile = "./admin.pwd";
   #   configureRedis = true;
   # };
-
-  ### Let's Encrypt (ACME) Configuration
-  security.acme.acceptTerms = true;
 
   system.stateVersion = "24.11";
 }
