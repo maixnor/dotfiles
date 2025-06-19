@@ -20,7 +20,7 @@
   };
 
   services.openssh.enable = true;
-  services.openssh.settings.PermitRootLogin = true;
+  services.openssh.settings.PermitRootLogin = "yes";
   services.openssh.authorizedKeysInHomedir = true;
 
   time.timeZone = "Europe/Amsterdam";
