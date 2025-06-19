@@ -2,11 +2,9 @@
 
 {
   imports = [ 
-    inputs.disko.nixosModules.default
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
-    (import ./disko.nix { device = "/dev/sda"; })
-    ./hardware-configuration.nix
+    ./vpsadminos.nix # for vpsfree.cz
     ../modules/zerotier.nix
     #inputs.nixvim.nixosModules.nixvim
     #../modules/nixvim.nix
@@ -22,6 +20,10 @@
   };
 
   services.openssh.enable = true;
+  services.openssh.settings.permitRootLogin = true;
+  services.openssh.authorizedKeysInHomedir = true;
+
+  time.timeZone = "Europe/Amsterdam";
 
   users.users.backup = {
     initialPassword = "backup";
