@@ -9,7 +9,7 @@
     inputs.nixvim.nixosModules.nixvim
     ../modules/nixvim.nix
     ../modules/zerotier.nix
-    
+    ../modules/services.nix    
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -32,40 +32,6 @@
     packages = with pkgs; [ just gh ];
   };
 
-  ### Services
-  services.searx.enable = true;
-  services.searx.settings = {
-    server.port = 6666;
-    server.bind_address = "0.0.0.0";
-    server.secret_key = "definetelysecret";
-    formats = [ "html" "json" "csv" ];
-  };
-
-  ### Nginx and Networking
-  services.nginx.enable = true;
-  services.nginx.recommendedProxySettings = true;
-  services.nginx.recommendedTlsSettings = true;
-  services.nginx.virtualHosts."maixnor.com" = {
-    serverAliases = [ "wieselburg.maixnor.com" "wb.maixnor.com" ];
-    addSSL = true;
-    enableACME = true;
-    root = "/var/www/maixnor.com";
-  };
-
-  services.nginx.virtualHosts."search.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://localhost:6666/";
-    };
-  };
-
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = "benjamin@meixner.org";
-  };
-
-  networking.firewall.allowedTCPPorts = [ 6666 80 443 ];
   networking.hostName = "wieselburg";
 
   ### System Packages
