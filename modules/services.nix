@@ -14,16 +14,16 @@
       formats = [ "html" "json" "csv" ];
     };
 
-    #services.open-webui = {
-    #  enable = true;
-    #  port = 7080;
-    #  environment = {
-    #    ANONYMIZED_TELEMETRY = "False";
-    #    DO_NOT_TRACK = "True";
-    #    SCARF_NO_ANALYTICS = "True";
-    #    WEBUI_AUTH = "False";
-    #  };
-    #};
+    # services.open-webui = {
+    #   enable = true;
+    #   port = 7080;
+    #   environment = {
+    #     ANONYMIZED_TELEMETRY = "False";
+    #     DO_NOT_TRACK = "True";
+    #     SCARF_NO_ANALYTICS = "True";
+    #     WEBUI_AUTH = "False";
+    #   };
+    # };
 
     ### Nginx and Networking
     networking.firewall.allowedTCPPorts = [ 6666 80 443 ];
