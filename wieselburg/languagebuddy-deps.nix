@@ -1,19 +1,23 @@
 { config, pkgs, ... }:
-{
-  environment.systemPackages = with pkgs; [
-    nodejs_24
-  ];
 
-  services.redis = {
+{
+  services.redis.servers.languagebuddy-test = {
     enable = true;
-    extraConfig = ''
-      appendonly yes
-      appendfsync everysec
-    '';
+    port = 6380;
+    appendOnly = true;
+    openFirewall = true;
+  };
+
+  services.redis.servers.languagebuddy-prod = {
+    enable = true;
+    port = 6397;
+    appendOnly = true;
+    openFirewall = true;
   };
 
   systemd.services.languagebuddy-update = {
     description = "Pull latest code and restart app";
+    path = with pkgs; [ git ];
     serviceConfig = {
       Type = "oneshot";
       WorkingDirectory = "/home/maixnor/repo/languagebuddy";
@@ -35,13 +39,21 @@
     };
   };
 
-  systemd.services.languagebuddy-app = {
-    description = "LanguageBuddy App";
+  systemd.services.languagebuddy-api = {
+    description = "LanguageBuddy API";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
+    # idk why this does not want to link the binary properly
+    path = with pkgs; [ nodejs_24 ];
     serviceConfig = {
-      WorkingDirectory = "/home/maixnor/repo/languagebuddy";
-      ExecStart = "npm start";
+      WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
+      ExecStart = pkgs.writeShellScript "run.sh" ''
+        echo $REDIS_PORT
+        node -v
+        npm -v
+        npm i
+        ENV=PRODUCTION npm run start
+      '';
       Restart = "always";
       User = "maixnor";
       EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env";

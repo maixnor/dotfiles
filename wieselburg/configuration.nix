@@ -13,6 +13,7 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   virtualisation.vmware.guest.enable = true;
 
   services.openssh.enable = true;
@@ -42,10 +43,21 @@
 
   ### Nginx and Networking
   services.nginx.enable = true;
+  services.nginx.recommendedProxySettings = true;
+  services.nginx.recommendedTlsSettings = true;
   services.nginx.virtualHosts."maixnor.com" = {
-      addSSL = true;
-      enableACME = true;
-      root = "/var/www/maixnor.com";
+    serverAliases = [ "wieselburg.maixnor.com" "wb.maixnor.com" ];
+    addSSL = true;
+    enableACME = true;
+    root = "/var/www/maixnor.com";
+  };
+
+  services.nginx.virtualHosts."search.maixnor.com" = {
+    enableACME = true;
+    addSSL = true;
+    locations."/" = {
+      proxyPass = "http://localhost:6666/";
+    };
   };
 
   security.acme = {
@@ -53,7 +65,7 @@
     defaults.email = "benjamin@meixner.org";
   };
 
-  networking.firewall.allowedTCPPorts = [ 6666 ];
+  networking.firewall.allowedTCPPorts = [ 6666 80 443 ];
   networking.hostName = "wieselburg";
 
   ### System Packages
