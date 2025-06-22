@@ -43,6 +43,12 @@
             allowUnfree = true;
         };
       };
+
+      nvim = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
+        inherit pkgs;
+        module = import ./modules/nixvim.nix;
+        extraSpecialArgs = {};
+      };
 # TODO build utility function with loop
     in {
       nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
@@ -89,7 +95,12 @@
           ];
           format = "linode";
         };
+        nixvim = nvim;
       };
       
+      packages.default = nvim;
+
+      formatter = pkgs.nixfmt-rfc-style;
+
     };
 }
