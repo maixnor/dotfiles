@@ -16,6 +16,13 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   virtualisation.vmware.guest.enable = true;
 
+  systemd.services.nix-build = {
+    serviceConfig = {
+      MemoryLimit = "2G";
+    };
+  };
+  nix.settings.cores = 4;
+
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
   services.openssh.authorizedKeysInHomedir = true;
