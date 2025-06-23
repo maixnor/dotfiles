@@ -56,27 +56,27 @@
           modules = [ ./bierbasis/configuration.nix ];
       };
 
-			nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
-				specialArgs = { inherit system; inherit inputs; };
-				modules = [ ./bierzelt/configuration.nix ];
-			};
+	nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
+		specialArgs = { inherit system; inherit inputs; };
+		modules = [ ./bierzelt/configuration.nix ];
+	};
 
-			nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-				specialArgs = { inherit system; inherit inputs; };
-				modules = [ ./wieselburg/configuration.nix ];
-			};
+	nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
+system = "x86_64-linux";
+		specialArgs = { inherit system; inherit inputs; inherit nvim; };
+		modules = [ ./wieselburg/configuration.nix ];
+	};
 
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./bierbasis/home.nix ];
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = { inherit inputs; inherit nvim; };
       };
 
       homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./bierzelt/home.nix ];
-        extraSpecialArgs = { inherit inputs; };
+        extraSpecialArgs = { inherit inputs; inherit nvim; };
       };
       
       homeConfigurations."wieselburg" = home-manager.lib.homeManagerConfiguration {

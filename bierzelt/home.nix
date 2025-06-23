@@ -1,12 +1,10 @@
 
-{ config, lib, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, nvim, ... }:
 
 {
   
   imports = [
     inputs.stylix.homeManagerModules.stylix
-    inputs.nixvim.homeManagerModules.nixvim
-    ../modules/nixvim.nix
     ../modules/tmux.nix
     ../modules/terminal.nix
     ../modules/office.nix
@@ -21,6 +19,8 @@
     nixpkgs.config.allowUnfree = true;
     home.username = "maixnor";
     home.homeDirectory = "/home/maixnor";
+
+    home.packages = [ nvim ];
 
     home.file."justfile".text = ''
       sync-wu-quartz:

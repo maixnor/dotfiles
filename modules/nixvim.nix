@@ -1,7 +1,6 @@
 { config, lib, pkgs, ... }:
 
 {
-
   enableMan = true;
   viAlias = true;
   vimAlias = true;

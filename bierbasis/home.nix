@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, nvim, ... }:
 
 {
 
@@ -17,12 +17,10 @@
 
   imports = [
     #inputs.stylix.homeManagerModules.stylix
-    inputs.nixvim.homeManagerModules.nixvim
     ../modules/tmux.nix
     ../modules/terminal.nix
     ../modules/office.nix
     ../modules/misc.nix
-    ../modules/nixvim.nix
     #../modules/stylix.nix
     #../modules/neovim.nix
     ../modules/zsh.nix
@@ -32,6 +30,8 @@
   ];
 
   home.stateVersion = "24.11";
+
+  home.packages = [ nvim ];
 
   home.sessionVariables = {
     EDITOR = "nvim";

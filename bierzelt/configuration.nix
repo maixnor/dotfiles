@@ -9,7 +9,7 @@
   imports =
     [
       ./hardware-configuration.nix
-      ../modules/services.nix
+      #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
       #../modules/myzaney/config.nix
