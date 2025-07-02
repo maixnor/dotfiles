@@ -5,11 +5,12 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
-    ./languagebuddy-deps.nix
+    #./languagebuddy-deps.nix
     ../modules/zerotier.nix
     ../services/nginx-base.nix
     ../services/maixnorcom.nix
     ../services/searx.nix
+    ../services/languagebuddy.nix
   ];
 
   virtualisation.vmware.guest.enable = true;
