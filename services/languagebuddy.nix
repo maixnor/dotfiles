@@ -1,8 +1,10 @@
 { pkgs, ... }:
 
+let 
+  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION npm run start'';
+  redis_socket = "/run/redis-languagebuddy-dev/socket.sock";
+in
 {
-
-  environment.systemPackages = with pkgs; [ nodejs_24 ];
 
   systemd.services.languagebuddy-update = {
     description = "Pull latest code and restart app";
@@ -13,7 +15,7 @@
       ExecStart = pkgs.writeShellScript "languagebuddy-update.sh" ''
         if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
           git pull origin main
-          systemctl --user restart languagebuddy-app.service || true
+          systemctl --user restart languagebuddy-api.service
         fi
       '';
       User = "maixnor";
@@ -23,8 +25,16 @@
   systemd.timers.languagebuddy-update = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "*:*:0/60";
+      OnCalendar = "minutely";
       Unit = "languagebuddy-update.service";
+    };
+  };
+
+  services.nginx.virtualHosts."languagebuddy-test.maixnor.com" = {
+    enableACME = true;
+    addSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:8080/";
     };
   };
 
@@ -32,13 +42,15 @@
     description = "LanguageBuddy API";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_24 ];
+    path = with pkgs; [ nodejs_24 bash ];
+    script = "${runscript}/bin/start";
     serviceConfig = {
       WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
-      ExecStart = pkgs.writeShellScript "run.sh" ''pwd && npm -v && npm i && npm run build && ENV=PRODUCTION npm run start'';
+      EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env";
       Restart = "always";
       User = "maixnor";
-      EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env";
+      PrivateNetwork = false;
+      IPAddressAllow = [ "127.0.0.1" "::1" ];
     };
   };
 
@@ -58,7 +70,7 @@
         requirePassFile = /etc/languagebuddy-prod.scrt;
         appendOnly = true;
         openFirewall = true;
-        # bind = null; # only available from the host itself
+        bind = null; # only available from the host itself
       };
     };
   };
