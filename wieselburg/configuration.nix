@@ -11,6 +11,7 @@
     ../services/maixnorcom.nix
     ../services/searx.nix
     ../services/languagebuddy.nix
+    ../services/jupyter-nlp-module.nix
   ];
 
   virtualisation.vmware.guest.enable = true;
@@ -43,6 +44,12 @@
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
     };
+  };
+
+  services.jupyter-nlp = {
+    enable = true;
+    port = 8888;
+    host = "0.0.0.0";  # Change to "127.0.0.1" for local access only
   };
 
   networking.hostName = "wieselburg";
