@@ -21,98 +21,11 @@ let
     scikit-learn
     ipykernel
     pip
+    pydantic
+    typing-extensions
+    packaging
+    atproto
   ]);
-  
-  # Preproc.py file content
-  preprocPy = pkgs.writeText "preproc.py" ''
-    """
-    Preprocessing functions for NLP tasks
-    """
-    
-    import re
-    import nltk
-    from nltk.corpus import stopwords
-    from nltk.stem import WordNetLemmatizer
-    import langid
-    
-    # Initialize NLTK components
-    lemmatizer = WordNetLemmatizer()
-    
-    def check_lang(text):
-        """Detect language of the text"""
-        try:
-            lang, confidence = langid.classify(text)
-            return lang
-        except:
-            return "unknown"
-    
-    def remove_stops(text):
-        """Remove stopwords from text"""
-        try:
-            stop_words = set(stopwords.words('english'))
-            words = text.split()
-            filtered_words = [word for word in words if word.lower() not in stop_words]
-            return ' '.join(filtered_words)
-        except:
-            return text
-    
-    def clean_text(text):
-        """Clean text by removing special characters, URLs, etc."""
-        if not text:
-            return ""
-        
-        # Remove URLs
-        text = re.sub(r'http\S+|www\S+|https\S+', \'\', text, flags=re.MULTILINE)
-        
-        # Remove user mentions and hashtags
-        text = re.sub(r'@\w+|#\w+', '', text)
-        
-        # Remove special characters and digits
-        text = re.sub(r'[^a-zA-Z\s]', '', text)
-        
-        # Remove extra whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
-        
-        return text.lower()
-    
-    def pos_tag_text(text):
-        """Apply POS tagging to text"""
-        try:
-            tokens = nltk.word_tokenize(text)
-            pos_tags = nltk.pos_tag(tokens)
-            return ' '.join([f"{word}_{tag}" for word, tag in pos_tags])
-        except:
-            return text
-    
-    def lemmatize_text(text):
-        """Lemmatize text"""
-        try:
-            words = text.split()
-            lemmatized = [lemmatizer.lemmatize(word) for word in words]
-            return ' '.join(lemmatized)
-        except:
-            return text
-    
-    def is_blank(text):
-        """Check if text is blank or empty"""
-        return not text or text.strip() == ""
-    
-    def preprocess_full(text):
-        """Full preprocessing pipeline"""
-        if is_blank(text):
-            return ""
-        
-        # Clean text
-        cleaned = clean_text(text)
-        
-        # Remove stopwords
-        no_stops = remove_stops(cleaned)
-        
-        # Lemmatize
-        lemmatized = lemmatize_text(no_stops)
-        
-        return lemmatized
-  '';
 
 in
 
@@ -200,12 +113,10 @@ in
           # Create data directory structure
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/notebooks"
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}/.jupyter"
-          # Copy preproc.py to data directory
-          "${pkgs.coreutils}/bin/cp ${preprocPy} ${cfg.dataDir}/notebooks/preproc.py"
           # Fix permissions
           "${pkgs.coreutils}/bin/chown -R ${cfg.user}:${cfg.group} ${cfg.dataDir}"
           # Download NLTK data
-          "${pkgs.su}/bin/su -s ${pkgs.bash}/bin/bash ${cfg.user} -c 'cd ${cfg.dataDir} && ${pythonEnv}/bin/python -c \"import nltk; nltk.download(\\\"averaged_perceptron_tagger\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"averaged_perceptron_tagger_eng\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"stopwords\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"wordnet\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"punkt\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\")\"'"
+          #"${pkgs.su}/bin/su -s ${pkgs.bash}/bin/bash ${cfg.user} -c 'cd ${cfg.dataDir} && ${pythonEnv}/bin/python -c \"import nltk; nltk.download(\\\"averaged_perceptron_tagger\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"averaged_perceptron_tagger_eng\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"stopwords\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"wordnet\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\"); nltk.download(\\\"punkt\\\", download_dir=\\\"${cfg.dataDir}/nltk_data\\\")\"'"
         ];
         ExecStart = "${pythonEnv}/bin/jupyter lab --ip=${cfg.host} --port=${toString cfg.port} --no-browser --allow-root --notebook-dir=${cfg.dataDir}/notebooks" + 
           (if cfg.passwordHash != null then " --ServerApp.password='${cfg.passwordHash}'" else " --ServerApp.token=''");
