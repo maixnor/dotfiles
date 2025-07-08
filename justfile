@@ -1,9 +1,9 @@
 
 home host: 
-  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup --option cores 7
+  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup
 
 nixos host:
-	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}} --option cores 7
+	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
 
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
@@ -21,5 +21,5 @@ bierbasis:
   just nixos bierbasis home bierbasis
 
 wieselburg: 
-  just nixos wieselburg home wieselburg
+  just nixos wieselburg
 
