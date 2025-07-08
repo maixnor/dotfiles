@@ -1,11 +1,15 @@
 { modulesPath, config, pkgs, inputs, lib, nvim, ... }:
 
+let 
+  hostname = "wieselburg";
+in
 {
   imports = [ 
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
     ../modules/zerotier.nix
+    ../services/autoupdate.nix
     ../services/nginx-base.nix
     ../services/maixnorcom.nix
     ../services/searx.nix
@@ -17,6 +21,11 @@
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.cores = 3;
+
+  services.autoupdate = {
+    enable = true;
+    hostname = "${hostname}";
+  };
 
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";
@@ -44,7 +53,7 @@
     };
   };
 
-  networking.hostName = "wieselburg";
+  networking.hostName = "${hostname}";
 
   ### System Packages
   environment.systemPackages = with pkgs; [ 
