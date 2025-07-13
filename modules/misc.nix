@@ -33,6 +33,7 @@
       krename
       ktimetracker
       kdePackages.kompare
+      kdePackages.ktorrent
       kdePackages.konsole
       kdePackages.spectacle
       kdePackages.okular
