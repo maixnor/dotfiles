@@ -56,16 +56,22 @@
           modules = [ ./bierbasis/configuration.nix ];
       };
 
-	nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
-		specialArgs = { inherit system; inherit inputs; };
-		modules = [ ./bierzelt/configuration.nix ];
-	};
+      nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
+        specialArgs = { inherit system; inherit inputs; };
+        modules = [ ./bierzelt/configuration.nix ];
+      };
 
-	nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
-system = "x86_64-linux";
-		specialArgs = { inherit system; inherit inputs; inherit nvim; };
-		modules = [ ./wieselburg/configuration.nix ];
-	};
+      nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
+    system = "x86_64-linux";
+        specialArgs = { inherit system; inherit inputs; inherit nvim; };
+        modules = [ ./wieselburg/configuration.nix ];
+      };
+
+      nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit system; inherit inputs; inherit nvim; };
+        modules = [ ./wieselburg/vm-test.nix ];
+      };
 
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
@@ -96,6 +102,20 @@ system = "x86_64-linux";
           format = "linode";
         };
         nixvim = nvim;
+        wieselburg-vm-test = inputs.self.nixosConfigurations.wieselburg-vm-test.config.system.build.vm;
+      };
+
+      apps.x86_64-linux = {
+        wieselburg-vm-test = {
+          type = "app";
+          program = let
+            vmSystem = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
+              specialArgs = { inherit system; inherit inputs; inherit nvim; };
+              modules = [ ./wieselburg/vm-test.nix ];
+            };
+          in "${vmSystem.config.system.build.vm}/bin/run-wieselburg-vm-test-vm";
+        };
       };
       
       packages.default = nvim;

@@ -9,7 +9,7 @@ in
     enable = mkEnableOption "Update system to latest state on GitHub";
 
     hostname = mkOption {
-      type = types.string;
+      type = types.str;
       default = "changeme";
       description = "hostname after just command";
     };

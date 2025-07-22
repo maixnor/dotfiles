@@ -14,6 +14,12 @@ in
     ../services/maixnorcom.nix
     ../services/searx.nix
     ../services/languagebuddy.nix
+    ../services/ai-research.nix
+    ../services/nextcloud.nix
+    ../services/immich.nix
+    ../services/audiobookshelf.nix
+    ../services/navidrome.nix
+    ../services/collabora.nix
   ];
 
   virtualisation.vmware.guest.enable = true;
@@ -65,15 +71,6 @@ in
   ### User Configuration
   security.sudo.wheelNeedsPassword = false;
   nix.settings.trusted-users = [ "@wheel" "maixnor" "backup" ];
-  # Uncomment and configure these services if needed
-  # services.jitsi-meet = { enable = true; hostName = "gehinoasch"; };
-  # services.mattermost = { enable = true; };
-  # services.nextcloud = { 
-  #   enable = true; 
-  #   hostName = "wieselburg"; 
-  #   config.adminpassFile = "./admin.pwd";
-  #   configureRedis = true;
-  # };
 
   system.stateVersion = "24.11";
 }
