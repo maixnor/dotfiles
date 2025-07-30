@@ -4,7 +4,7 @@
 {
 
   config = {
-    home.packages = with pkgs; [
+    environment.systemPackages = with pkgs; [
       openconnect
       traceroute
       gh git
