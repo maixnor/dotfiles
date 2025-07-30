@@ -68,7 +68,7 @@ in
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 bash ];
-    script = "${runscript}/bin/start";
+    script = "${runscript-swc}/bin/start";
     serviceConfig = {
       WorkingDirectory = "/home/maixnor/repo/languagebuddy-prod/backend";
       EnvironmentFile = "/home/maixnor/repo/languagebuddy-prod/backend/.env";
