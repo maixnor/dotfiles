@@ -1,7 +1,8 @@
 { pkgs, ... }:
 
 let 
-  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION npm run start'';
+  runscript-swc = pkgs.writeShellScriptBin "start" ''npm i && npm run build:swc && ENV=PRODUCTION nodemon dist/src/main.js'';
+  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION nodemon dist/src/main.js'';
   redis_socket = "/run/redis-languagebuddy-dev/socket.sock";
 in
 {
@@ -51,7 +52,7 @@ in
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 bash ];
-    script = "${runscript}/bin/start";
+    script = "${runscript-swc}/bin/start";
     serviceConfig = {
       WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
       EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env";
