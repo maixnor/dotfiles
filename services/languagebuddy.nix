@@ -6,7 +6,7 @@ let
 in
 {
 
-  systemd.services.languagebuddy-update = {
+  systemd.services.languagebuddy-api-test-update = {
     description = "Pull latest code and restart app";
     path = with pkgs; [ git ];
     serviceConfig = {
@@ -15,14 +15,14 @@ in
       ExecStart = pkgs.writeShellScript "languagebuddy-update.sh" ''
         if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
           git pull origin main
-          systemctl --user restart languagebuddy-api.service
+          systemctl --user restart languagebuddy-api-test.service
         fi
       '';
       User = "maixnor";
     };
   };
 
-  systemd.timers.languagebuddy-update = {
+  systemd.timers.languagebuddy-api-test-update = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "minutely";
@@ -30,7 +30,7 @@ in
     };
   };
 
-  services.nginx.virtualHosts."languagebuddy-test.maixnor.com" = {
+  services.nginx.virtualHosts."prod.languagebuddy.maixnor.com" = {
     enableACME = true;
     addSSL = true;
     locations."/" = {
@@ -38,7 +38,15 @@ in
     };
   };
 
-  systemd.services.languagebuddy-api = {
+  services.nginx.virtualHosts."test.languagebuddy.maixnor.com" = {
+    enableACME = true;
+    addSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:8081/";
+    };
+  };
+
+  systemd.services.languagebuddy-api-test = {
     description = "LanguageBuddy API";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
@@ -54,9 +62,25 @@ in
     };
   };
 
+  systemd.services.languagebuddy-api-prod = {
+    description = "LanguageBuddy API Production";
+    after = [ "network.target" "redis.service" ];
+    wantedBy = [ "default.target" ];
+    path = with pkgs; [ nodejs_24 bash ];
+    script = "${runscript}/bin/start";
+    serviceConfig = {
+      WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
+      EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env.prod";
+      Restart = "always";
+      User = "maixnor";
+      PrivateNetwork = false;
+      IPAddressAllow = [ "127.0.0.1" "::1" ];
+    };
+  };
+
   services.redis = {
     servers = {
-      languagebuddy-dev = {
+      languagebuddy-test = {
         enable = true;
         port = 6379;
         requirePassFile = /etc/languagebuddy-dev.scrt;

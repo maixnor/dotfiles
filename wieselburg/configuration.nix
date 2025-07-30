@@ -14,12 +14,12 @@ in
     ../services/maixnorcom.nix
     ../services/searx.nix
     ../services/languagebuddy.nix
-    ../services/ai-research.nix
-    ../services/nextcloud.nix
-    ../services/immich.nix
-    ../services/audiobookshelf.nix
-    ../services/navidrome.nix
-    ../services/collabora.nix
+    # ../services/ai-research.nix
+    # ../services/nextcloud.nix
+    # ../services/immich.nix
+    # ../services/audiobookshelf.nix
+    # ../services/navidrome.nix
+    # ../services/collabora.nix
   ];
 
   virtualisation.vmware.guest.enable = true;
