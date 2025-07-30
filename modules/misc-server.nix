@@ -11,6 +11,7 @@
       wget xh
       freshfetch
       btop iftop iotop
+      ripgrep
       ripgrep-all
       inotify-tools
     ];

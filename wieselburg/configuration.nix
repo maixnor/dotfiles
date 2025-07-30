@@ -8,6 +8,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
+    ../modules/misc-server.nix
     ../modules/zerotier.nix
     ../services/autoupdate.nix
     ../services/nginx-base.nix
