@@ -69,8 +69,8 @@ in
     path = with pkgs; [ nodejs_24 bash ];
     script = "${runscript}/bin/start";
     serviceConfig = {
-      WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
-      EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env.prod";
+      WorkingDirectory = "/home/maixnor/repo/languagebuddy-prod/backend";
+      EnvironmentFile = "/home/maixnor/repo/languagebuddy-prod/backend/.env";
       Restart = "always";
       User = "maixnor";
       PrivateNetwork = false;
