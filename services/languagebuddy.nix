@@ -1,8 +1,8 @@
 { pkgs, ... }:
 
 let 
-  runscript-swc = pkgs.writeShellScriptBin "start" ''npm i && npm run build:swc && ENV=PRODUCTION nodemon dist/src/main.js'';
-  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION nodemon dist/src/main.js'';
+  runscript-swc = pkgs.writeShellScriptBin "start" ''npm i && npm run build:swc && ENV=PRODUCTION npm run start'';
+  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION npm run start'';
   redis_socket = "/run/redis-languagebuddy-dev/socket.sock";
 in
 {
