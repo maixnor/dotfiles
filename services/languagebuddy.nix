@@ -39,11 +39,27 @@ in
     };
   };
 
+  services.nginx.virtualHosts."prod.languagebuddy.maixnor.com/redis" = {
+    enableACME = true;
+    addSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:6380/";
+    };
+  };
+
   services.nginx.virtualHosts."test.languagebuddy.maixnor.com" = {
     enableACME = true;
     addSSL = true;
     locations."/" = {
       proxyPass = "http://127.0.0.1:8081/";
+    };
+  };
+
+  services.nginx.virtualHosts."test.languagebuddy.maixnor.com/redis" = {
+    enableACME = true;
+    addSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:6379/";
     };
   };
 
