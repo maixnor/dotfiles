@@ -39,7 +39,7 @@ in
     };
   };
 
-  services.nginx.virtualHosts."prod.languagebuddy.maixnor.com/redis" = {
+  services.nginx.virtualHosts."prod.redis.maixnor.com" = {
     enableACME = true;
     addSSL = true;
     locations."/" = {
@@ -55,7 +55,7 @@ in
     };
   };
 
-  services.nginx.virtualHosts."test.languagebuddy.maixnor.com/redis" = {
+  services.nginx.virtualHosts."test.redis.maixnor.com" = {
     enableACME = true;
     addSSL = true;
     locations."/" = {
