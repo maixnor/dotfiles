@@ -57,7 +57,7 @@
       };
 
       nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit system; inherit inputs; };
+        specialArgs = { inherit system; inherit inputs; inherit nvim; };
         modules = [ ./bierzelt/configuration.nix ];
       };
 

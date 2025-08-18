@@ -43,13 +43,13 @@ This directory contains configuration for your self-hosted services running on t
 
 ## Initial Setup Steps
 
-### 1. Deploy the configuration
+### 1. Deploy the configuration - DONE
 ```bash
 # From your dotfiles directory
 sudo nixos-rebuild switch --flake .#wieselburg
 ```
 
-### 2. DNS Configuration
+### 2. DNS Configuration - DONE
 Add these DNS records to your domain:
 ```
 cloud.maixnor.com      A    YOUR_SERVER_IP
@@ -92,7 +92,6 @@ search.maixnor.com     A    YOUR_SERVER_IP
 - Nextcloud admin password: `/var/lib/nextcloud/admin-pass`
 - Collabora admin: Change password in container environment
 - AnythingLLM JWT secret: Update in `ai-research.nix`
-- SearXNG secret key: Update in `ai-research.nix`
 - Add your OpenAI/Anthropic API keys for enhanced AI features (optional)
 
 ### 5. Mobile Apps

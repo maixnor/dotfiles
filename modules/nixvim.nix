@@ -2,14 +2,14 @@
 
 {
   enableMan = true;
-  viAlias = true;
-  vimAlias = true;
+  viAlias = false;
+  vimAlias = false;
 
-  extraPackages = with pkgs; [ ripgrep parallel fd fzf bat ];
+  extraPackages = with pkgs; [ ripgrep parallel fd fzf bat vim ];
 
   opts = {
     number = true;         
-    relativenumber = true; 
+    relativenumber = true;
 
     shiftwidth = 2;
     tabstop = 2;
@@ -57,8 +57,6 @@
     git-conflict.enable = true;
     wakatime.enable = true;
     undotree.enable = true;
-
-    quarto.enable = true;
 
     colorizer.enable = true;
     treesitter.enable = true;

@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, nvim, ... }:
 
 
 {
@@ -12,6 +12,7 @@
       #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      (import "${inputs.home-manager}/nixos")
       #../modules/myzaney/config.nix
     ];
 
@@ -38,6 +39,7 @@
   #networking.nftables.enable = true;
   networking.firewall = { 
     enable = true;
+    allowedTCPPorts = [ 8080 ];
     allowedTCPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
@@ -99,19 +101,20 @@
     pulse.enable = true;
   };
 
-  nix.settings.trusted-users = [ "@wheel" "maixnor" ];
+  nix.settings.trusted-users = [ "@wheel" "maixnor" "alf" ];
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
-    packages = with pkgs; [ ];
+    packages = [ nvim ]; # nixvim
   };
+  # activate home-manager
+  home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };
 
   services.teamviewer.enable = true;
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william
-    teamviewer # only works with service.teamviewer
     gnome-network-displays
     # qemu and virt-manager to work with libvirt
     qemu
