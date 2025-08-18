@@ -118,9 +118,13 @@
         };
       };
       
-      packages.default = nvim;
+      packages.x86_64-linux.default = nvim;
+      apps.x86_64-linux.default = {
+        type = "app";
+        program = "${nvim}/bin/nvim";
+      };
 
-      formatter = pkgs.nixfmt-rfc-style;
+      formatter.x86_64-linux = pkgs.nixfmt-rfc-style;
 
     };
 }

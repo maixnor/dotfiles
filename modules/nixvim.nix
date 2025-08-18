@@ -5,7 +5,7 @@
   viAlias = false;
   vimAlias = false;
 
-  extraPackages = with pkgs; [ ripgrep parallel fd fzf bat vim ];
+  extraPackages = with pkgs; [ ripgrep parallel fd fzf bat vim tree-sitter viu chafa ueberzugpp ];
 
   opts = {
     number = true;         
