@@ -21,36 +21,27 @@
     home.homeDirectory = "/home/maixnor";
 
     home.file."justfile".text = ''
-      sync-wu-quartz:
-        cd ~/repo/obsidian/submodules/wu-quartz/content && git add . && git commit -m "backup bierbasis" && git pull && git push && cd ~
-
       update:
         cd ~/repo/dotfiles && just bierzelt
     '';
 
-    # Styling Options
-    stylix.targets = {
-      gnome.enable = lib.mkForce true;
-      gtk.enable = lib.mkForce true;
-      kde.enable = lib.mkForce true;
-    };
-    gtk = {
-      iconTheme = {
-        name = "Papirus-Dark";
-        package = pkgs.papirus-icon-theme;
-      };
-      gtk3.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
-      gtk4.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
-    };
-    qt = lib.mkForce {
-      enable = true;
-      style.name = "breeze";
-      platformTheme.name = "kde";
-    };
+    #gtk = {
+    #  iconTheme = {
+    #    name = "Papirus-Dark";
+    #    package = pkgs.papirus-icon-theme;
+    #  };
+    #  gtk3.extraConfig = {
+    #    gtk-application-prefer-dark-theme = 1;
+    #  };
+    #  gtk4.extraConfig = {
+    #    gtk-application-prefer-dark-theme = 1;
+    #  };
+    #};
+    #qt = lib.mkForce {
+    #  enable = true;
+    #  style.name = "breeze";
+    #  platformTheme.name = "kde";
+    #};
 
     services.kdeconnect = {
       enable = true;

@@ -1,8 +1,5 @@
 
-home host: 
-  export NIXPKGS_ALLOW_UNFREE=1 && home-manager switch --flake ~/repo/dotfiles#{{host}} --impure -b backup
-
-nixos host:
+update host:
 	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
 
 vm host:
@@ -15,11 +12,11 @@ anywhere host usr ip:
   nix run github:nix-community/nixos-anywhere -- --flake ~/repo/dotfiles#{{host}} {{usr}}@{{ip}} --disko-mode format
 
 bierzelt:
-  just nixos bierzelt home bierzelt
+  just update bierzelt 
 
 bierbasis: 
-  just nixos bierbasis home bierbasis
+  just update bierbasis 
 
 wieselburg: 
-  just nixos wieselburg
+  just update wieselburg
 
