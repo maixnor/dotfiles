@@ -59,7 +59,7 @@ in
     enableACME = true;
     addSSL = true;
     locations."/" = {
-      proxyPass = "http://127.0.0.1:6379/";
+      proxyPass = "http://127.0.0.1:6381/";
     };
   };
 
@@ -99,7 +99,7 @@ in
     servers = {
       languagebuddy-test = {
         enable = true;
-        port = 6379;
+        port = 6381;
         requirePassFile = /etc/languagebuddy-dev.scrt;
         appendOnly = true;
         openFirewall = true;
