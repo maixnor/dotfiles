@@ -9,13 +9,13 @@
     openFirewall = false; # We'll handle this via nginx
     mediaLocation = "/var/lib/immich/upload";
     
-    # Database configuration
+    # Database configuration - use socket connection for better security
     database = {
       enable = true;
       createDB = true;
       name = "immich";
       user = "immich";
-      host = "localhost";
+      host = "/run/postgresql"; # Use Unix socket instead of TCP
       port = 5432;
     };
     
@@ -53,6 +53,29 @@
     secretsFile = "/var/lib/immich/secrets.env";
   };
 
+  # Ensure PostgreSQL is configured properly for Immich
+  services.postgresql = {
+    enable = true;
+    ensureDatabases = [ "immich" ];
+    ensureUsers = [
+      {
+        name = "immich";
+        ensureDBOwnership = true;
+      }
+    ];
+    # Add required PostgreSQL extensions for Immich
+    extraPlugins = with config.services.postgresql.package.pkgs; [
+      pg_vectors
+    ];
+  };
+
+  # Configure Redis server for Immich (separate from your languagebuddy instances)
+  services.redis.servers.immich = {
+    enable = true;
+    port = 6390;
+    bind = "127.0.0.1";
+  };
+
   # Nginx configuration for Immich
   services.nginx.virtualHosts."photos.maixnor.com" = {
     forceSSL = true;
@@ -80,9 +103,10 @@
     if [ ! -f /var/lib/immich/secrets.env ]; then
       echo "JWT_SECRET=$(${pkgs.openssl}/bin/openssl rand -hex 32)" > /var/lib/immich/secrets.env
       chmod 600 /var/lib/immich/secrets.env
+      chown immich:immich /var/lib/immich/secrets.env
     fi
     
-    # Set proper ownership
+    # Set proper ownership for directories
     chown -R immich:immich /var/lib/immich
   '';
 }
