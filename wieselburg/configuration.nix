@@ -1,4 +1,4 @@
-{ modulesPath, config, pkgs, inputs, lib, nixvim, ... }:
+{ modulesPath, pkgs, nixvim, ... }:
 
 let 
   hostname = "wieselburg";

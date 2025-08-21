@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, inputs, nvim, ... }:
+{ config, pkgs, lib, inputs, nixvim, ... }:
 
 
 {
@@ -106,7 +106,7 @@
     isNormalUser = true;
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
-    packages = [ nvim ]; # nixvim
+    packages = [ nixvim ]; # nixvim
   };
   # activate home-manager
   home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };

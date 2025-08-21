@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, nvim, ... }:
+{ config, pkgs, inputs, nixvim, ... }:
 
 {
 
@@ -31,7 +31,7 @@
 
   home.stateVersion = "24.11";
 
-  home.packages = [ nvim ];
+  home.packages = [ nixvim ];
 
   home.sessionVariables = {
     EDITOR = "nvim";
