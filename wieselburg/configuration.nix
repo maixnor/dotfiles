@@ -1,4 +1,4 @@
-{ modulesPath, config, pkgs, inputs, lib, nvim, ... }:
+{ modulesPath, config, pkgs, inputs, lib, nixvim, ... }:
 
 let 
   hostname = "wieselburg";
@@ -44,10 +44,10 @@ in
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDA2UypJYZ7g0TWU1F3PlOkZNwdrFRHPs1pUGmG7kqTTxT0I5NZroQZn1NKKqqFc8H/75bVtja2n0SvpO5PLN2lwaCp60rG1Jz5RCiZ/Fg10VRmawKnx8yOePlOmmchE0ldT5RX84oYKtZbJuLjETMdy/poizyGrBVDQjx8/neI9QEgrbgIZ0WyWu6Cv5Jh2oqZRycVI3ip3oYcEjostLDHmVDW1uaV8qAzIBeL1cGYomW9PxD+pKIelZsPpaBGZrJkjr+1h1FXV1Uh/HQenbMO/qP9ydQzhwpGZ+t6DIy2gwrY2C7WdaJIdWCe6gMk5gPITsYPgS+1Vi58nUGlxOR+VucwYPICIVGYTVFdOr0f9jWrFxtUNuOSyEHExzxlLZJ0EQgRykzNI5rJwMvCBewpnAnaVyHaPM74UKKSXrvjBaYBvJwcwDJDYxn3jkB0YCj0RPsZEBXZzimj7Mh+0oJJ+NGtJ32VtdNDY0bYJoI16sAqIojkYYqEvrOykWwTkfs= maixnor@Bierbasis"
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxP0stb18D0Cdn0mPORFV8my2/sJErgCU+/3lMhZqJgbMSiOuvyIzjnYNbR/UZgO1zTj9Tnyr6OJbwxRKgv+gGPNWU+hAQU8nWhOUu8B3vIQiC3xp9u/EMkOloUItA2IMui2C/NC9oFLSLFOdOHD6pFu3b/OC59BHs05KKI5DQMF6bJlrGk40PCRa6HdmEk7yFMkhX7v6VSOqCtBPjO96RqsxgrtcfWmhVMFgjchah+0kUNTTOvDXOKSbp2N6Fj6tAG+MQCL1CJ97O+1nBKYRPqZtMNNDbvInkL5xYVmRQIAN6YscENVxzrxFzhtt9zh/S2Kdllus24f/OrYkCxnWtCW8IjVQF/GPXt7VNDRplZIJ6HqFxssLbEt8oEsZfvATys0h7scoEHUVY5sKI+ijxl+HAcPlRokpliEvwV/ffveEo24lmMr3F7iqCrWhDP4M0Ciqjloq7zfpIDEj0mjVR+yX0bcwreB7Hu0Zeso47DrM7HYJpbmucaH2AgZ/3h40= maixnor@bierzelt"
+      # bierzelt
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCwGqcBJ6aOYBilComuDTG6iW1z5FJ9I8rGgWhP3sUxHrpd47evuEuDDDfen7TkldtbvIQrbhWJ90Um6kCaKsEFh6kMUvraHLaqcd0dMSs9/xovRhPWmpVsGnnwjtDbxCvjEdoUgt28eRhn/CBjaprg4JYNWtrVbIdcjIL7Aho915G913QGK85qWzhx6eqomZpvNB90CbFHH6gtbRiQzwLO65SuOeJHa4iJ205JM7ivJduOgvyV1agYcxuh8MDWQpCsLUfrKsUYnm8o+NqcCHUc7/kCxgHXdC1QEc4m0ralTI9GoUuaY7z428YjjsM61cQuM3vmiDGakitJ7zWXBQ7avYHAFPbWHRXFqR6SGB3yxMExXTtYVvPBXaSbAMYPZeX0UMyLBZZLMCQf7eUm3zKH4z7wmMoPdiKGMkx0obhxQqtDCgYLj9ixqMwJvuzHhfB38vAkbP64ikhTx5uCTf1WuC4/C8wuVX14sESQxAMJvDwe+A83EFzZyaMx5MsCWlnvs42ygYKGBQ/Bfy6YrGviR+ePtiBHyUB1elaTH9kIMm17/MUOiu7HpA+88XuNaIQ9DpXpFv8uE/X/7aju1f5F8Qxj1tly7EEtiv2QfS5j1g0AmftgEPQu93WCABE6+DSoGmwZuxIquhhuskWXLWasJPXcBM5fMvVgBclSKbOb9w== maixnor@bierzelt"
     ];
-    packages = with pkgs; [ just git gh nvim ];
+    packages = [ nixvim ];
   };
 
   # Enable common container config files in /etc/containers
