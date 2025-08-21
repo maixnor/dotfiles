@@ -63,10 +63,6 @@
         ensureDBOwnership = true;
       }
     ];
-    # Add required PostgreSQL extensions for Immich
-    extraPlugins = with config.services.postgresql.package.pkgs; [
-      pg_vectors
-    ];
   };
 
   # Configure Redis server for Immich (separate from your languagebuddy instances)
@@ -108,5 +104,18 @@
     
     # Set proper ownership for directories
     chown -R immich:immich /var/lib/immich
+    
+    # Install PostgreSQL extensions required by Immich
+    # Wait for PostgreSQL to be ready
+    while ! ${pkgs.postgresql}/bin/pg_isready -h /run/postgresql > /dev/null 2>&1; do
+      echo "Waiting for PostgreSQL to be ready..."
+      sleep 2
+    done
+    
+    # Install required extensions for Immich (vectors/embeddings support)
+    ${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql}/bin/psql -d immich -c "CREATE EXTENSION IF NOT EXISTS vectors;" || true
+    ${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql}/bin/psql -d immich -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" || true
+    ${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql}/bin/psql -d immich -c "CREATE EXTENSION IF NOT EXISTS cube;" || true
+    ${pkgs.sudo}/bin/sudo -u postgres ${pkgs.postgresql}/bin/psql -d immich -c "CREATE EXTENSION IF NOT EXISTS earthdistance;" || true
   '';
 }
