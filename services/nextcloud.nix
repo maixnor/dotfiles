@@ -96,6 +96,7 @@
   system.activationScripts.nextcloud-setup = ''
     if [ ! -f /var/lib/nextcloud/admin-pass ]; then
       mkdir -p /var/lib/nextcloud
+      # don't worry, this has already been changed :)
       echo "ChangeThisPassword123!" > /var/lib/nextcloud/admin-pass
       chown nextcloud:nextcloud /var/lib/nextcloud/admin-pass
       chmod 600 /var/lib/nextcloud/admin-pass

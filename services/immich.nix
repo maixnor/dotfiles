@@ -2,53 +2,55 @@
 
 {
   # Immich for photo management (Google Photos alternative)
-  virtualisation.oci-containers.containers.immich-server = {
-    image = "ghcr.io/immich-app/immich-server:release";
-    ports = [ "2283:3001" ];
+  services.immich = {
+    enable = true;
+    port = 2283;
+    host = "127.0.0.1";
+    openFirewall = false; # We'll handle this via nginx
+    mediaLocation = "/var/lib/immich/upload";
+    
+    # Database configuration
+    database = {
+      enable = true;
+      createDB = true;
+      name = "immich";
+      user = "immich";
+      host = "localhost";
+      port = 5432;
+    };
+    
+    # Redis configuration  
+    redis = {
+      enable = true;
+      host = "localhost";
+      port = 6390;
+    };
+    
+    # Machine learning features
+    machine-learning = {
+      enable = true;
+      environment = {
+        TRANSFORMERS_CACHE = "/var/lib/immich/model-cache";
+      };
+    };
+    
+    # Immich settings
+    settings = {
+      server = {
+        externalDomain = "https://photos.maixnor.com";
+      };
+      newVersionCheck = {
+        enabled = false;
+      };
+    };
+    
+    # Environment variables
     environment = {
-      DB_HOSTNAME = "immich-postgres";
-      DB_USERNAME = "postgres";
-      DB_PASSWORD = "postgres";
-      DB_DATABASE_NAME = "immich";
-      REDIS_HOSTNAME = "immich-redis";
       LOG_LEVEL = "log";
-      JWT_SECRET = "randomjwtsecret123";
     };
-    volumes = [
-      "/var/lib/immich/upload:/usr/src/app/upload"
-      "/etc/localtime:/etc/localtime:ro"
-    ];
-    dependsOn = [ "immich-postgres" "immich-redis" ];
-  };
-
-  virtualisation.oci-containers.containers.immich-machine-learning = {
-    image = "ghcr.io/immich-app/immich-machine-learning:release";
-    volumes = [
-      "/var/lib/immich/model-cache:/cache"
-    ];
-    environment = {
-      TRANSFORMERS_CACHE = "/cache";
-    };
-  };
-
-  virtualisation.oci-containers.containers.immich-postgres = {
-    image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
-    environment = {
-      POSTGRES_PASSWORD = "postgres";
-      POSTGRES_USER = "postgres";
-      POSTGRES_DB = "immich";
-      POSTGRES_INITDB_ARGS = "--data-checksums";
-    };
-    volumes = [
-      "/var/lib/immich/postgres:/var/lib/postgresql/data"
-    ];
-  };
-
-  virtualisation.oci-containers.containers.immich-redis = {
-    image = "redis:6.2-alpine";
-    volumes = [
-      "/var/lib/immich/redis:/data"
-    ];
+    
+    # Secrets file for sensitive configuration like JWT_SECRET
+    secretsFile = "/var/lib/immich/secrets.env";
   };
 
   # Nginx configuration for Immich
@@ -70,10 +72,17 @@
     };
   };
 
-  # Create necessary directories
+  # Create necessary directories and secrets file
   system.activationScripts.immich-setup = ''
-    mkdir -p /var/lib/immich/{upload,postgres,redis,model-cache}
-    chown -R 999:999 /var/lib/immich/postgres
-    chown -R 999:999 /var/lib/immich/redis
+    mkdir -p /var/lib/immich/{upload,model-cache}
+    
+    # Create secrets file with JWT secret if it doesn't exist
+    if [ ! -f /var/lib/immich/secrets.env ]; then
+      echo "JWT_SECRET=$(${pkgs.openssl}/bin/openssl rand -hex 32)" > /var/lib/immich/secrets.env
+      chmod 600 /var/lib/immich/secrets.env
+    fi
+    
+    # Set proper ownership
+    chown -R immich:immich /var/lib/immich
   '';
 }
