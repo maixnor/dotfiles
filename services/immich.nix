@@ -69,7 +69,7 @@
   services.redis.servers.immich = {
     enable = true;
     port = 6390;
-    bind = "127.0.0.1";
+    bind = "localhost";
   };
 
   # Nginx configuration for Immich
