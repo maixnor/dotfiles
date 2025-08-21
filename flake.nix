@@ -20,7 +20,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     fine-cmdline = {
-      url = "github:VonHeikemen/fine-cmdline.nvim";
+      url = "github:VonHeikemen/fine-cmdline.nixvim";
       flake = false;
     };
     impermanence.url = "github:nix-community/impermanence";
@@ -44,7 +44,7 @@
         };
       };
 
-      nvim = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
+      nixvim = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
         inherit pkgs;
         module = import ./modules/nixvim.nix;
         extraSpecialArgs = {};
@@ -57,32 +57,32 @@
       };
 
       nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit system; inherit inputs; inherit nvim; };
+        specialArgs = { inherit system; inherit inputs; inherit nixvim; };
         modules = [ ./bierzelt/configuration.nix ];
       };
 
       nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
-        specialArgs = { inherit system; inherit inputs; inherit nvim; };
+        specialArgs = { inherit system; inherit inputs; inherit nixvim; };
         modules = [ ./wieselburg/configuration.nix ];
       };
 
       nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit system; inherit inputs; inherit nvim; };
+        specialArgs = { inherit system; inherit inputs; inherit nixvim; };
         modules = [ ./wieselburg/vm-test.nix ];
       };
 
       homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./bierbasis/home.nix ];
-        extraSpecialArgs = { inherit inputs; inherit nvim; };
+        extraSpecialArgs = { inherit inputs; inherit nixvim; };
       };
 
       homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./bierzelt/home.nix ];
-        extraSpecialArgs = { inherit inputs; inherit nvim; };
+        extraSpecialArgs = { inherit inputs; inherit nixvim; };
       };
       
       homeConfigurations."wieselburg" = home-manager.lib.homeManagerConfiguration {
@@ -101,7 +101,7 @@
           ];
           format = "linode";
         };
-        nixvim = nvim;
+        nixvim = nixvim;
         wieselburg-vm-test = inputs.self.nixosConfigurations.wieselburg-vm-test.config.system.build.vm;
       };
 
@@ -111,17 +111,17 @@
           program = let
             vmSystem = nixpkgs.lib.nixosSystem {
               system = "x86_64-linux";
-              specialArgs = { inherit system; inherit inputs; inherit nvim; };
+              specialArgs = { inherit system; inherit inputs; inherit nixvim; };
               modules = [ ./wieselburg/vm-test.nix ];
             };
           in "${vmSystem.config.system.build.vm}/bin/run-wieselburg-vm-test-vm";
         };
       };
       
-      packages.x86_64-linux.default = nvim;
+      packages.x86_64-linux.default = nixvim;
       apps.x86_64-linux.default = {
         type = "app";
-        program = "${nvim}/bin/nvim";
+        program = "${nixvim}/bin/nvim";
       };
 
       formatter.x86_64-linux = pkgs.nixfmt-rfc-style;
