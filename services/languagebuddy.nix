@@ -16,7 +16,7 @@ in
       ExecStart = pkgs.writeShellScript "languagebuddy-update.sh" ''
         if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
           git pull origin main
-          systemctl --user restart languagebuddy-api-test.service
+          systemctl --user restart languagebuddy-api-prod.service
         fi
       '';
       User = "maixnor";
@@ -103,7 +103,7 @@ in
         requirePassFile = /etc/languagebuddy-dev.scrt;
         appendOnly = true;
         openFirewall = true;
-        bind = null; # essentially 0.0.0.0
+        bind = null;
       };
       languagebuddy-prod = {
         enable = true;
@@ -111,7 +111,7 @@ in
         requirePassFile = /etc/languagebuddy-prod.scrt;
         appendOnly = true;
         openFirewall = true;
-        bind = null; # only available from the host itself
+        bind = null;
       };
     };
   };
