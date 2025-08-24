@@ -4,7 +4,7 @@
 
 	home.packages = with pkgs; [
 		just
-    ranger
+		ranger
 	];
 
   programs.wezterm = {
@@ -24,17 +24,15 @@
 			scrolling = {
 				history = 30000;
 			};
-      font.normal = lib.mkForce { family = "monospace"; };
+			font.normal = lib.mkForce { family = "monospace"; };
 			general.live_config_reload = true;
 			terminal.shell = {
 				program = "${pkgs.zsh}/bin/zsh";
 			};
 			colors = {
-        draw_bold_text_with_bright_colors = true;
+				draw_bold_text_with_bright_colors = true;
 			};	
 		};
-
 	};
-
 
 }

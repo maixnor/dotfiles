@@ -14,6 +14,9 @@
       ripgrep
       ripgrep-all
       inotify-tools
+      fzf jq
+      just ranger
+      static-server
     ];
   };
 
