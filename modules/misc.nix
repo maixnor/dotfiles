@@ -22,6 +22,7 @@
       thunderbird
       ngrok
       josm
+      nextcloud-client
 
       # nixos
       nix-index
