@@ -9,11 +9,9 @@
   imports =
     [
       ./hardware-configuration.nix
-      #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
       (import "${inputs.home-manager}/nixos")
-      #../modules/myzaney/config.nix
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -48,7 +46,7 @@
     ];  
   }; 
 
-  time.timeZone = "Europe/Vienna";
+  time.timeZone = "America/Lima";
 
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -64,6 +62,12 @@
   };
 
   services.openssh.enable = true;
+
+  qt = {
+    enable = false;
+    style = "breeze";
+    platformTheme = "kde";
+  };
 
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
@@ -102,16 +106,22 @@
   };
 
   nix.settings.trusted-users = [ "@wheel" "maixnor" "alf" ];
+
+  home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
     packages = [ nixvim ]; # nixvim
   };
-  # activate home-manager
-  home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };
 
-  services.teamviewer.enable = true;
+  # users.users.alf = {
+  #   isNormalUser = true;
+  #   description = "Benjamin Meixner";
+  #   extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
+  #   packages = [ nixvim ]; # nixvim
+  # };
+  # home-manager.users.alf = import ./home-alf.nix { inherit config pkgs lib inputs ; };
 
   environment.systemPackages = with pkgs; [ 
     wormhole-william

@@ -17,26 +17,13 @@
 
   config = {
     nixpkgs.config.allowUnfree = true;
-    home.username = "maixnor";
-    home.homeDirectory = "/home/maixnor";
+    home.username = "alf";
+    home.homeDirectory = "/home/alf";
 
     home.file."justfile".text = ''
       update:
         cd ~/repo/dotfiles && just bierzelt
     '';
-
-    #gtk = {
-    #  iconTheme = {
-    #    name = "Papirus-Dark";
-    #    package = pkgs.papirus-icon-theme;
-    #  };
-    #  gtk3.extraConfig = {
-    #    gtk-application-prefer-dark-theme = 1;
-    #  };
-    #  gtk4.extraConfig = {
-    #    gtk-application-prefer-dark-theme = 1;
-    #  };
-    #};
 
     services.kdeconnect = {
       enable = false;
@@ -52,7 +39,7 @@
     programs.home-manager.enable = true;
     programs.git = {
       enable = true;
-      userName = "maixnor";
+      userName = "alf";
       userEmail = "46966993+maixnor@users.noreply.github.com";
       extraConfig = {
         pull.rebase = true;
