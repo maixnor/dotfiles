@@ -4,7 +4,6 @@
 
 { config, pkgs, lib, inputs, nixvim, ... }:
 
-
 {
   imports =
     [
@@ -64,9 +63,9 @@
   services.openssh.enable = true;
 
   qt = {
-    enable = false;
-    style = "breeze";
-    platformTheme = "kde";
+    enable = true;
+    platformTheme = "gnome";
+    style = "adwaita-dark";
   };
 
   services.displayManager.sddm.enable = true;
@@ -124,6 +123,8 @@
   # home-manager.users.alf = import ./home-alf.nix { inherit config pkgs lib inputs ; };
 
   environment.systemPackages = with pkgs; [ 
+    kdePackages.qt6ct
+    kdePackages.qtstyleplugin-kvantum
     wormhole-william
     gnome-network-displays
     # qemu and virt-manager to work with libvirt
