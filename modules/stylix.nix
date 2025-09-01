@@ -37,15 +37,8 @@
     targets = {
       nixvim.transparentBackground.main = true;
       nixvim.transparentBackground.signColumn = true;
-
-      gnome.enable = false;
-      gtk.enable = false;
+      qt.enable = false;
       kde.enable = false;
-
-      # zaney does that instead
-      waybar.enable = false;
-      rofi.enable = false;
-      hyprland.enable = false;
     };
   };
 }

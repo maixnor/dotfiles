@@ -25,6 +25,7 @@
         cd ~/repo/dotfiles && just bierzelt
     '';
 
+<<<<<<< HEAD
     #gtk = {
     #  iconTheme = {
     #    name = "Papirus-Dark";
@@ -38,6 +39,8 @@
     #  };
     #};
 
+=======
+>>>>>>> save-bierzelt
     services.kdeconnect = {
       enable = false;
     };
