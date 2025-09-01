@@ -15,7 +15,7 @@ anywhere host usr ip:
   nix run github:nix-community/nixos-anywhere -- --flake ~/repo/dotfiles#{{host}} {{usr}}@{{ip}} --disko-mode format
 
 bierzelt:
-  just nixos bierzelt home bierzelt
+  just nixos bierzelt
 
 bierbasis: 
   just nixos bierbasis home bierbasis

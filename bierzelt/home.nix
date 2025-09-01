@@ -28,30 +28,6 @@
         cd ~/repo/dotfiles && just bierzelt
     '';
 
-    # Styling Options
-    stylix.targets = {
-      gnome.enable = lib.mkForce true;
-      gtk.enable = lib.mkForce true;
-      kde.enable = lib.mkForce true;
-    };
-    gtk = {
-      iconTheme = {
-        name = "Papirus-Dark";
-        package = pkgs.papirus-icon-theme;
-      };
-      gtk3.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
-      gtk4.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
-      };
-    };
-    qt = lib.mkForce {
-      enable = true;
-      style.name = "breeze";
-      platformTheme.name = "kde";
-    };
-
     services.kdeconnect = {
       enable = true;
     };
