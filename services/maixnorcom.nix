@@ -2,42 +2,64 @@
 { pkgs, ... }:
 
 {
-  services.nginx.virtualHosts."maixnor.com" = {
-    serverAliases = [ "wieselburg.maixnor.com" "wb.maixnor.com" ];
-    addSSL = true;
-    enableACME = true;
-    root = "/var/www/maixnor.com";
+  # Create Traefik configuration file for maixnor.com sites
+  environment.etc."traefik/maixnorcom.yml".text = ''
+    http:
+      routers:
+        maixnor-com:
+          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)"
+          service: "maixnor-com"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+        static-maixnor-com:
+          rule: "Host(`static.maixnor.com`)"
+          service: "static-maixnor-com"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
+      services:
+        maixnor-com:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8090"
+        static-maixnor-com:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8091"
+  '';
+
+  # Simple HTTP servers for static content
+  systemd.services.maixnor-com-server = {
+    description = "Static file server for maixnor.com";
+    after = [ "network.target" ];
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.python3}/bin/python -m http.server 8090 --directory /var/www/maixnor.com";
+      Restart = "always";
+      User = "nobody";
+      Group = "nogroup";
+    };
   };
 
-  # Static file server with directory browsing
-  services.nginx.virtualHosts."static.maixnor.com" = {
-    addSSL = true;
-    enableACME = true;
-    root = "/var/www/static";
-    
-    extraConfig = ''
-      # Enable directory browsing
-      autoindex on;
-      autoindex_exact_size off;  # Show human-readable file sizes
-      autoindex_localtime on;    # Show local time instead of UTC
-      
-      autoindex_format html;
-      
-      # Enable range requests for video streaming
-      location ~* \.(mp4|webm|ogg|avi|mov|flv|wmv|3gp|mkv)$ {
-        add_header Accept-Ranges bytes;
-        add_header Cache-Control "public, max-age=31536000";
-      }
-      
-      # Cache image and other static files
-      location ~* \.(jpg|jpeg|png|gif|ico|svg|webp|bmp|tiff)$ {
-        add_header Cache-Control "public, max-age=31536000";
-      }
-      
-      # Prevent access to hidden files
-      location ~ /\. {
-        deny all;
-      }
-    '';
+  systemd.services.static-maixnor-com-server = {
+    description = "Static file server for static.maixnor.com";
+    after = [ "network.target" ];
+    wantedBy = [ "default.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.python3}/bin/python -m http.server 8091 --directory /var/www/static";
+      Restart = "always";
+      User = "nobody";
+      Group = "nogroup";
+    };
   };
+
+  # Create necessary directories
+  system.activationScripts.maixnorcom-setup = ''
+    mkdir -p /var/www/{maixnor.com,static}
+    chown -R nobody:nogroup /var/www
+  '';
 }

@@ -12,11 +12,22 @@
 
   networking.firewall.allowedTCPPorts = [ 6666 ];
 
-  services.nginx.virtualHosts."search.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:6666/";
-    };
-  };
+  # Create Traefik configuration file for Searx
+  environment.etc."traefik/searx.yml".text = ''
+    http:
+      routers:
+        searx:
+          rule: "Host(`search.maixnor.com`)"
+          service: "searx"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
+      services:
+        searx:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:6666"
+  '';
 }

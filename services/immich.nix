@@ -81,24 +81,24 @@
     bind = "localhost";
   };
 
-  # Nginx configuration for Immich
-  services.nginx.virtualHosts."photos.maixnor.com" = {
-    forceSSL = true;
-    enableACME = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:2283";
-      proxyWebsockets = true;
-      extraConfig = ''
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Allow large file uploads
-        client_max_body_size 50000M;
-      '';
-    };
-  };
+  # Create Traefik configuration file for Immich
+  environment.etc."traefik/immich.yml".text = ''
+    http:
+      routers:
+        immich:
+          rule: "Host(`photos.maixnor.com`)"
+          service: "immich"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
+      services:
+        immich:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:2283"
+  '';
 
   # Create necessary directories and secrets file
   system.activationScripts.immich-setup = ''

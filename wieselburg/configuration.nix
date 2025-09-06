@@ -11,7 +11,7 @@ in
     ../modules/misc-server.nix
     ../modules/zerotier.nix
     ../services/autoupdate.nix
-    ../services/nginx-base.nix
+    ../services/traefik-base.nix
     ../services/maixnorcom.nix
     ../services/searx.nix
     ../services/languagebuddy.nix

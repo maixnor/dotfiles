@@ -27,26 +27,24 @@
     };
   };
 
-  # Nginx configuration for Navidrome
-  services.nginx.virtualHosts."music.maixnor.com" = {
-    forceSSL = true;
-    enableACME = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:4533";
-      proxyWebsockets = true;
-      extraConfig = ''
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Increase timeout for music streaming
-        proxy_read_timeout 300;
-        proxy_connect_timeout 300;
-        proxy_send_timeout 300;
-      '';
-    };
-  };
+  # Create Traefik configuration file for Navidrome
+  environment.etc."traefik/navidrome.yml".text = ''
+    http:
+      routers:
+        navidrome:
+          rule: "Host(`music.maixnor.com`)"
+          service: "navidrome"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
+      services:
+        navidrome:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:4533"
+  '';
 
   # Create necessary directories
   system.activationScripts.navidrome-setup = ''

@@ -57,22 +57,43 @@
     };
   };
 
-  # Nginx configuration for Nextcloud
-  services.nginx.virtualHosts.${config.services.nextcloud.hostName} = {
-    forceSSL = true;
-    enableACME = true;
-    
-    # Security headers
-    extraConfig = ''
-      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-      add_header X-Content-Type-Options "nosniff" always;
-      add_header X-Frame-Options "SAMEORIGIN" always;
-      add_header Referrer-Policy "no-referrer" always;
-      add_header X-XSS-Protection "1; mode=block" always;
-      add_header X-Permitted-Cross-Domain-Policies "none" always;
-      add_header X-Robots-Tag "noindex, nofollow" always;
-    '';
-  };
+  # Create Traefik configuration file for Nextcloud
+  environment.etc."traefik/nextcloud.yml".text = ''
+    http:
+      routers:
+        nextcloud:
+          rule: "Host(`${config.services.nextcloud.hostName}`)"
+          service: "nextcloud"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+          middlewares:
+            - "nextcloud-headers"
+
+      middlewares:
+        nextcloud-headers:
+          headers:
+            customRequestHeaders:
+              X-Forwarded-Proto: "https"
+            customResponseHeaders:
+              Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+              X-Content-Type-Options: "nosniff"
+              X-Frame-Options: "SAMEORIGIN"
+              Referrer-Policy: "no-referrer"
+              X-XSS-Protection: "1; mode=block"
+              X-Permitted-Cross-Domain-Policies: "none"
+              X-Robots-Tag: "noindex, nofollow"
+
+      services:
+        nextcloud:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:80"
+  '';
+
+  # Enable Traefik for this service
+  services.traefik.enable = true;
 
   # Database setup
   services.postgresql = {
