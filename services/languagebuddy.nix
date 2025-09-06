@@ -31,35 +31,125 @@ in
     };
   };
 
-  services.nginx.virtualHosts."prod.languagebuddy.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:8080/";
-    };
-  };
+  # Create the A/B testing configuration file
+  environment.etc."traefik/ab-testing.yml".text = ''
+    http:
+      routers:
+        # Single production router with configurable weights
+        languagebuddy-prod:
+          rule: "Host(`languagebuddy.maixnor.com`)"
+          service: "languagebuddy-weighted"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
 
-  services.nginx.virtualHosts."prod.redis.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:6380/";
-    };
-  };
+      services:
+        languagebuddy-weighted:
+          weighted:
+            services:
+              - name: "prod-languagebuddy"
+                weight: 100
+              - name: "test-languagebuddy"
+                weight: 0
+        prod-languagebuddy:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8080"
+        test-languagebuddy:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8081"
+  '';
 
-  services.nginx.virtualHosts."test.languagebuddy.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:8081/";
+  services.traefik = {
+    enable = true;
+    staticConfigOptions = {
+      entryPoints = {
+        web = {
+          address = ":80";
+          http.redirections.entrypoint = {
+            to = "websecure";
+            scheme = "https";
+            permanent = true;
+          };
+        };
+        websecure = {
+          address = ":443";
+          http.tls.certResolver = "letsencrypt";
+        };
+      };
+      certificatesResolvers.letsencrypt = {
+        acme = {
+          email = "benjamin@meixner.org";
+          storage = "/var/lib/traefik/acme.json";
+          httpChallenge.entryPoint = "web";
+        };
+      };
+      api = {
+        dashboard = true;
+        insecure = false;
+      };
+      providers = {
+        file = {
+          filename = "/etc/traefik/ab-testing.yml";
+          watch = true;
+        };
+      };
     };
-  };
-
-  services.nginx.virtualHosts."test.redis.maixnor.com" = {
-    enableACME = true;
-    addSSL = true;
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:6381/";
+    dynamicConfigOptions = {
+      http = {
+        routers = {
+          # Static routers (not affected by A/B testing)
+          prod-languagebuddy = {
+            rule = "Host(`prod.languagebuddy.maixnor.com`)";
+            service = "prod-languagebuddy-static";
+            entryPoints = ["websecure"];
+            tls.certResolver = "letsencrypt";
+          };
+          test-languagebuddy = {
+            rule = "Host(`test.languagebuddy.maixnor.com`)";
+            service = "test-languagebuddy-static";
+            entryPoints = ["websecure"];
+            tls.certResolver = "letsencrypt";
+          };
+          prod-redis = {
+            rule = "Host(`prod.redis.maixnor.com`)";
+            service = "prod-redis";
+            entryPoints = ["websecure"];
+            tls.certResolver = "letsencrypt";
+          };
+          test-redis = {
+            rule = "Host(`test.redis.maixnor.com`)";
+            service = "test-redis";
+            entryPoints = ["websecure"];
+            tls.certResolver = "letsencrypt";
+          };
+        };
+        services = {
+          # Static services for direct access
+          prod-languagebuddy-static = {
+            loadBalancer.servers = [{
+              url = "http://127.0.0.1:8080";
+            }];
+          };
+          test-languagebuddy-static = {
+            loadBalancer.servers = [{
+              url = "http://127.0.0.1:8081";
+            }];
+          };
+          prod-redis = {
+            loadBalancer.servers = [{
+              url = "http://127.0.0.1:6380";
+            }];
+          };
+          test-redis = {
+            loadBalancer.servers = [{
+              url = "http://127.0.0.1:6381";
+            }];
+          };
+        };
+      };
     };
   };
 
