@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Disable nginx since we're using Traefik
+  services.nginx.enable = lib.mkForce false;
+
   services.nextcloud = {
     enable = true;
     hostName = "cloud.maixnor.com";
@@ -91,9 +94,6 @@
             servers:
               - url: "http://127.0.0.1:80"
   '';
-
-  # Enable Traefik for this service
-  services.traefik.enable = true;
 
   # Database setup
   services.postgresql = {
