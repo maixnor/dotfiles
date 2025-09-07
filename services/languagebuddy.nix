@@ -31,82 +31,57 @@ in
     };
   };
 
-  services.traefik.dynamicConfigOptions = {
-    http = {
-      routers = {
+  # Create Traefik configuration file for LanguageBuddy
+  environment.etc."traefik/languagebuddy.yml".text = ''
+    http:
+      routers:
         # Main production router with A/B testing
-        languagebuddy-main = {
-          rule = "Host(`languagebuddy.maixnor.com`)";
-          service = "languagebuddy-weighted";
-          entryPoints = ["websecure"];
-          tls.certResolver = "letsencrypt";
-        };
+        languagebuddy-main:
+          rule: "Host(`languagebuddy.maixnor.com`)"
+          service: "languagebuddy-weighted"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+        
         # Direct access routers
-        prod-languagebuddy = {
-          rule = "Host(`prod.languagebuddy.maixnor.com`)";
-          service = "prod-languagebuddy";
-          entryPoints = ["websecure"];
-          tls.certResolver = "letsencrypt";
-        };
-        test-languagebuddy = {
-          rule = "Host(`test.languagebuddy.maixnor.com`)";
-          service = "test-languagebuddy";
-          entryPoints = ["websecure"];
-          tls.certResolver = "letsencrypt";
-        };
-        prod-redis = {
-          rule = "Host(`prod.redis.maixnor.com`)";
-          service = "prod-redis";
-          entryPoints = ["websecure"];
-          tls.certResolver = "letsencrypt";
-        };
-        test-redis = {
-          rule = "Host(`test.redis.maixnor.com`)";
-          service = "test-redis";
-          entryPoints = ["websecure"];
-          tls.certResolver = "letsencrypt";
-        };
-      };
-      services = {
+        prod-languagebuddy:
+          rule: "Host(`prod.languagebuddy.maixnor.com`)"
+          service: "prod-languagebuddy"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+        
+        test-languagebuddy:
+          rule: "Host(`test.languagebuddy.maixnor.com`)"
+          service: "test-languagebuddy"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
+      services:
         # Weighted service for A/B testing
-        languagebuddy-weighted = {
-          weighted = {
-            services = [
-              {
-                name = "prod-languagebuddy";
-                weight = 100;
-              }
-              {
-                name = "test-languagebuddy";
-                weight = 0;
-              }
-            ];
-          };
-        };
+        languagebuddy-weighted:
+          weighted:
+            services:
+              - name: "prod-languagebuddy"
+                weight: 100
+              - name: "test-languagebuddy"
+                weight: 0
+        
         # Backend services
-        prod-languagebuddy = {
-          loadBalancer.servers = [{
-            url = "http://127.0.0.1:8080";
-          }];
-        };
-        test-languagebuddy = {
-          loadBalancer.servers = [{
-            url = "http://127.0.0.1:8081";
-          }];
-        };
-        prod-redis = {
-          loadBalancer.servers = [{
-            url = "http://127.0.0.1:6380";
-          }];
-        };
-        test-redis = {
-          loadBalancer.servers = [{
-            url = "http://127.0.0.1:6381";
-          }];
-        };
-      };
-    };
-  };
+        prod-languagebuddy:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8080"
+        
+        test-languagebuddy:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8081"
+  '';
 
   systemd.services.languagebuddy-api-test = {
     description = "LanguageBuddy API";
@@ -121,6 +96,9 @@ in
       User = "maixnor";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
+    };
+    environment = {
+      PORT = "8081";
     };
   };
 
@@ -137,6 +115,9 @@ in
       User = "maixnor";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
+    };
+    environment = {
+      PORT = "8080";
     };
   };
 
