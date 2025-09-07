@@ -31,85 +31,26 @@ in
     };
   };
 
-  # Create the A/B testing configuration file
-  environment.etc."traefik/ab-testing.yml".text = ''
-    http:
-      routers:
-        # Single production router with configurable weights
-        languagebuddy-prod:
-          rule: "Host(`languagebuddy.maixnor.com`)"
-          service: "languagebuddy-weighted"
-          entryPoints:
-            - "websecure"
-          tls:
-            certResolver: "letsencrypt"
-
-      services:
-        languagebuddy-weighted:
-          weighted:
-            services:
-              - name: "prod-languagebuddy"
-                weight: 100
-              - name: "test-languagebuddy"
-                weight: 0
-        prod-languagebuddy:
-          loadBalancer:
-            servers:
-              - url: "http://127.0.0.1:8080"
-        test-languagebuddy:
-          loadBalancer:
-            servers:
-              - url: "http://127.0.0.1:8081"
-  '';
-
-  services.traefik = {
-    enable = true;
-    staticConfigOptions = {
-      entryPoints = {
-        web = {
-          address = ":80";
-          http.redirections.entrypoint = {
-            to = "websecure";
-            scheme = "https";
-            permanent = true;
-          };
-        };
-        websecure = {
-          address = ":443";
-          http.tls.certResolver = "letsencrypt";
-        };
-      };
-      certificatesResolvers.letsencrypt = {
-        acme = {
-          email = "benjamin@meixner.org";
-          storage = "/var/lib/traefik/acme.json";
-          httpChallenge.entryPoint = "web";
-        };
-      };
-      api = {
-        dashboard = true;
-        insecure = false;
-      };
-      providers = {
-        file = {
-          filename = "/etc/traefik/ab-testing.yml";
-          watch = true;
-        };
-      };
-    };
-    dynamicConfigOptions = {
+  services.traefik.dynamicConfigOptions = {
       http = {
         routers = {
-          # Static routers (not affected by A/B testing)
+          # Main production router with A/B testing
+          languagebuddy-main = {
+            rule = "Host(`languagebuddy.maixnor.com`)";
+            service = "languagebuddy-weighted";
+            entryPoints = ["websecure"];
+            tls.certResolver = "letsencrypt";
+          };
+          # Direct access routers
           prod-languagebuddy = {
             rule = "Host(`prod.languagebuddy.maixnor.com`)";
-            service = "prod-languagebuddy-static";
+            service = "prod-languagebuddy";
             entryPoints = ["websecure"];
             tls.certResolver = "letsencrypt";
           };
           test-languagebuddy = {
             rule = "Host(`test.languagebuddy.maixnor.com`)";
-            service = "test-languagebuddy-static";
+            service = "test-languagebuddy";
             entryPoints = ["websecure"];
             tls.certResolver = "letsencrypt";
           };
@@ -127,13 +68,28 @@ in
           };
         };
         services = {
-          # Static services for direct access
-          prod-languagebuddy-static = {
+          # Weighted service for A/B testing
+          languagebuddy-weighted = {
+            weighted = {
+              services = [
+                {
+                  name = "prod-languagebuddy";
+                  weight = 100;
+                }
+                {
+                  name = "test-languagebuddy";
+                  weight = 0;
+                }
+              ];
+            };
+          };
+          # Backend services
+          prod-languagebuddy = {
             loadBalancer.servers = [{
               url = "http://127.0.0.1:8080";
             }];
           };
-          test-languagebuddy-static = {
+          test-languagebuddy = {
             loadBalancer.servers = [{
               url = "http://127.0.0.1:8081";
             }];
