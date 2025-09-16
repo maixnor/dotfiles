@@ -16,7 +16,7 @@ in
       ExecStart = pkgs.writeShellScript "languagebuddy-update.sh" ''
         if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
           git pull origin main
-          systemctl --user restart languagebuddy-api-prod.service
+          systemctl --user restart languagebuddy-api-test.service
         fi
       '';
       User = "maixnor";

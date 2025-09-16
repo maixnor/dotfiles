@@ -18,6 +18,10 @@
       just ranger
       static-server
     ];
+
+    environment.shellAliases = {
+      z = "{pkgs.zoxide}/bin/zoxide";
+    };
   };
 
 }
