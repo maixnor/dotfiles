@@ -26,7 +26,7 @@
     '';
 
     services.kdeconnect = {
-      enable = false;
+      enable = true;
     };
 
     home.stateVersion = "24.11";

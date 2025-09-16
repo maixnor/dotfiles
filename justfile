@@ -1,4 +1,7 @@
 
+update host:
+	sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
+
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
 

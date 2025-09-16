@@ -8,6 +8,7 @@
       traceroute
       wget xh
       freshfetch
+      presenterm
       calc
       miraclecast
       spotify
