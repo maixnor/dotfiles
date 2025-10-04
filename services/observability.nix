@@ -114,7 +114,6 @@
     configuration = {
       server = {
         http_listen_port = 3100;
-        grpc_listen_port = 9096;
       };
       
       auth_enabled = false;
@@ -128,10 +127,7 @@
             };
             replication_factor = 1;
           };
-          final_sleep = "0s";
         };
-        chunk_idle_period = "5m";
-        chunk_retain_period = "30s";
       };
       
       schema_config = {
@@ -160,13 +156,6 @@
       limits_config = {
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
-        ingestion_rate_mb = 16;
-        ingestion_burst_size_mb = 32;
-      };
-      
-      table_manager = {
-        retention_deletes_enabled = false;
-        retention_period = "0s";
       };
     };
   };
