@@ -133,9 +133,9 @@
       schema_config = {
         configs = [{
           from = "2020-10-24";
-          store = "boltdb-shipper";
+          store = "tsdb";
           object_store = "filesystem";
-          schema = "v11";
+          schema = "v13";
           index = {
             prefix = "index_";
             period = "24h";
@@ -144,9 +144,9 @@
       };
       
       storage_config = {
-        boltdb_shipper = {
-          active_index_directory = "/var/lib/loki/boltdb-shipper-active";
-          cache_location = "/var/lib/loki/boltdb-shipper-cache";
+        tsdb_shipper = {
+          active_index_directory = "/var/lib/loki/tsdb-shipper-active";
+          cache_location = "/var/lib/loki/tsdb-shipper-cache";
         };
         filesystem = {
           directory = "/var/lib/loki/chunks";
@@ -156,6 +156,7 @@
       limits_config = {
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
+        allow_structured_metadata = false;
       };
     };
   };
@@ -418,8 +419,8 @@
     "d /var/lib/grafana/dashboards 0755 grafana grafana -"
     "d /var/lib/loki 0755 loki loki -"
     "d /var/lib/loki/chunks 0755 loki loki -"
-    "d /var/lib/loki/boltdb-shipper-active 0755 loki loki -"
-    "d /var/lib/loki/boltdb-shipper-cache 0755 loki loki -"
+    "d /var/lib/loki/tsdb-shipper-active 0755 loki loki -"
+    "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
   ];
 }
