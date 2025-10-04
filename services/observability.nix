@@ -132,7 +132,6 @@
         };
         chunk_idle_period = "5m";
         chunk_retain_period = "30s";
-        max_transfer_retries = 0;
       };
       
       schema_config = {
@@ -152,7 +151,6 @@
         boltdb_shipper = {
           active_index_directory = "/var/lib/loki/boltdb-shipper-active";
           cache_location = "/var/lib/loki/boltdb-shipper-cache";
-          shared_store = "filesystem";
         };
         filesystem = {
           directory = "/var/lib/loki/chunks";
@@ -164,10 +162,6 @@
         reject_old_samples_max_age = "168h";
         ingestion_rate_mb = 16;
         ingestion_burst_size_mb = 32;
-      };
-      
-      chunk_store_config = {
-        max_look_back_period = "0s";
       };
       
       table_manager = {
