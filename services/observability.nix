@@ -37,7 +37,10 @@
       redis = {
         enable = true;
         port = 9121;
-        redisAddr = "redis://localhost:6380"; # prod redis
+        extraFlags = [
+          "--redis.addr=redis://localhost:6380"
+          "--redis.password-file=/etc/languagebuddy-prod.scrt"
+        ];
       };
     };
     
@@ -424,7 +427,7 @@
   };
 
   # Open firewall ports for internal services
-  networking.firewall.allowedTCPPorts = [ 9090 3100 9100 9121 ];
+  networking.firewall.allowedTCPPorts = [ 9090 3100 3000 ];
 
   # Create data directories
   systemd.tmpfiles.rules = [
