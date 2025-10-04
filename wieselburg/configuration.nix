@@ -15,6 +15,7 @@ in
     ../services/maixnorcom.nix
     ../services/searx.nix
     ../services/languagebuddy.nix
+    ../services/observability.nix
     # ../services/ai-research.nix
     # ../services/nextcloud.nix
     ../services/immich.nix
