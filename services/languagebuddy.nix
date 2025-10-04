@@ -84,7 +84,7 @@ in
   '';
 
   systemd.services.languagebuddy-api-test = {
-    description = "LanguageBuddy API";
+    description = "LanguageBuddy API Test Environment";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 bash ];
@@ -96,9 +96,14 @@ in
       User = "maixnor";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
+      SyslogIdentifier = "languagebuddy-test";
     };
     environment = {
       PORT = "8081";
+      NODE_ENV = "production";
+      LOG_LEVEL = "info";
+      ENVIRONMENT = "test";
+      SERVICE_NAME = "languagebuddy";
     };
   };
 
@@ -115,9 +120,14 @@ in
       User = "maixnor";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
+      SyslogIdentifier = "languagebuddy-prod";
     };
     environment = {
       PORT = "8080";
+      NODE_ENV = "production";
+      LOG_LEVEL = "info";
+      ENVIRONMENT = "prod";
+      SERVICE_NAME = "languagebuddy";
     };
   };
 
