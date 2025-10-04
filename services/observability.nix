@@ -422,5 +422,8 @@
     "d /var/lib/loki/tsdb-shipper-active 0755 loki loki -"
     "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
+    # Fix permissions on Grafana config files (existing or new)
+    "z /etc/grafana.scrt 0640 grafana grafana -"
+    "z /etc/grafana.key 0640 grafana grafana -"
   ];
 }
