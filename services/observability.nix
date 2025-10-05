@@ -34,14 +34,14 @@
       };
       
       # Redis exporter for Redis metrics
-      redis = {
-        enable = true;
-        port = 9121;
-        extraFlags = [
-          "--redis.addr=redis://localhost:6380"
-          "--redis.password-file=/etc/languagebuddy-prod.scrt"
-        ];
-      };
+      #redis = {
+      #  enable = true;
+      #  port = 9121;
+      #  extraFlags = [
+      #    "--redis.addr=redis://localhost:6380"
+      #    "--redis.password-file=/etc/languagebuddy-prod.scrt"
+      #  ];
+      #};
     };
     
     # Scrape configuration
