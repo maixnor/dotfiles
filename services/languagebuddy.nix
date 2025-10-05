@@ -87,7 +87,7 @@ in
     description = "LanguageBuddy API Test Environment";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_24 bash ];
+    path = with pkgs; [ nodejs_24 bash swc ];
     script = "${runscript-swc}/bin/start";
     serviceConfig = {
       WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
@@ -111,7 +111,7 @@ in
     description = "LanguageBuddy API Production";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_24 bash ];
+    path = with pkgs; [ nodejs_24 bash swc ];
     script = "${runscript-swc}/bin/start";
     serviceConfig = {
       WorkingDirectory = "/home/maixnor/repo/languagebuddy-prod/backend";
