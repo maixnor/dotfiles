@@ -1,35 +1,17 @@
 { pkgs, ... }:
 
 let 
-  runscript-swc = pkgs.writeShellScriptBin "start" ''npm i && npm run build:swc && ENV=PRODUCTION npm run start'';
-  runscript = pkgs.writeShellScriptBin "start" ''npm i && npm run build && ENV=PRODUCTION npm run start'';
   redis_socket = "/run/redis-languagebuddy-dev/socket.sock";
 in
 {
 
-  systemd.services.languagebuddy-api-test-update = {
-    description = "Pull latest code and restart app";
-    path = with pkgs; [ git ];
-    serviceConfig = {
-      Type = "oneshot";
-      WorkingDirectory = "/home/maixnor/repo/languagebuddy";
-      ExecStart = pkgs.writeShellScript "languagebuddy-update.sh" ''
-        if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
-          git pull origin main
-          systemctl --user restart languagebuddy-api-test.service
-        fi
-      '';
-      User = "maixnor";
-    };
-  };
-
-  systemd.timers.languagebuddy-api-test-update = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "minutely";
-      Unit = "languagebuddy-update.service";
-    };
-  };
+  # Ensure directories exist for languagebuddy artifacts
+  systemd.tmpfiles.rules = [
+    "d /var/www 0755 maixnor maixnor -"
+    "d /var/www/languagebuddy 0755 maixnor maixnor -"
+    "d /var/www/languagebuddy/prod 0755 maixnor maixnor -"
+    "d /var/www/languagebuddy/test 0755 maixnor maixnor -"
+  ];
 
   # Create Traefik configuration file for LanguageBuddy
   environment.etc."traefik/languagebuddy.yml".text = ''
@@ -87,11 +69,11 @@ in
     description = "LanguageBuddy API Test Environment";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_24 bash swc ];
-    script = "${runscript-swc}/bin/start";
+    path = with pkgs; [ nodejs_24 ];
+    script = "node index.js";
     serviceConfig = {
-      WorkingDirectory = "/home/maixnor/repo/languagebuddy/backend";
-      EnvironmentFile = "/home/maixnor/repo/languagebuddy/backend/.env";
+      WorkingDirectory = "/var/www/languagebuddy/test";
+      EnvironmentFile = "/var/www/languagebuddy/test/.env";
       Restart = "always";
       User = "maixnor";
       PrivateNetwork = false;
@@ -100,9 +82,9 @@ in
     };
     environment = {
       PORT = "8081";
-      NODE_ENV = "production";
+      NODE_ENV = "TEST";
       LOG_LEVEL = "info";
-      ENVIRONMENT = "test";
+      ENVIRONMENT = "TEST";
       SERVICE_NAME = "languagebuddy";
     };
   };
@@ -111,11 +93,11 @@ in
     description = "LanguageBuddy API Production";
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_24 bash swc ];
-    script = "${runscript-swc}/bin/start";
+    path = with pkgs; [ nodejs_24 ];
+    script = "node index.js";
     serviceConfig = {
-      WorkingDirectory = "/home/maixnor/repo/languagebuddy-prod/backend";
-      EnvironmentFile = "/home/maixnor/repo/languagebuddy-prod/backend/.env";
+      WorkingDirectory = "/var/www/languagebuddy/prod";
+      EnvironmentFile = "/var/www/languagebuddy/prod/.env";
       Restart = "always";
       User = "maixnor";
       PrivateNetwork = false;
@@ -124,9 +106,9 @@ in
     };
     environment = {
       PORT = "8080";
-      NODE_ENV = "production";
+      NODE_ENV = "PRODUCTION";
       LOG_LEVEL = "info";
-      ENVIRONMENT = "prod";
+      ENVIRONMENT = "PROD";
       SERVICE_NAME = "languagebuddy";
     };
   };
