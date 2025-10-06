@@ -70,7 +70,7 @@ in
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 ];
-    script = "node index.js";
+    script = "node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/test";
       EnvironmentFile = "/var/www/languagebuddy/test/.env";
@@ -94,7 +94,7 @@ in
     after = [ "network.target" "redis.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 ];
-    script = "node index.js";
+    script = "node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/prod";
       EnvironmentFile = "/var/www/languagebuddy/prod/.env";
