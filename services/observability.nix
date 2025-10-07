@@ -55,7 +55,6 @@
         max_chunk_age = "1h";
         chunk_target_size = 999999;
         chunk_retain_period = "30s";
-        max_transfer_retries = 0;
       };
 
       schema_config = {
@@ -76,7 +75,6 @@
           active_index_directory = "/var/lib/loki/tsdb-shipper-active";
           cache_location = "/var/lib/loki/tsdb-shipper-cache";
           cache_ttl = "24h";
-          shared_store = "filesystem";
         };
 
         filesystem = {
@@ -89,18 +87,12 @@
         reject_old_samples_max_age = "168h";
       };
 
-      chunk_store_config = {
-        max_look_back_period = "0s";
-      };
-
-      table_manager = {
-        retention_deletes_enabled = false;
-        retention_period = "0s";
-      };
-
       compactor = {
-        working_directory = "/var/lib/loki";
-        shared_store = "filesystem";
+        working_directory = "/var/lib/loki/compactor";
+        compaction_interval = "10m";
+        retention_enabled = false;
+        retention_delete_delay = "2h";
+        retention_delete_worker_count = 150;
         compactor_ring = {
           kvstore = {
             store = "inmemory";
@@ -146,14 +138,16 @@
 
   # grafana: port 3010 (8010)
   services.grafana = {
-    port = 3010;
-    rootUrl = "https://grafana.maixnor.com"; # helps with nginx / ws / live
-
-    protocol = "http";
-    addr = "127.0.0.1";
     enable = true;
 
     settings = {
+      server = {
+        http_port = 3010;
+        root_url = "https://grafana.maixnor.com";
+        protocol = "http";
+        http_addr = "127.0.0.1";
+      };
+
       database = {
         type = "sqlite3";
         path = "/var/lib/grafana/grafana.db";
