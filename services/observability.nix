@@ -158,6 +158,11 @@
         };
       };
       
+      compactor = {
+        working_directory = "/var/lib/loki/compactor";
+        compaction_interval = "10m";
+      };
+      
       limits_config = {
         reject_old_samples = true;
         reject_old_samples_max_age = "168h";
@@ -426,6 +431,7 @@
     "d /var/lib/loki/chunks 0755 loki loki -"
     "d /var/lib/loki/tsdb-shipper-active 0755 loki loki -"
     "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
+    "d /var/lib/loki/compactor 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
