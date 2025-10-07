@@ -3,20 +3,20 @@
 {
   # MONITORING: services run on loopback interface
   #             nginx reverse proxy exposes services to network
-  #             - grafana:3010
-  #             - prometheus:3020
-  #             - loki:3030
-  #             - promtail:3031
+  #             - grafana:3000
+  #             - prometheus:9090
+  #             - loki:3100
+  #             - promtail:9080
 
-  # prometheus: port 3020 (8020)
+  # prometheus: port 9090 (default)
   #
   services.prometheus = {
-    port = 3020;
+    port = 9090;
     enable = true;
 
     exporters = {
       node = {
-        port = 3021;
+        port = 9100;
         enabledCollectors = [ "systemd" ];
         enable = true;
       };
@@ -33,12 +33,12 @@
     }];
   };
 
-  # loki: port 3030 (8030)
+  # loki: port 3100 (default)
   #
   services.loki = {
     enable = true;
     configuration = {
-      server.http_listen_port = 3030;
+      server.http_listen_port = 3100;
       auth_enabled = false;
 
       # Disable memberlist for single-node setup
@@ -123,13 +123,13 @@
     # user, group, dataDir, extraFlags, (configFile)
   };
 
-  # promtail: port 3031 (8031)
+  # promtail: port 9080 (default)
   #
   services.promtail = {
     enable = true;
     configuration = {
       server = {
-        http_listen_port = 3031;
+        http_listen_port = 9080;
         grpc_listen_port = 0;
       };
       positions = {
@@ -156,13 +156,13 @@
     # extraFlags
   };
 
-  # grafana: port 3010 (8010)
+  # grafana: port 3000 (default)
   services.grafana = {
     enable = true;
 
     settings = {
       server = {
-        http_port = 3010;
+        http_port = 3000;
         root_url = "https://grafana.maixnor.com";
         protocol = "http";
         http_addr = "127.0.0.1";
@@ -244,17 +244,17 @@
         grafana:
           loadBalancer:
             servers:
-              - url: "http://127.0.0.1:3000"
+              - url: "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}"
         
         prometheus:
           loadBalancer:
             servers:
-              - url: "http://127.0.0.1:9090"
+              - url: "http://127.0.0.1:${toString config.services.prometheus.port}"
         
         loki:
           loadBalancer:
             servers:
-              - url: "http://127.0.0.1:3100"
+              - url: "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}"
 
       middlewares:
         auth:
@@ -316,7 +316,7 @@
   };
 
   # Open firewall ports for internal services
-  networking.firewall.allowedTCPPorts = [ 9090 3100 3000 ];
+  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 ];
 
   # Create data directories
   systemd.tmpfiles.rules = [
