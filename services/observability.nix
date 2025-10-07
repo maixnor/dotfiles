@@ -118,6 +118,11 @@
       
       auth_enabled = false;
       
+      common = {
+        instance_addr = "127.0.0.1";
+        replication_factor = 1;
+      };
+      
       ingester = {
         lifecycler = {
           address = "127.0.0.1";
