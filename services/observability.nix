@@ -41,6 +41,13 @@
       server.http_listen_port = 3030;
       auth_enabled = false;
 
+      # Disable memberlist for single-node setup
+      memberlist = {
+        abort_if_cluster_join_fails = false;
+        bind_port = 7946;
+        join_members = [];
+      };
+
       common = {
         ring = {
           kvstore = {
@@ -48,6 +55,7 @@
           };
         };
         replication_factor = 1;
+        instance_interface_names = ["lo"];
       };
 
       ingester = {
