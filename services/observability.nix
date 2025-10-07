@@ -41,6 +41,15 @@
       server.http_listen_port = 3030;
       auth_enabled = false;
 
+      common = {
+        ring = {
+          kvstore = {
+            store = "inmemory";
+          };
+        };
+        replication_factor = 1;
+      };
+
       ingester = {
         lifecycler = {
           address = "127.0.0.1";
