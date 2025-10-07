@@ -151,7 +151,6 @@
 
     protocol = "http";
     addr = "127.0.0.1";
-    analytics.reporting.enable = false;
     enable = true;
 
     settings = {
