@@ -45,6 +45,9 @@
       memberlist = {
         abort_if_cluster_join_fails = false;
         bind_port = 7946;
+        bind_addr = ["127.0.0.1"];
+        advertise_addr = "127.0.0.1";
+        advertise_port = 7946;
         join_members = [];
       };
 
@@ -55,7 +58,7 @@
           };
         };
         replication_factor = 1;
-        instance_interface_names = ["lo"];
+        instance_addr = "127.0.0.1";
       };
 
       ingester = {
