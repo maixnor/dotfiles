@@ -166,11 +166,42 @@
         grpc_listen_port = 9095;
       };
       auth_enabled = false;
+      
+      distributor = {
+        receivers = {
+          otlp = {
+            protocols = {
+              grpc = {
+                endpoint = "127.0.0.1:4317";
+              };
+              http = {
+                endpoint = "127.0.0.1:4318";
+              };
+            };
+          };
+        };
+      };
+
+      ingester = {
+        trace_idle_period = "10s";
+        max_block_bytes = 1000000;
+        max_block_duration = "5m";
+      };
+
+      compactor = {
+        compaction = {
+          block_retention = "1h";
+        };
+      };
+
       storage = {
         trace = {
           backend = "local";
+          wal = {
+            path = "/var/lib/tempo/wal";
+          };
           local = {
-            path = "/var/lib/tempo/traces";
+            path = "/var/lib/tempo/blocks";
           };
         };
       };
@@ -370,7 +401,9 @@
     "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
     "d /var/lib/loki/compactor 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
-    "d /var/lib/tempo/traces 0755 tempo tempo -"
+    "d /var/lib/tempo 0755 tempo tempo -"
+    "d /var/lib/tempo/blocks 0755 tempo tempo -"
+    "d /var/lib/tempo/wal 0755 tempo tempo -"
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
     "z /etc/grafana.key 0640 grafana grafana -"
