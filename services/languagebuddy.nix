@@ -5,15 +5,10 @@ let
 in
 {
 
-  # Ensure directories exist for languagebuddy artifacts
+  # Create deployment directories with correct ownership
   systemd.tmpfiles.rules = [
-    "d /var/www 0755 maixnor maixnor -"
-    "d /var/www/languagebuddy 0755 maixnor maixnor -"
     "d /var/www/languagebuddy/prod 0755 maixnor maixnor -"
     "d /var/www/languagebuddy/test 0755 maixnor maixnor -"
-    # Recursively fix ownership and permissions for deployment
-    "Z /var/www 0755 maixnor maixnor -"
-    "Z /var/www/languagebuddy 0755 maixnor maixnor -"
     "Z /var/www/languagebuddy/prod 0755 maixnor maixnor -"
     "Z /var/www/languagebuddy/test 0755 maixnor maixnor -"
   ];
