@@ -163,7 +163,7 @@
     settings = {
       server = {
         http_listen_port = 3200;
-        grpc_listen_port = 9095;
+        grpc_listen_port = 9096;
       };
       auth_enabled = false;
       
