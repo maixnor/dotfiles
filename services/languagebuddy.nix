@@ -11,6 +11,8 @@ in
     "d /var/www/languagebuddy 0755 maixnor maixnor -"
     "d /var/www/languagebuddy/prod 0755 maixnor maixnor -"
     "d /var/www/languagebuddy/test 0755 maixnor maixnor -"
+    "Z /var/www/languagebuddy/prod 0755 maixnor maixnor -"
+    "Z /var/www/languagebuddy/test 0755 maixnor maixnor -"
   ];
 
   # Create Traefik configuration file for LanguageBuddy

@@ -160,7 +160,7 @@
   #
   services.tempo = {
     enable = true;
-    configuration = {
+    settings = {
       server = {
         http_listen_port = 3200;
         grpc_listen_port = 9095;
@@ -175,7 +175,6 @@
         };
       };
     };
-    # user, group, dataDir, extraFlags, (configFile)
   };
 
   # grafana: port 3000 (default)
@@ -230,7 +229,7 @@
           name = "Tempo";
           type = "tempo";
           access = "proxy";
-          url = "http://127.0.0.1:${toString config.services.tempo.configuration.server.http_listen_port}";
+          url = "http://127.0.0.1:${toString config.services.tempo.settings.server.http_listen_port}";
         }
       ];
     };
@@ -297,7 +296,7 @@
         tempo:
           loadBalancer:
             servers:
-              - url: "http://127.0.0.1:${toString config.services.tempo.configuration.server.http_listen_port}"
+              - url: "http://127.0.0.1:${toString config.services.tempo.settings.server.http_listen_port}"
 
       middlewares:
         auth:
