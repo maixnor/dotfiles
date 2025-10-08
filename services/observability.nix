@@ -156,6 +156,28 @@
     # extraFlags
   };
 
+  # tempo: port 3200 (default)
+  #
+  services.tempo = {
+    enable = true;
+    configuration = {
+      server = {
+        http_listen_port = 3200;
+        grpc_listen_port = 9095;
+      };
+      auth_enabled = false;
+      storage = {
+        trace = {
+          backend = "local";
+          local = {
+            path = "/var/lib/tempo/traces";
+          };
+        };
+      };
+    };
+    # user, group, dataDir, extraFlags, (configFile)
+  };
+
   # grafana: port 3000 (default)
   services.grafana = {
     enable = true;
@@ -204,6 +226,12 @@
           access = "proxy";
           url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}";
         }
+        {
+          name = "Tempo";
+          type = "tempo";
+          access = "proxy";
+          url = "http://127.0.0.1:${toString config.services.tempo.configuration.server.http_listen_port}";
+        }
       ];
     };
   };
@@ -239,6 +267,16 @@
             certResolver: "letsencrypt"
           middlewares:
             - "auth"
+        
+        tempo:
+          rule: "Host(`tempo.maixnor.com`)"
+          service: "tempo"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+          middlewares:
+            - "auth"
 
       services:
         grafana:
@@ -255,6 +293,11 @@
           loadBalancer:
             servers:
               - url: "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}"
+        
+        tempo:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:${toString config.services.tempo.configuration.server.http_listen_port}"
 
       middlewares:
         auth:
@@ -316,7 +359,7 @@
   };
 
   # Open firewall ports for internal services
-  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 ];
+  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 3200 ];
 
   # Create data directories
   systemd.tmpfiles.rules = [
@@ -328,6 +371,7 @@
     "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
     "d /var/lib/loki/compactor 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
+    "d /var/lib/tempo/traces 0755 tempo tempo -"
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
     "z /etc/grafana.key 0640 grafana grafana -"
