@@ -78,6 +78,13 @@ in
       LOG_LEVEL = "info";
       ENVIRONMENT = "TEST";
       SERVICE_NAME = "languagebuddy";
+      # OpenTelemetry configuration for distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:4318";
+      OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";
+      OTEL_SERVICE_NAME = "languagebuddy-test";
+      OTEL_TRACES_EXPORTER = "otlp";
+      OTEL_METRICS_EXPORTER = "none";
+      OTEL_LOGS_EXPORTER = "none";
     };
   };
 
@@ -102,6 +109,13 @@ in
       LOG_LEVEL = "info";
       ENVIRONMENT = "PROD";
       SERVICE_NAME = "languagebuddy";
+      # OpenTelemetry configuration for distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:4318";
+      OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";
+      OTEL_SERVICE_NAME = "languagebuddy-prod";
+      OTEL_TRACES_EXPORTER = "otlp";
+      OTEL_METRICS_EXPORTER = "none";
+      OTEL_LOGS_EXPORTER = "none";
     };
   };
 
