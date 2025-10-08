@@ -5,14 +5,6 @@ let
 in
 {
 
-  # Create deployment directories with correct ownership
-  systemd.tmpfiles.rules = [
-    "d /var/www/languagebuddy/prod 0755 maixnor maixnor -"
-    "d /var/www/languagebuddy/test 0755 maixnor maixnor -"
-    "Z /var/www/languagebuddy/prod 0755 maixnor maixnor -"
-    "Z /var/www/languagebuddy/test 0755 maixnor maixnor -"
-  ];
-
   # Create Traefik configuration file for LanguageBuddy
   environment.etc."traefik/languagebuddy.yml".text = ''
     http:
