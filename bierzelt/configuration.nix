@@ -100,10 +100,13 @@
 
   nix.settings.trusted-users = [ "@wheel" "maixnor" "alf" ];
 
+  users.groups.maixnor = {};
+
   home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
+    group = "maixnor";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
     packages = [ nixvim ]; # nixvim
   };

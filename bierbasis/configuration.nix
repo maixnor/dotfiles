@@ -131,9 +131,13 @@
   };
 
   nix.settings.trusted-users = [ "@wheel" "maixnor" ];
+
+  users.groups.maixnor = {};
+
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
+    group = "maixnor";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
     packages = with pkgs; [
       nh

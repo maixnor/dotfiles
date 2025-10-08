@@ -41,8 +41,11 @@ in
 
   time.timeZone = "Europe/Amsterdam";
 
+  users.groups.maixnor = {};
+
   users.users.maixnor = {
     isNormalUser = true;
+    group = "maixnor";
     extraGroups = [ "wheel" "immich" ];
     openssh.authorizedKeys.keys = [
       # bierzelt
