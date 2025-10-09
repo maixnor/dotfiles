@@ -216,10 +216,10 @@
         };
         processor = {
           service_graphs = {
-            enabled = true;
+            dimensions = ["service.name"];
           };
           span_metrics = {
-            enabled = true;
+            dimensions = ["service.name"];
           };
         };
         storage = {
