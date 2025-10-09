@@ -20,17 +20,32 @@
         enabledCollectors = [ "systemd" ];
         enable = true;
       };
+      
+      redis = {
+        port = 9121;
+        enable = true;
+      };
     };
 
     # ingest the published nodes
-    scrapeConfigs = [{
-      job_name = "nodes";
-      static_configs = [{
-        targets = [
-          "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
-        ];
-      }];
-    }];
+    scrapeConfigs = [
+      {
+        job_name = "nodes";
+        static_configs = [{
+          targets = [
+            "127.0.0.1:${toString config.services.prometheus.exporters.node.port}"
+          ];
+        }];
+      }
+      {
+        job_name = "redis";
+        static_configs = [{
+          targets = [
+            "127.0.0.1:${toString config.services.prometheus.exporters.redis.port}"
+          ];
+        }];
+      }
+    ];
   };
 
   # loki: port 3100 (default)
@@ -440,22 +455,101 @@
         {
           id = 1;
           title = "CPU Usage";
-          type = "stat";
-          targets = [{
-            expr = "100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
-            legendFormat = "CPU Usage %";
-          }];
+          type = "graph";
+          targets = [
+            {
+              expr = "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+              legendFormat = "CPU Usage - {{instance}}";
+            }
+            {
+              expr = "avg by (mode) (irate(node_cpu_seconds_total[5m])) * 100";
+              legendFormat = "{{mode}}";
+            }
+          ];
           gridPos = { h = 8; w = 12; x = 0; y = 0; };
+          fieldConfig = {
+            defaults = {
+              unit = "percent";
+              min = 0;
+              max = 100;
+            };
+          };
         }
         {
           id = 2;
           title = "Memory Usage";
-          type = "stat";
-          targets = [{
-            expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
-            legendFormat = "Memory Usage %";
-          }];
+          type = "graph";
+          targets = [
+            {
+              expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
+              legendFormat = "Memory Usage %";
+            }
+            {
+              expr = "node_memory_MemTotal_bytes";
+              legendFormat = "Total Memory";
+            }
+            {
+              expr = "node_memory_MemAvailable_bytes";
+              legendFormat = "Available Memory";
+            }
+          ];
           gridPos = { h = 8; w = 12; x = 12; y = 0; };
+          fieldConfig = {
+            defaults = {
+              unit = "percent";
+              min = 0;
+              max = 100;
+            };
+          };
+        }
+        {
+          id = 4;
+          title = "Redis Stats";
+          type = "graph";
+          targets = [
+            {
+              expr = "redis_connected_clients";
+              legendFormat = "Connected Clients";
+            }
+            {
+              expr = "rate(redis_commands_processed_total[5m])";
+              legendFormat = "Commands/sec";
+            }
+            {
+              expr = "redis_memory_used_bytes";
+              legendFormat = "Memory Used";
+            }
+          ];
+          gridPos = { h = 8; w = 12; x = 0; y = 16; };
+        }
+        {
+          id = 5;
+          title = "System Memory Details";
+          type = "graph";
+          targets = [
+            {
+              expr = "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes";
+              legendFormat = "Used Memory";
+            }
+            {
+              expr = "node_memory_Buffers_bytes";
+              legendFormat = "Buffers";
+            }
+            {
+              expr = "node_memory_Cached_bytes";
+              legendFormat = "Cached";
+            }
+            {
+              expr = "node_memory_MemFree_bytes";
+              legendFormat = "Free";
+            }
+          ];
+          gridPos = { h = 8; w = 12; x = 12; y = 16; };
+          fieldConfig = {
+            defaults = {
+              unit = "bytes";
+            };
+          };
         }
         {
           id = 3;
@@ -483,7 +577,7 @@
   };
 
   # Open firewall ports for internal services
-  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 3200 ];
+  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 9121 3200 ];
 
   # Create data directories
   systemd.tmpfiles.rules = [
