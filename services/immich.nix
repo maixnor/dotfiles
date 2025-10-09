@@ -32,6 +32,7 @@
       environment = {
         TRANSFORMERS_CACHE = "/var/lib/immich/model-cache";
         HF_HOME = "/var/lib/immich/model-cache";
+        MPLCONFIGDIR = "/var/lib/immich/model-cache/matplotlib";
       };
     };
     
