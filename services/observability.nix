@@ -191,6 +191,7 @@
             replication_factor = 1;
           };
           tokens_file_path = "/var/lib/tempo/tokens.json";
+          address = "127.0.0.1";
         };
         trace_idle_period = "10s";
         max_block_bytes = 1000000;
@@ -205,6 +206,7 @@
           kvstore = {
             store = "inmemory";
           };
+          instance_addr = "127.0.0.1";
         };
       };
 
@@ -213,6 +215,7 @@
           kvstore = {
             store = "inmemory";
           };
+          instance_addr = "127.0.0.1";
         };
         processor = {
           service_graphs = {
