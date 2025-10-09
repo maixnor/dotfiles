@@ -31,6 +31,7 @@
       enable = true;
       environment = {
         TRANSFORMERS_CACHE = "/var/lib/immich/model-cache";
+        HF_HOME = "/var/lib/immich/model-cache";
       };
     };
     
@@ -81,6 +82,16 @@
     bind = "localhost";
   };
 
+  # Ensure the machine learning service has proper permissions
+  systemd.services.immich-machine-learning = {
+    serviceConfig = {
+      # Ensure the service can write to the model cache
+      ReadWritePaths = [ "/var/lib/immich/model-cache" ];
+      # Give the service more time to download models on first run
+      TimeoutStartSec = "10min";
+    };
+  };
+
   # Create Traefik configuration file for Immich
   environment.etc."traefik/immich.yml".text = ''
     http:
@@ -111,7 +122,8 @@
       chown immich:immich /var/lib/immich/secrets.env
     fi
     
-    # Set proper ownership for directories
+    # Set proper ownership and permissions for directories
     chown -R immich:immich /var/lib/immich
+    chmod -R 755 /var/lib/immich/model-cache
   '';
 }
