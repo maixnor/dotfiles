@@ -93,6 +93,14 @@
     };
   };
 
+  # Ensure the immich-server service can access the upload directory
+  systemd.services.immich-server = {
+    serviceConfig = {
+      # Ensure the service can access the upload directory
+      ReadWritePaths = [ "/var/lib/immich/upload" ];
+    };
+  };
+
   # Create Traefik configuration file for Immich
   environment.etc."traefik/immich.yml".text = ''
     http:
@@ -123,8 +131,7 @@
       chown immich:immich /var/lib/immich/secrets.env
     fi
     
-    # Set proper ownership and permissions for directories
+    # Set proper ownership for directories
     chown -R immich:immich /var/lib/immich
-    chmod -R 755 /var/lib/immich/model-cache
   '';
 }
