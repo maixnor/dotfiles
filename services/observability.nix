@@ -183,6 +183,15 @@
       };
 
       ingester = {
+        lifecycler = {
+          ring = {
+            kvstore = {
+              store = "inmemory";
+            };
+            replication_factor = 1;
+          };
+          tokens_file_path = "/var/lib/tempo/tokens.json";
+        };
         trace_idle_period = "10s";
         max_block_bytes = 1000000;
         max_block_duration = "5m";
@@ -191,6 +200,36 @@
       compactor = {
         compaction = {
           block_retention = "1h";
+        };
+        ring = {
+          kvstore = {
+            store = "inmemory";
+          };
+        };
+      };
+
+      metrics_generator = {
+        ring = {
+          kvstore = {
+            store = "inmemory";
+          };
+        };
+        processor = {
+          service_graphs = {
+            enabled = true;
+          };
+          span_metrics = {
+            enabled = true;
+          };
+        };
+        storage = {
+          path = "/var/lib/tempo/generator/wal";
+          remote_write = [
+            {
+              url = "http://127.0.0.1:9090/api/v1/write";
+              send_exemplars = true;
+            }
+          ];
         };
       };
 
@@ -202,6 +241,14 @@
           };
           local = {
             path = "/var/lib/tempo/blocks";
+          };
+        };
+      };
+
+      overrides = {
+        defaults = {
+          metrics_generator = {
+            processors = ["service-graphs" "span-metrics"];
           };
         };
       };
@@ -448,6 +495,8 @@
     "d /var/lib/tempo 0755 tempo tempo -"
     "d /var/lib/tempo/blocks 0755 tempo tempo -"
     "d /var/lib/tempo/wal 0755 tempo tempo -"
+    "d /var/lib/tempo/generator 0755 tempo tempo -"
+    "d /var/lib/tempo/generator/wal 0755 tempo tempo -"
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
     "z /etc/grafana.key 0640 grafana grafana -"
