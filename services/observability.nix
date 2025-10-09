@@ -249,6 +249,18 @@
           type = "prometheus";
           access = "proxy";
           url = "http://127.0.0.1:${toString config.services.prometheus.port}";
+          isDefault = true;
+          jsonData = {
+            httpMethod = "POST";
+            timeInterval = "15s";
+            queryTimeout = "60s";
+            exemplarTraceIdDestinations = [
+              {
+                name = "traceID";
+                datasourceUid = "tempo";
+              }
+            ];
+          };
         }
         {
           name = "Loki";
