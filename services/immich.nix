@@ -117,12 +117,6 @@
 
   # Create necessary directories and secrets file
   system.activationScripts.immich-setup = ''
-    mkdir -p /var/lib/immich/{upload,model-cache}
-    mkdir -p /var/lib/immich/upload/{library,upload,profile,thumbs,encoded-video,backups}
-    
-    # Create .immich marker files for storage verification
-    touch /var/lib/immich/upload/{library,upload,profile,thumbs,encoded-video,backups}/.immich
-    
     # Create secrets file with JWT secret if it doesn't exist
     if [ ! -f /var/lib/immich/secrets.env ]; then
       echo "JWT_SECRET=$(${pkgs.openssl}/bin/openssl rand -hex 32)" > /var/lib/immich/secrets.env
