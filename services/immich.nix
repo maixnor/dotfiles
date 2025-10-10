@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  # add user maixnor to immich group for file access
+  users.users.maixnor.extraGroups = [ "immich" ];
+  
   # Immich for photo management (Google Photos alternative)
   services.immich = {
     enable = true;
