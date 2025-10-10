@@ -4,6 +4,23 @@ let
   redis_socket = "/run/redis-languagebuddy-dev/socket.sock";
 in
 {
+  # Create dedicated user and group for LanguageBuddy
+  users.users.languagebuddy = {
+    isSystemUser = true;
+    group = "languagebuddy";
+    description = "LanguageBuddy service user";
+  };
+
+  users.groups.languagebuddy = {
+    members = [ "maixnor" ];
+  };
+
+  # Set up permissions for LanguageBuddy directories
+  system.activationScripts.languagebuddy-permissions = ''
+    mkdir -p /var/www/languagebuddy/{test,prod}
+    chown -R languagebuddy:languagebuddy /var/www/languagebuddy
+    chmod -R 770 /var/www/languagebuddy
+  '';
 
   # Create Traefik configuration file for LanguageBuddy
   environment.etc."traefik/languagebuddy.yml".text = ''
@@ -67,7 +84,8 @@ in
       WorkingDirectory = "/var/www/languagebuddy/test";
       EnvironmentFile = "/var/www/languagebuddy/test/.env";
       Restart = "always";
-      User = "maixnor";
+      User = "languagebuddy";
+      Group = "languagebuddy";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
       SyslogIdentifier = "languagebuddy-test";
@@ -92,7 +110,8 @@ in
       WorkingDirectory = "/var/www/languagebuddy/prod";
       EnvironmentFile = "/var/www/languagebuddy/prod/.env";
       Restart = "always";
-      User = "maixnor";
+      User = "languagebuddy";
+      Group = "languagebuddy";
       PrivateNetwork = false;
       IPAddressAllow = [ "127.0.0.1" "::1" ];
       SyslogIdentifier = "languagebuddy-prod";
