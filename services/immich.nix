@@ -126,5 +126,6 @@
     
     # Set proper ownership for directories
     chown -R immich:immich /var/lib/immich
+    chmod -R 750 /var/lib/immich
   '';
 }
