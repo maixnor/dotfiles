@@ -15,14 +15,13 @@ in
     members = [ "maixnor" ];
   };
 
-  # Fix permissions for existing LanguageBuddy directories
   systemd.services.languagebuddy-setup = {
     description = "Set up LanguageBuddy directory permissions";
     wantedBy = [ "multi-user.target" ];
     before = [ "languagebuddy-api-prod.service" "languagebuddy-api-test.service" ];
     serviceConfig = {
       Type = "oneshot";
-      RemainAfterExit = true;
+      RemainAfterExit = false;
     };
     script = ''
       mkdir -p /var/www/languagebuddy/{test,prod}
@@ -87,7 +86,8 @@ in
 
   systemd.services.languagebuddy-api-test = {
     description = "LanguageBuddy API Test Environment";
-    after = [ "network.target" "redis.service" ];
+    after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
+    requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 ];
     script = "node main.js";
@@ -113,7 +113,8 @@ in
 
   systemd.services.languagebuddy-api-prod = {
     description = "LanguageBuddy API Production";
-    after = [ "network.target" "redis.service" ];
+    after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
+    requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_24 ];
     script = "node main.js";
