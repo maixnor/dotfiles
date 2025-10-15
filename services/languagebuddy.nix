@@ -15,12 +15,23 @@ in
     members = [ "maixnor" ];
   };
 
-  # Set up permissions for LanguageBuddy directories
-  system.activationScripts.languagebuddy-permissions = ''
-    mkdir -p /var/www/languagebuddy/{test,prod}
-    chown -R languagebuddy:languagebuddy /var/www/languagebuddy
-    chmod -R 770 /var/www/languagebuddy
-  '';
+  # Fix permissions for existing LanguageBuddy directories
+  systemd.services.languagebuddy-setup = {
+    description = "Set up LanguageBuddy directory permissions";
+    wantedBy = [ "multi-user.target" ];
+    before = [ "languagebuddy-api-prod.service" "languagebuddy-api-test.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p /var/www/languagebuddy/{test,prod}
+      chown -R languagebuddy:languagebuddy /var/www/languagebuddy
+      chmod 770 /var/www/languagebuddy
+      chmod 770 /var/www/languagebuddy/test
+      chmod 770 /var/www/languagebuddy/prod
+    '';
+  };
 
   # Create Traefik configuration file for LanguageBuddy
   environment.etc."traefik/languagebuddy.yml".text = ''
