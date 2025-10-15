@@ -239,6 +239,9 @@
           span_metrics = {
             dimensions = ["service.name"];
           };
+          local_blocks = {
+            filter_server_spans = false;
+          };
         };
         storage = {
           path = "/var/lib/tempo/generator/wal";
@@ -266,7 +269,7 @@
       overrides = {
         defaults = {
           metrics_generator = {
-            processors = ["service-graphs" "span-metrics"];
+            processors = ["service-graphs" "span-metrics" "local-blocks"];
           };
         };
       };
