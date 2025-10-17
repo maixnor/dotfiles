@@ -41,6 +41,23 @@
 
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 
+  # ensuring /var/lib/traefik/acme.json exists with 600 permissions (othewise no certficate challenge)
+  systemd.services.traefik-acme-setup = {
+    description = "Set up Traefik ACME file permissions";
+    wantedBy = [ "traefik.service" ];
+    before = [ "traefik.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p /var/lib/traefik
+      touch /var/lib/traefik/acme.json
+      chown traefik:traefik /var/lib/traefik/acme.json
+      chmod 600 /var/lib/traefik/acme.json
+    '';
+  };
+
   # ACME is now handled by Traefik, but keep this for compatibility
   security.acme = {
     acceptTerms = true;
