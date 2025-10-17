@@ -600,5 +600,7 @@
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
     "z /etc/grafana.key 0640 grafana grafana -"
+    # Fix permissions on observability auth file (must be readable by traefik)
+    "z /etc/observability.scrt 0644 root root -"
   ];
 }
