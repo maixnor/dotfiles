@@ -53,30 +53,28 @@ in {
 
       gcc
 
-      jetbrains.webstorm
+      #jetbrains.webstorm
       deno 
       nodejs_24
 
-      jetbrains.rider
-      dotnet-sdk_9
-      dotnet-runtime_9
-      dotnet-aspnetcore_9
+      #jetbrains.rider
+      #dotnet-sdk_9
+      #dotnet-runtime_9
+      #dotnet-aspnetcore_9
 
       # all the R stuff
-
       R 
       r-with-my-packages
-
-      rstudio
       tectonic
       quarto
       vscode
       pandoc
       # only for Rstudio, normally use tectonic
-      texlive.combined.scheme-medium 
+      #rstudio
+      #texlive.combined.scheme-medium 
 
       # jetbrains.idea-ultimate
-      vscodium
+      #vscodium
       vscode
       postman
       static-server
