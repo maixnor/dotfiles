@@ -111,34 +111,29 @@
     packages = [ nixvim ]; # nixvim
   };
 
-  # users.users.alf = {
-  #   isNormalUser = true;
-  #   description = "Benjamin Meixner";
-  #   extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
-  #   packages = [ nixvim ]; # nixvim
-  # };
-  # home-manager.users.alf = import ./home-alf.nix { inherit config pkgs lib inputs ; };
-
   environment.systemPackages = with pkgs; [ 
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum
     wormhole-william
     gnome-network-displays
-    # qemu and virt-manager to work with libvirt
-    qemu
-    quickemu
-    virt-manager
     podman-compose # drop in replacement for docker-compose
+
+    # qemu and virt-manager to work with libvirt
+    # qemu
+    # quickemu
+    # virt-manager
   ];
 
-  # Virtualization / Containers
+  # Containers with Podman
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
     defaultNetwork.settings.dns_enabled = true;
   };
-  virtualisation.libvirtd.enable = true;
-	programs.dconf.enable = true; # virt-manager requires dconf to remember settings
+
+  # QEMU virtualization (rarely needed)
+  #virtualisation.libvirtd.enable = true;
+	#programs.dconf.enable = true; # virt-manager requires dconf to remember settings
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against chrome and electron apps flickering on wayland
