@@ -11,7 +11,6 @@
       presenterm
       calc
       miraclecast
-      spotify
       btop iftop iotop
       inotify-tools
       ripgrep-all
@@ -71,8 +70,6 @@
 
       # unfree
       obsidian
-      discord-canary
-      discord
     ];
   };
 
