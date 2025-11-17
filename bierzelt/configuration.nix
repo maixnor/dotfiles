@@ -102,7 +102,10 @@
 
   users.groups.maixnor = {};
 
-  home-manager.users.maixnor = import ./home.nix { inherit config pkgs lib inputs ; };
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users.maixnor = import ./home.nix;
+  };
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";

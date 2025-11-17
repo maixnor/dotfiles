@@ -13,7 +13,7 @@
     ../modules/stylix.nix
     ../modules/zsh.nix
     ../modules/graphics.nix
-    ../modules/librewolf.nix
+    ../modules/firefox.nix
   ];
 
   config = {
