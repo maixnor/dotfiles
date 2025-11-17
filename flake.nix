@@ -88,20 +88,16 @@
       };
 
       packages.x86_64-linux = {
-        linode = nixos-generators.nixosGenerate {
-          system = "x86_64-linux";
-          modules = [
-            # you can include your own nixos configuration here, i.e.
-            # ./configuration.nix
-            ./linode/configuration.nix
-          ];
-          format = "linode";
-        };
+        default = nixvim;
         nixvim = nixvim;
         wieselburg-vm-test = inputs.self.nixosConfigurations.wieselburg-vm-test.config.system.build.vm;
       };
 
       apps.x86_64-linux = {
+        default = {
+          type = "app";
+          program = "${nixvim}/bin/nvim";
+        };
         wieselburg-vm-test = {
           type = "app";
           program = let
@@ -114,13 +110,6 @@
         };
       };
       
-      packages.x86_64-linux.default = nixvim;
-      apps.x86_64-linux.default = {
-        type = "app";
-        program = "${nixvim}/bin/nvim";
-      };
-
       formatter.x86_64-linux = pkgs.nixfmt-rfc-style;
-
     };
 }
