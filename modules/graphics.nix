@@ -5,7 +5,7 @@
 				wayland-utils
 				xorg.xwininfo
 				vulkan-tools
-				glxinfo
+				mesa-demos
 				clinfo
     ];
 }
