@@ -45,6 +45,7 @@
       name = "maixnor";
       isDefault = true;
       extensions.packages = with inputs.firefox-addons.packages."x86_64-linux"; [
+        leechblock-ng
         darkreader
         bitwarden
         ublock-origin

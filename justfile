@@ -14,3 +14,6 @@ bierbasis:
 wieselburg: 
   just update wieselburg
 
+remove-gtk:
+  rm -rf ~/.gtk*
+
