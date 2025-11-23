@@ -2,6 +2,39 @@
 
 {
 
+  systemd.user.services.tmux-cleanup = {
+    Unit = {
+      Description = "Clean up unnamed tmux sessions";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = pkgs.writeShellScript "tmux-cleanup" ''
+        #!/usr/bin/env bash
+        # Get list of all sessions and remove those with numeric-only names (default tmux naming)
+        ${pkgs.tmux}/bin/tmux list-sessions -F '#{session_name}' 2>/dev/null | while read -r session; do
+          # Check if session name is a number (unnamed/default sessions)
+          if [[ "$session" =~ ^[0-9]+$ ]]; then
+            echo "Removing unnamed session: $session"
+            ${pkgs.tmux}/bin/tmux kill-session -t "$session" 2>/dev/null || true
+          fi
+        done
+      '';
+    };
+  };
+
+  systemd.user.timers.tmux-cleanup = {
+    Unit = {
+      Description = "Daily cleanup of unnamed tmux sessions";
+    };
+    Timer = {
+      OnCalendar = "daily";
+      Persistent = true;
+    };
+    Install = {
+      WantedBy = [ "timers.target" ];
+    };
+  };
+
   programs.tmux = {
     enable = true;
     shell = "${pkgs.zsh}/bin/zsh";

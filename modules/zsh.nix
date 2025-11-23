@@ -40,8 +40,6 @@
     };
   };
 
-  programs.kitty.enable = true;
-
 	home.packages = with pkgs; [
     nix-zsh-completions
 
