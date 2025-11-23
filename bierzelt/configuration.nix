@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      ../modules/laptop-power.nix
       (import "${inputs.home-manager}/nixos")
     ];
 
@@ -29,6 +30,18 @@
 
   hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;
+  
+  # Intel GPU optimizations for power saving
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver  # LIBVA_DRIVER_NAME=iHD
+      intel-vaapi-driver  # LIBVA_DRIVER_NAME=i965 (older but sometimes better)
+      libva-vdpau-driver
+      libvdpau-va-gl
+      intel-compute-runtime # OpenCL
+    ];
+  };
 
   networking.hostName = "bierzelt";
   networking.networkmanager.enable = true;
