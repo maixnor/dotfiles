@@ -49,6 +49,7 @@
         darkreader
         bitwarden
         ublock-origin
+        sponsorblock
         decentraleyes
         privacy-badger
         vimium
