@@ -39,7 +39,7 @@
       nixvim.transparentBackground.signColumn = true;
       qt.enable = false;
       kde.enable = false;
-      firefox.profileNames = [ "default" ];
+      firefox.profileNames = [ "maixnor" ];
     };
   };
 }
