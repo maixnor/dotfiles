@@ -40,9 +40,9 @@
     programs.home-manager.enable = true;
     programs.git = {
       enable = true;
-      userName = "maixnor";
-      userEmail = "46966993+maixnor@users.noreply.github.com";
-      extraConfig = {
+      settings = {
+        user.name = "maixnor";
+        user.email = "46966993+maixnor@users.noreply.github.com";
         pull.rebase = true;
         rebase.autoStash = true;
         init.defaultBranch = "main";
