@@ -6,6 +6,7 @@ vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
 
 bierzelt:
+  just remove-gtk
   just update bierzelt 
 
 bierbasis: 
