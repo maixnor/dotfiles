@@ -22,6 +22,8 @@ let
       tidyverse
       viridisLite
       Benchmarking
+      kableExtra
+      scales
       # maps
       sf
       rnaturalearth
