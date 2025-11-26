@@ -30,6 +30,13 @@ in
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.cores = 3;
 
+  nix.gc = {
+    automatic = true;
+    persistent = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
   services.autoupdate = {
     enable = true;
     hostname = "${hostname}";
