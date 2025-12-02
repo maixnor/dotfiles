@@ -180,6 +180,16 @@
         http_listen_port = 3200;
         grpc_listen_port = 9096;
       };
+
+      memberlist = {
+        abort_if_cluster_join_fails = false;
+        bind_port = 7947;
+        bind_addr = ["127.0.0.1"];
+        advertise_addr = "127.0.0.1";
+        advertise_port = 7947;
+        join_members = [];
+      };
+
       auth_enabled = false;
       
       distributor = {
