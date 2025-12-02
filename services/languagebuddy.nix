@@ -15,24 +15,19 @@ in
     members = [ "maixnor" ];
   };
 
-  services.nginx.enable = true;
-  services.nginx.virtualHosts."languagebuddy.maixnor.com" = {
-    root = "/var/www/languagebuddy/web";
-    locations."/" = {
-      extraConfig = ''
-        proxy_hide_header Content-Security-Policy;
-        proxy_hide_header X-Frame-Options;
-      '';
-    };
-    extraConfig = ''
-      labels = {
-        "traefik.enable" = "true";
-        "traefik.http.routers.languagebuddy-frontend.rule" = "Host(`languagebuddy.maixnor.com`)";
-        "traefik.http.routers.languagebuddy-frontend.entrypoints" = "websecure";
-        "traefik.http.routers.languagebuddy-frontend.tls.certresolver" = "letsencrypt";
-        "traefik.http.services.languagebuddy-frontend.loadbalancer.server.port" = "80"; # Nginx typically listens on 80 by default
+  services.nginx = {
+    enable = true;
+    defaultHTTPListenPort = 8181; # Avoid conflict with Traefik on port 80
+    virtualHosts."languagebuddy.maixnor.com" = {
+      root = "/var/www/languagebuddy/web";
+      listen = [{ addr = "127.0.0.1"; port = 8082; }];
+      locations."/" = {
+        extraConfig = ''
+          proxy_hide_header Content-Security-Policy;
+          proxy_hide_header X-Frame-Options;
+        '';
       };
-    '';
+    };
   };
 
   systemd.services.languagebuddy-setup = {
@@ -57,6 +52,15 @@ in
   environment.etc."traefik/languagebuddy.yml".text = ''
     http:
       routers:
+        # Frontend router
+        languagebuddy-frontend:
+          rule: "Host(`languagebuddy.maixnor.com`)"
+          service: "languagebuddy-frontend"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
+
         # API router
         api-languagebuddy-main:
           rule: "Host(`api.languagebuddy.maixnor.com`)"
@@ -76,6 +80,12 @@ in
             certResolver: "letsencrypt"
 
       services:
+        # Frontend service
+        languagebuddy-frontend:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8082"
+
         # Backend services (prod and test remain)
         prod-languagebuddy:
           loadBalancer:
