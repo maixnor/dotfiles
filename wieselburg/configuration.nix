@@ -46,6 +46,27 @@ in
   services.openssh.settings.PermitRootLogin = "yes";
   services.openssh.authorizedKeysInHomedir = true;
 
+  services.nginx.enable = true;
+
+  services.nginx.virtualHosts."languagebuddy.maixnor.com" = {
+    root = "/var/www/languagebuddy/web";
+    locations."/" = {
+      extraConfig = ''
+        proxy_hide_header Content-Security-Policy;
+        proxy_hide_header X-Frame-Options;
+      '';
+    };
+    extraConfig = ''
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.languagebuddy-frontend.rule" = "Host(`languagebuddy.maixnor.com`)";
+        "traefik.http.routers.languagebuddy-frontend.entrypoints" = "websecure";
+        "traefik.http.routers.languagebuddy-frontend.tls.certresolver" = "letsencrypt";
+        "traefik.http.services.languagebuddy-frontend.loadbalancer.server.port" = "80"; # Nginx typically listens on 80 by default
+      };
+    '';
+  };
+
   time.timeZone = "Europe/Amsterdam";
 
   users.groups.maixnor = {};

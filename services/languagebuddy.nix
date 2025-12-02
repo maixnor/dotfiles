@@ -24,11 +24,12 @@ in
       RemainAfterExit = false;
     };
     script = ''
-      mkdir -p /var/www/languagebuddy/{test,prod}
+      mkdir -p /var/www/languagebuddy/{test,prod,web}
       chown -R languagebuddy:languagebuddy /var/www/languagebuddy
       chmod 770 /var/www/languagebuddy
       chmod 770 /var/www/languagebuddy/test
       chmod 770 /var/www/languagebuddy/prod
+      chmod 770 /var/www/languagebuddy/web
     '';
   };
 
@@ -36,24 +37,16 @@ in
   environment.etc."traefik/languagebuddy.yml".text = ''
     http:
       routers:
-        # Main production router with A/B testing
-        languagebuddy-main:
-          rule: "Host(`languagebuddy.maixnor.com`)"
-          service: "languagebuddy-weighted"
-          entryPoints:
-            - "websecure"
-          tls:
-            certResolver: "letsencrypt"
-        
-        # Direct access routers
-        prod-languagebuddy:
-          rule: "Host(`prod.languagebuddy.maixnor.com`)"
+        # API router
+        api-languagebuddy-main:
+          rule: "Host(`api.languagebuddy.maixnor.com`)"
           service: "prod-languagebuddy"
           entryPoints:
             - "websecure"
           tls:
             certResolver: "letsencrypt"
         
+        # Direct access routers (test remains)
         test-languagebuddy:
           rule: "Host(`test.languagebuddy.maixnor.com`)"
           service: "test-languagebuddy"
@@ -63,16 +56,7 @@ in
             certResolver: "letsencrypt"
 
       services:
-        # Weighted service for A/B testing
-        languagebuddy-weighted:
-          weighted:
-            services:
-              - name: "prod-languagebuddy"
-                weight: 100
-              - name: "test-languagebuddy"
-                weight: 0
-        
-        # Backend services
+        # Backend services (prod and test remain)
         prod-languagebuddy:
           loadBalancer:
             servers:
@@ -83,6 +67,8 @@ in
             servers:
               - url: "http://127.0.0.1:8081"
   '';
+
+
 
   systemd.services.languagebuddy-api-test = {
     description = "LanguageBuddy API Test Environment";
