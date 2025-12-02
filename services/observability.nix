@@ -352,7 +352,6 @@
                 datasourceUid = "tempo";
                 matcherRegex = "traceID=(\\w+)";
                 name = "TraceID";
-                url = "$${__value.raw}";
               }
             ];
           };
