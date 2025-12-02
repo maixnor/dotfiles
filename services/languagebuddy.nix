@@ -42,10 +42,8 @@ in
     script = ''
       mkdir -p /var/www/languagebuddy/{test,prod,web}
       chown -R languagebuddy:languagebuddy /var/www/languagebuddy
-      chmod 770 /var/www/languagebuddy
-      chmod 770 /var/www/languagebuddy/test
-      chmod 770 /var/www/languagebuddy/prod
-      chmod 770 /var/www/languagebuddy/web
+      # Ensure group (including nginx) can read/execute all files/dirs
+      chmod -R 770 /var/www/languagebuddy
     '';
   };
 
