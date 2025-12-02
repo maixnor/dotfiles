@@ -8,6 +8,7 @@
     ../modules/minecraft.nix
     ../modules/tmux.nix
     ../modules/terminal.nix
+    ../modules/zed.nix
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/stylix.nix
