@@ -12,7 +12,7 @@ in
   };
 
   users.groups.languagebuddy = {
-    members = [ "maixnor" ];
+    members = [ "maixnor" "nginx" ];
   };
 
   services.nginx = {
@@ -22,6 +22,7 @@ in
       root = "/var/www/languagebuddy/web";
       listen = [{ addr = "127.0.0.1"; port = 8082; }];
       locations."/" = {
+        tryFiles = "$uri $uri/ /index.html";
         extraConfig = ''
           proxy_hide_header Content-Security-Policy;
           proxy_hide_header X-Frame-Options;
