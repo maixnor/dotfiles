@@ -333,12 +333,6 @@
             httpMethod = "POST";
             timeInterval = "15s";
             queryTimeout = "60s";
-            exemplarTraceIdDestinations = [
-              {
-                name = "traceID";
-                datasourceUid = "tempo";
-              }
-            ];
           };
         }
         {
@@ -349,13 +343,6 @@
           url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}";
           jsonData = {
             maxLines = 1000;
-            derivedFields = [
-              {
-                datasourceUid = "tempo";
-                matcherRegex = "traceID=(\\w+)";
-                name = "TraceID";
-              }
-            ];
           };
         }
         {
@@ -366,23 +353,11 @@
           url = "http://127.0.0.1:${toString config.services.tempo.settings.server.http_listen_port}";
           jsonData = {
             httpMethod = "GET";
-            tracesToLogsV2 = {
-              datasourceUid = "loki";
-            };
-            tracesToMetrics = {
-              datasourceUid = "prometheus";
-            };
-            serviceMap = {
-              datasourceUid = "prometheus";
-            };
             nodeGraph = {
               enabled = true;
             };
             search = {
               hide = false;
-            };
-            lokiSearch = {
-              datasourceUid = "loki";
             };
           };
         }
