@@ -22,7 +22,7 @@ in
       root = "/var/www/languagebuddy/web";
       listen = [{ addr = "127.0.0.1"; port = 8082; }];
       locations."/" = {
-        tryFiles = "$uri $uri/ /index.html";
+        tryFiles = "$uri $uri/index.html $uri.html /index.html =404";
         extraConfig = ''
           proxy_hide_header Content-Security-Policy;
           proxy_hide_header X-Frame-Options;
