@@ -40,6 +40,7 @@ in {
     };
 
     environment.systemPackages = with pkgs; [
+      redli
       wl-clipboard
 
       jetbrains-toolbox
