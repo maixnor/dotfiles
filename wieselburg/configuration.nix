@@ -19,6 +19,7 @@ in
     # ../services/ai-research.nix
     # ../services/nextcloud.nix
     ../services/immich.nix
+    ../services/adhoc-tunnel.nix
     # ../services/audiobookshelf.nix
     # ../services/navidrome.nix
     # ../services/collabora.nix
