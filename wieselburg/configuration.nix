@@ -29,7 +29,13 @@ in
 
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix.settings.cores = 3;
+  nix.settings.cores = 2;
+  nix.settings.max-jobs = 1;
+
+  systemd.services.nix-daemon.serviceConfig = {
+    MemoryMax = "2G";
+    MemoryHigh = "1900M";
+  };
 
   nix.gc = {
     automatic = true;
