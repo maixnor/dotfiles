@@ -69,7 +69,7 @@
       # Disable memberlist for single-node setup
       memberlist = {
         abort_if_cluster_join_fails = false;
-        instance_interface_names = [ "venet0" ];
+        bind_addr = [ "127.0.0.1" ];
         join_members = [];
       };
 
