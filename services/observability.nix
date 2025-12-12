@@ -443,140 +443,147 @@
             usersFile: "/etc/observability.scrt"
   '';
 
-  # Create some basic Grafana dashboards
-  environment.etc."grafana/dashboards/system-overview.json".text = builtins.toJSON {
-    dashboard = {
-      id = null;
-      title = "System Overview";
-      tags = [ "system" "overview" ];
-      timezone = "browser";
-      panels = [
-        {
-          id = 1;
-          title = "CPU Usage";
-          type = "graph";
-          targets = [
-            {
-              expr = "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
-              legendFormat = "CPU Usage - {{instance}}";
-            }
-            {
-              expr = "avg by (mode) (irate(node_cpu_seconds_total[5m])) * 100";
-              legendFormat = "{{mode}}";
-            }
-          ];
-          gridPos = { h = 8; w = 12; x = 0; y = 0; };
-          fieldConfig = {
-            defaults = {
-              unit = "percent";
-              min = 0;
-              max = 100;
+        # Create some basic Grafana dashboards
+    environment.etc."grafana/dashboards/system-overview.json".text = builtins.toJSON {
+      dashboard = {
+        id = null;
+        title = "System Overview";
+        tags = [ "system" "overview" ];
+        timezone = "browser";
+        panels = [
+          {
+            id = 1;
+            title = "CPU Usage";
+            type = "graph";
+            targets = [
+              {
+                expr = "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+                legendFormat = "CPU Usage - {{instance}}";
+              }
+              {
+                expr = "avg by (mode) (irate(node_cpu_seconds_total[5m])) * 100";
+                legendFormat = "{{mode}}";
+              }
+            ];
+            gridPos = { h = 8; w = 12; x = 0; y = 0; };
+            fieldConfig = {
+              defaults = {
+                unit = "percent";
+                min = 0;
+                max = 100;
+              };
             };
-          };
-        }
-        {
-          id = 2;
-          title = "Memory Usage";
-          type = "graph";
-          targets = [
-            {
-              expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
-              legendFormat = "Memory Usage %";
-            }
-            {
-              expr = "node_memory_MemTotal_bytes";
-              legendFormat = "Total Memory";
-            }
-            {
-              expr = "node_memory_MemAvailable_bytes";
-              legendFormat = "Available Memory";
-            }
-          ];
-          gridPos = { h = 8; w = 12; x = 12; y = 0; };
-          fieldConfig = {
-            defaults = {
-              unit = "percent";
-              min = 0;
-              max = 100;
+          }
+          {
+            id = 2;
+            title = "Memory Usage";
+            type = "graph";
+            targets = [
+              {
+                expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
+                legendFormat = "Memory Usage %";
+              }
+              {
+                expr = "node_memory_MemTotal_bytes";
+                legendFormat = "Total Memory";
+              }
+              {
+                expr = "node_memory_MemAvailable_bytes";
+                legendFormat = "Available Memory";
+              }
+            ];
+            gridPos = { h = 8; w = 12; x = 12; y = 0; };
+            fieldConfig = {
+              defaults = {
+                unit = "percent";
+                min = 0;
+                max = 100;
+              };
             };
-          };
-        }
-        {
-          id = 4;
-          title = "Redis Stats";
-          type = "graph";
-          targets = [
-            {
-              expr = "redis_connected_clients";
-              legendFormat = "Connected Clients";
-            }
-            {
-              expr = "rate(redis_commands_processed_total[5m])";
-              legendFormat = "Commands/sec";
-            }
-            {
-              expr = "redis_memory_used_bytes";
-              legendFormat = "Memory Used";
-            }
-          ];
-          gridPos = { h = 8; w = 12; x = 0; y = 16; };
-        }
-        {
-          id = 5;
-          title = "System Memory Details";
-          type = "graph";
-          targets = [
-            {
-              expr = "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes";
-              legendFormat = "Used Memory";
-            }
-            {
-              expr = "node_memory_Buffers_bytes";
-              legendFormat = "Buffers";
-            }
-            {
-              expr = "node_memory_Cached_bytes";
-              legendFormat = "Cached";
-            }
-            {
-              expr = "node_memory_MemFree_bytes";
-              legendFormat = "Free";
-            }
-          ];
-          gridPos = { h = 8; w = 12; x = 12; y = 16; };
-          fieldConfig = {
-            defaults = {
-              unit = "bytes";
+          }
+          {
+            id = 4;
+            title = "Redis Stats";
+            type = "graph";
+            targets = [
+              {
+                expr = "redis_connected_clients";
+                legendFormat = "Connected Clients";
+              }
+              {
+                expr = "rate(redis_commands_processed_total[5m])";
+                legendFormat = "Commands/sec";
+              }
+              {
+                expr = "redis_memory_used_bytes";
+                legendFormat = "Memory Used";
+              }
+            ];
+            gridPos = { h = 8; w = 12; x = 0; y = 16; };
+          }
+          {
+            id = 5;
+            title = "System Memory Details";
+            type = "graph";
+            targets = [
+              {
+                expr = "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes";
+                legendFormat = "Used Memory";
+              }
+              {
+                expr = "node_memory_Buffers_bytes";
+                legendFormat = "Buffers";
+              }
+              {
+                expr = "node_memory_Cached_bytes";
+                legendFormat = "Cached";
+              }
+              {
+                expr = "node_memory_MemFree_bytes";
+                legendFormat = "Free";
+              }
+            ];
+            gridPos = { h = 8; w = 12; x = 12; y = 16; };
+            fieldConfig = {
+              defaults = {
+                unit = "bytes";
+              };
             };
-          };
-        }
-        {
-          id = 3;
-          title = "LanguageBuddy Response Times";
-          type = "graph";
-          targets = [
-            {
-              expr = "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"languagebuddy\"}[5m])) by (le, environment))";
-              legendFormat = "95th percentile - {{environment}}";
-            }
-            {
-              expr = "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{service=\"languagebuddy\"}[5m])) by (le, environment))";
-              legendFormat = "50th percentile - {{environment}}";
-            }
-          ];
-          gridPos = { h = 8; w = 24; x = 0; y = 8; };
-        }
-      ];
-      time = {
-        from = "now-1h";
-        to = "now";
+          }
+          {
+            id = 3;
+            title = "LanguageBuddy Response Times";
+            type = "graph";
+            targets = [
+              {
+                expr = "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service=\"languagebuddy\"}[5m])) by (le, environment))";
+                legendFormat = "95th percentile - {{environment}}";
+              }
+              {
+                expr = "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{service=\"languagebuddy\"}[5m])) by (le, environment))";
+                legendFormat = "50th percentile - {{environment}}";
+              }
+            ];
+            gridPos = { h = 8; w = 24; x = 0; y = 8; };
+          }
+        ];
+        time = {
+          from = "now-1h";
+          to = "now";
+        };
+        refresh = "5s";
       };
-      refresh = "5s";
     };
-  };
-
-  # Open firewall ports for internal services
-  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 9121 3200 ];
+  
+    # Explicitly provision an empty list for "local" datasources to ensure any previously
+    # provisioned datasources from such a file (if they existed) are removed.
+    environment.etc."grafana/provisioning/datasources/00-local-datasources.yaml".text = ''
+      apiVersion: 1
+  
+      datasources: []
+    '';
+  
+    # Open firewall ports for internal services  networking.firewall.allowedTCPPorts = [ 3000 9090 3100 9080 9100 9121 3200 ];
 
   # Create data directories
   systemd.tmpfiles.rules = [
