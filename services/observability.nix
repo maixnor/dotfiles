@@ -46,6 +46,20 @@
           ];
         }];
       }
+      {
+        job_name = "languagebuddy-prod";
+        metrics_path = "/metrics";
+        static_configs = [{
+          targets = [ "127.0.0.1:8080" ];
+        }];
+      }
+      {
+        job_name = "languagebuddy-test";
+        metrics_path = "/metrics";
+        static_configs = [{
+          targets = [ "127.0.0.1:8081" ];
+        }];
+      }
     ];
   };
 
