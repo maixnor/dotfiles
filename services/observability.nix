@@ -12,6 +12,7 @@
   #
   services.prometheus = {
     port = 9090;
+    listenAddress = "127.0.0.1";
     enable = true;
 
     exporters = {
@@ -53,16 +54,22 @@
   services.loki = {
     enable = true;
     configuration = {
-      server.http_listen_port = 3100;
+      server = {
+        http_listen_port = 3100;
+        http_listen_address = "127.0.0.1";
+        grpc_listen_port = 9095;
+        grpc_listen_address = "127.0.0.1";
+      };
       auth_enabled = false;
+      
+      frontend = {
+        address = "127.0.0.1";
+      };
 
       # Disable memberlist for single-node setup
       memberlist = {
         abort_if_cluster_join_fails = false;
-        bind_port = 7946;
-        bind_addr = ["127.0.0.1"];
-        advertise_addr = "127.0.0.1";
-        advertise_port = 7946;
+        instance_interface_names = [ "venet0" ];
         join_members = [];
       };
 
@@ -178,7 +185,9 @@
     settings = {
       server = {
         http_listen_port = 3200;
+        http_listen_address = "127.0.0.1";
         grpc_listen_port = 9096;
+        grpc_listen_address = "127.0.0.1";
       };
 
       memberlist = {
