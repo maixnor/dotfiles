@@ -19,7 +19,7 @@
           http.tls.certResolver = "letsencrypt";
         };
         metrics = {
-          address = ":8082";
+          address = ":8002";
         };
       };
       metrics = {
