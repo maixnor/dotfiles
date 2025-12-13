@@ -60,6 +60,12 @@
           targets = [ "127.0.0.1:8081" ];
         }];
       }
+      {
+        job_name = "traefik";
+        static_configs = [{
+          targets = [ "127.0.0.1:8082" ];
+        }];
+      }
     ];
   };
 

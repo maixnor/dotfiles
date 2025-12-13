@@ -18,6 +18,17 @@
           address = ":443";
           http.tls.certResolver = "letsencrypt";
         };
+        metrics = {
+          address = ":8082";
+        };
+      };
+      metrics = {
+        prometheus = {
+          entryPoint = "metrics";
+          addEntryPointsLabels = true;
+          addRoutersLabels = true;
+          addServicesLabels = true;
+        };
       };
       certificatesResolvers.letsencrypt = {
         acme = {
