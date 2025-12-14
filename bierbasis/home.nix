@@ -27,6 +27,7 @@
     ../modules/graphics.nix
     ../modules/librewolf.nix
     ../modules/minecraft.nix
+    ../modules/gemini.nix
   ];
 
   home.stateVersion = "24.11";
