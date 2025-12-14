@@ -2,6 +2,8 @@
 
 This repository serves as a comprehensive collection of NixOS and Home Manager configurations, managed as a Nix flake. It's designed to define and deploy reproducible system-wide and user-specific environments across multiple machines (e.g., `bierbasis`, `bierzelt`, `wieselburg`). The configurations cover a wide range of functionalities, from core system services and desktop environments to development toolchains and self-hosted applications.
 
+`bierzelt` is a Lenovo Laptop. `bierbasis` is a tower PC currently not in use, no need to update that. `wieselburg` is a VPS server.
+
 ## Project Structure and Purpose
 
 The project leverages Nix flakes to ensure consistent and declarative system management. Key aspects include:
