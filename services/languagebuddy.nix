@@ -108,6 +108,7 @@ in
     script = "node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/test";
+      StateDirectory = "languagebuddy-api-test";
       EnvironmentFile = "/var/www/languagebuddy/test/.env";
       Restart = "always";
       User = "languagebuddy";
@@ -135,6 +136,7 @@ in
     script = "node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/prod";
+      StateDirectory = "languagebuddy-api-prod";
       EnvironmentFile = "/var/www/languagebuddy/prod/.env";
       Restart = "always";
       User = "languagebuddy";
