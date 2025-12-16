@@ -105,7 +105,7 @@ in
     requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_20 ];
-    script = "node main.js";
+    script = "node -v && node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/test";
       StateDirectory = "languagebuddy-api-test";
@@ -133,7 +133,7 @@ in
     requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
     path = with pkgs; [ nodejs_20 ];
-    script = "node main.js";
+    script = "node -v && node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/prod";
       StateDirectory = "languagebuddy-api-prod";
