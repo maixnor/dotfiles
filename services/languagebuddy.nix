@@ -15,19 +15,26 @@ in
     members = [ "maixnor" "nginx" ];
   };
 
-  services.nginx = {
-    enable = true;
-    defaultHTTPListenPort = 8181; # Avoid conflict with Traefik on port 80
-    virtualHosts."languagebuddy.maixnor.com" = {
-      root = "/var/www/languagebuddy/web";
-      listen = [{ addr = "127.0.0.1"; port = 8082; }];
-      locations."/" = {
-        tryFiles = "$uri $uri/index.html $uri.html /index.html =404";
-        extraConfig = ''
-          proxy_hide_header Content-Security-Policy;
-          proxy_hide_header X-Frame-Options;
-        '';
-      };
+  systemd.services.languagebuddy-frontend = {
+    description = "LanguageBuddy Frontend";
+    after = [ "network.target" "languagebuddy-setup.service" ];
+    requires = [ "languagebuddy-setup.service" ];
+    wantedBy = [ "default.target" ];
+    path = with pkgs; [ nodejs_22 ];
+    script = "node -v && node dist/server/entry.mjs";
+    serviceConfig = {
+      WorkingDirectory = "/var/www/languagebuddy/web";
+      StateDirectory = "languagebuddy-frontend";
+      Restart = "always";
+      User = "languagebuddy";
+      Group = "languagebuddy";
+      PrivateNetwork = false;
+      IPAddressAllow = [ "127.0.0.1" "::1" ];
+      SyslogIdentifier = "languagebuddy-frontend";
+    };
+    environment = {
+      HOST = "127.0.0.1";
+      PORT = "8082";
     };
   };
 
