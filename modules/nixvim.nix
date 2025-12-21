@@ -53,6 +53,10 @@
     tmux-navigator.enable = true;
     lualine.enable = true;
     fugitive.enable = true;
+    gitsigns = {
+      enable = true;
+      settings.current_line_blame = true;
+    };
     git-worktree.enable = true;
     git-conflict.enable = true;
     wakatime.enable = true;
@@ -66,6 +70,20 @@
     web-devicons.enable = true;
 
     lsp.enable = true;
+    lsp.keymaps.lspBuf = {
+      K = "hover";
+      gD = "declaration";
+      gd = "definition";
+      gr = "references";
+      gi = "implementation";
+      gt = "type_definition";
+      "<leader>rn" = "rename";
+      "<leader>ca" = "code_action";
+    };
+    lsp.keymaps.diagnostic = {
+      "[d" = "goto_prev";
+      "]d" = "goto_next";
+    };
     lsp.servers = {
       nixd.enable = true;
       bashls.enable = true;
