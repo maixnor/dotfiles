@@ -50,6 +50,8 @@
     cmp-nvim-lsp.enable = true;
     cmp-path.enable = true;
 
+    which-key.enable = true;
+
     tmux-navigator.enable = true;
     lualine.enable = true;
     fugitive.enable = true;
