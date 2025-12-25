@@ -198,122 +198,7 @@
     # extraFlags
   };
 
-  # tempo: port 3200 (default)
-  #
-  services.tempo = {
-    enable = true;
-    settings = {
-      server = {
-        http_listen_port = 3200;
-        http_listen_address = "127.0.0.1";
-        grpc_listen_port = 9096;
-        grpc_listen_address = "127.0.0.1";
-      };
 
-      memberlist = {
-        abort_if_cluster_join_fails = false;
-        bind_port = 7947;
-        bind_addr = ["127.0.0.1"];
-        advertise_addr = "127.0.0.1";
-        advertise_port = 7947;
-        join_members = [];
-      };
-
-      auth_enabled = false;
-      
-      distributor = {
-        receivers = {
-          otlp = {
-            protocols = {
-              grpc = {
-                endpoint = "127.0.0.1:4317";
-              };
-              http = {
-                endpoint = "127.0.0.1:4318";
-              };
-            };
-          };
-        };
-      };
-
-      ingester = {
-        lifecycler = {
-          ring = {
-            kvstore = {
-              store = "inmemory";
-            };
-            replication_factor = 1;
-          };
-          tokens_file_path = "/var/lib/tempo/tokens.json";
-          address = "127.0.0.1";
-        };
-        trace_idle_period = "10s";
-        max_block_bytes = 1000000;
-        max_block_duration = "5m";
-      };
-
-      compactor = {
-        compaction = {
-          block_retention = "1h";
-        };
-        ring = {
-          kvstore = {
-            store = "inmemory";
-          };
-          instance_addr = "127.0.0.1";
-        };
-      };
-
-      metrics_generator = {
-        ring = {
-          kvstore = {
-            store = "inmemory";
-          };
-          instance_addr = "127.0.0.1";
-        };
-        processor = {
-          service_graphs = {
-            dimensions = ["service.name"];
-          };
-          span_metrics = {
-            dimensions = ["service.name"];
-          };
-          local_blocks = {
-            filter_server_spans = false;
-          };
-        };
-        storage = {
-          path = "/var/lib/tempo/generator/wal";
-          remote_write = [
-            {
-              url = "http://127.0.0.1:9090/api/v1/write";
-              send_exemplars = true;
-            }
-          ];
-        };
-      };
-
-      storage = {
-        trace = {
-          backend = "local";
-          wal = {
-            path = "/var/lib/tempo/wal";
-          };
-          local = {
-            path = "/var/lib/tempo/blocks";
-          };
-        };
-      };
-
-      overrides = {
-        defaults = {
-          metrics_generator = {
-            processors = ["service-graphs" "span-metrics" "local-blocks"];
-          };
-        };
-      };
-    };
-  };
 
   # grafana: port 3000 (default)
   services.grafana = {
@@ -374,22 +259,7 @@
             maxLines = 1000;
           };
         }
-        {
-          name = "Tempo";
-          type = "tempo";
-          uid = "tempo";
-          access = "proxy";
-          url = "http://127.0.0.1:${toString config.services.tempo.settings.server.http_listen_port}";
-          jsonData = {
-            httpMethod = "GET";
-            nodeGraph = {
-              enabled = true;
-            };
-            search = {
-              hide = false;
-            };
-          };
-        }
+
       ];
     };
   };
@@ -426,15 +296,6 @@
           middlewares:
             - "auth"
         
-        tempo:
-          rule: "Host(`tempo.maixnor.com`)"
-          service: "tempo"
-          entryPoints:
-            - "websecure"
-          tls:
-            certResolver: "letsencrypt"
-          middlewares:
-            - "auth"
 
       services:
         grafana:
@@ -452,10 +313,7 @@
             servers:
               - url: "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}"
         
-        tempo:
-          loadBalancer:
-            servers:
-              - url: "http://127.0.0.1:${toString config.services.tempo.settings.server.http_listen_port}"
+
 
       middlewares:
         auth:
@@ -615,11 +473,7 @@
     "d /var/lib/loki/tsdb-shipper-cache 0755 loki loki -"
     "d /var/lib/loki/compactor 0755 loki loki -"
     "d /var/lib/promtail 0755 promtail promtail -"
-    "d /var/lib/tempo 0755 tempo tempo -"
-    "d /var/lib/tempo/blocks 0755 tempo tempo -"
-    "d /var/lib/tempo/wal 0755 tempo tempo -"
-    "d /var/lib/tempo/generator 0755 tempo tempo -"
-    "d /var/lib/tempo/generator/wal 0755 tempo tempo -"
+
     # Fix permissions on Grafana config files (existing or new)
     "z /etc/grafana.scrt 0640 grafana grafana -"
     "z /etc/grafana.key 0640 grafana grafana -"
