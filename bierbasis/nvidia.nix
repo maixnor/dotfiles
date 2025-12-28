@@ -9,7 +9,7 @@
     extraPackages = with pkgs; [
       libvdpau-va-gl
       nvidia-vaapi-driver
-      vaapiVdpau
+      libva-vdpau-driver
       vulkan-validation-layers
     ];
   };
@@ -26,7 +26,7 @@
     open = false;
     nvidiaSettings = true;
 
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
   # Set environment variables related to NVIDIA graphics

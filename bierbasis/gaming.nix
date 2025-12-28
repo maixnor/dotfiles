@@ -7,7 +7,7 @@
   programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [
-    protonup
+    #protonup-rs
     mangohud
     bottles
     lutris

@@ -48,7 +48,7 @@
 # TODO build utility function with loop
     in {
       nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit system; inherit inputs; };
+          specialArgs = { inherit system; inherit inputs; inherit nixvim; };
           modules = [ ./bierbasis/configuration.nix ];
       };
 

@@ -8,7 +8,7 @@
     fonts = {
       monospace = {
         package = pkgs.nerd-fonts.iosevka;
-        name = "Iosevka";
+        name = "Iosevka Nerd Font";
       };
       sansSerif = {
         package = pkgs.montserrat;

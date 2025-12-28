@@ -98,7 +98,7 @@
     spice 
     spice-gtk
     spice-protocol
-    win-virtio
+    virtio-win
     win-spice
     adwaita-icon-theme
 
@@ -171,27 +171,27 @@
   };
 
   programs.dconf.enable = true;
-  virtualisation = {
-    libvirtd = {
-      enable = true;
-      qemu = {
-        swtpm.enable = true;
-        ovmf.enable = true;
-        ovmf.packages = [ pkgs.OVMFFull.fd ];
-      };
-    };
-    spiceUSBRedirection.enable = true;
-  };
+  #virtualisation = {
+  #  libvirtd = {
+  #    enable = true;
+  #    qemu = {
+  #      swtpm.enable = true;
+  #      ovmf.enable = true;
+  #      ovmf.packages = [ pkgs.OVMFFull.fd ];
+  #    };
+  #  };
+  #  spiceUSBRedirection.enable = true;
+  #};
 
 
-  services.ollama = {
-    enable = true;
-    acceleration = "cuda";
-    environmentVariables = {
-      HOME = "/var/data/ollama";
-      FLAKE = "/home/maixnor/repo/dotfiles";
-    };
-  };
+  #services.ollama = {
+  #  enable = true;
+  #  acceleration = "cuda";
+  #  environmentVariables = {
+  #    HOME = "/var/data/ollama";
+  #    FLAKE = "/home/maixnor/repo/dotfiles";
+  #  };
+  #};
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1"; # against electron apps flickering on wayland

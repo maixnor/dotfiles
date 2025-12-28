@@ -10,6 +10,7 @@ bierzelt:
   just update bierzelt 
 
 bierbasis: 
+  just remove-gtk
   just update bierbasis 
 
 wieselburg: 
