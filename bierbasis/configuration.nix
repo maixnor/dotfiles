@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, inputs, nixvim, ... }:
 
 {
   imports =
@@ -13,9 +13,10 @@
       ./nvidia.nix
       ./gaming.nix
       #../modules/moodle.nix
-      ../modules/services.nix
+      #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      (import "${inputs.home-manager}/nixos")
     ];
 
   nixpkgs.config.allowUnfree = true;
@@ -27,14 +28,15 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # faster boot, don't wait on network
-  #systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
-  #systemd.services.NetworkManager-wait-online.enable = false;
+  systemd.targets.network-online.wantedBy = pkgs.lib.mkForce []; # Normally ["multi-user.target"]
+  systemd.services.NetworkManager-wait-online.enable = false;
 
-  boot.supportedFilesystems = lib.mkForce [ "btrfs" ];
+  boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
   hardware.bluetooth.enable = true;
+  hardware.enableRedistributableFirmware = true;
 
   networking = {
     hostName = "bierbasis";
@@ -61,6 +63,10 @@
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "workman";
+  };
 
   # wu-bachelor-thesis
   services.postgresql = {
@@ -78,16 +84,11 @@
     extensions = with pkgs.postgresql17Packages; [ postgis ];
   };
 
-  qt = {
-    enable = true;
-    platformTheme = "kde";
-    style = "breeze";
-  };
-
-  #services.teamviewer.enable = true;
-
   environment.systemPackages = with pkgs; [ 
+    kdePackages.qt6ct
+    kdePackages.qtstyleplugin-kvantum
     wormhole-william
+    gnome-network-displays
     podman-compose # drop in replacement for docker-compose
     #teamviewer # only works with service.teamviewer
     ntfs3g exfat exfatprogs # mounting hdd
@@ -120,6 +121,7 @@
   };
 
   services.pulseaudio.enable = false;
+  security.polkit.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -134,20 +136,25 @@
 
   users.groups.maixnor = {};
 
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users.maixnor = import ./home.nix;
+  };
+
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";
     group = "maixnor";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
-    packages = with pkgs; [
-      nh
+    packages = [
+      nixvim
       # pkgs go here
     ];
   };
 
   networking.nftables.enable = false;
   networking.firewall = { 
-    enable = false;
+    enable = true;
     allowedTCPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
@@ -198,121 +205,7 @@
 
 	programs.nix-ld.enable = true;
 	programs.nix-ld.libraries = with pkgs; [
-    stdenv.cc.cc
-    zlib
-    fuse3
-    icu
-    nss
-    openssl
-    curl
-    expat
-
-    # jetbrains tools
-    alsa-lib
-    at-spi2-atk
-    at-spi2-core
-    atk
-    bzip2
-    cairo
-    cups
-    curlWithGnuTls
-    dbus
-    dbus-glib
-    desktop-file-utils
-    e2fsprogs
-    expat
-    flac
-    fontconfig
-    freeglut
-    freetype
-    fribidi
-    fuse
-    fuse3
-    gdk-pixbuf
-    glew110
-    glib
-    gmp
-    gst_all_1.gst-plugins-base
-    gst_all_1.gst-plugins-ugly
-    gst_all_1.gstreamer
-    gtk2
-    harfbuzz
-    icu
-    keyutils.lib
-    libGL
-    libGLU
-    libappindicator-gtk2
-    libcaca
-    libcanberra
-    libcap
-    libclang.lib
-    libdbusmenu
-    libdrm
-    libgcrypt
-    libgpg-error
-    libidn
-    libjack2
-    libjpeg
-    libmikmod
-    libogg
-    libpng12
-    libpulseaudio
-    librsvg
-    libsamplerate
-    libthai
-    libtheora
-    libtiff
-    libudev0-shim
-    libusb1
-    libuuid
-    libvdpau
-    libvorbis
-    libvpx
-    libxcrypt-legacy
-    libxkbcommon
-    libxml2
-    mesa
-    nspr
-    nss
-    openssl
-    p11-kit
-    pango
-    pixman
-    python3
-    speex
-    stdenv.cc.cc
-    tbb
-    udev
-    vulkan-loader
-    wayland
-    xorg.libICE
-    xorg.libSM
-    xorg.libX11
-    xorg.libXScrnSaver
-    xorg.libXcomposite
-    xorg.libXcursor
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXft
-    xorg.libXi
-    xorg.libXinerama
-    xorg.libXmu
-    xorg.libXrandr
-    xorg.libXrender
-    xorg.libXt
-    xorg.libXtst
-    xorg.libXxf86vm
-    xorg.libpciaccess
-    xorg.libxcb
-    xorg.xcbutil
-    xorg.xcbutilimage
-    xorg.xcbutilkeysyms
-    xorg.xcbutilrenderutil
-    xorg.xcbutilwm
-    xorg.xkeyboardconfig
-    xz
-    zlib
+    # place libraries here
 	];
   
   services.openssh = {
