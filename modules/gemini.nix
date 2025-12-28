@@ -11,7 +11,7 @@
       previewFeatures = true;
       disableAutoUpdate = true;
       sessionRetention = {
-        enabled = false;
+        enabled = true;
       };
     };
     output = {
@@ -31,13 +31,6 @@
     security = {
       auth = {
         selectedType = "oauth-personal";
-      };
-    };
-  } // { # Existing settings
-    mcpServers = {
-      "context7" = {
-        command = "${pkgs.nodejs}/bin/npx";
-        args = [ "-y" "@upstash/context7-mcp" ];
       };
     };
   });
