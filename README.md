@@ -13,14 +13,8 @@ nix shell github:NixOS/nixpkgs#home-manager --command home-manager switch --flak
 
 To remove all generations older than 30 days:
 
-**NixOS (System):**
-```bash
+```sh
+sudo nix profile wipe-history --profile /nix/var/nix/profiles/system --older-than 30d
 sudo nix-collect-garbage --delete-older-than 30d
 ```
-
-**Home Manager (User):**
-```bash
-nix-collect-garbage --delete-older-than 30d
-```
-
 
