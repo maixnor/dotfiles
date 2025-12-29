@@ -70,6 +70,7 @@
 
       # unfree
       obsidian
+      discord
     ];
   };
 
