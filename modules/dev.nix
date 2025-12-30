@@ -40,6 +40,8 @@ in {
     };
 
     environment.systemPackages = with pkgs; [
+      sqlite
+      sqlitebrowser
       redli
       wl-clipboard
 
