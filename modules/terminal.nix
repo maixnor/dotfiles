@@ -19,6 +19,8 @@
 		shellIntegration.enableZshIntegration = true;
 		settings = {
 			shell = "${pkgs.zsh}/bin/zsh -c 'tmux new-session -A -s kitty'";
+			hide_window_decorations = "yes";
+			confirm_os_window_close = 0;
 		};
 	};
 
@@ -26,8 +28,8 @@
 		enable = true;
 		settings = {
 			window = {
-				startup_mode = "Windowed";
-				decorations = "full";
+				startup_mode = "Fullscreen";
+				decorations = "none";
 			};
 			scrolling = {
 				history = 30000;

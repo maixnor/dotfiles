@@ -42,6 +42,9 @@
     };
 
     programs.home-manager.enable = true;
+    programs.kitty.settings = {
+      font_size = lib.mkForce 13;
+    };
     programs.git = {
       enable = true;
       settings = {
