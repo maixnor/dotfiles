@@ -155,10 +155,26 @@
     Comment.fg = "#f47ac9";
     TreesitterContext.bg = "NONE";
 
-    #Normal.bg = "NONE";
-    #NonText.bg = "NONE";
-    #Normal.ctermbg = "NONE";
+    Normal.bg = "NONE";
     NormalNC.bg = "NONE";
+    NonText.bg = "NONE";
+    SignColumn.bg = "NONE";
+    LineNr.bg = "NONE";
+    CursorLineNr.bg = "NONE";
+    EndOfBuffer.bg = "NONE";
+    StatusLine.bg = "NONE";
+    StatusLineNC.bg = "NONE";
+    VertSplit.bg = "NONE";
+    WinSeparator.bg = "NONE";
+    Folded.bg = "NONE";
+    FoldColumn.bg = "NONE";
+
+    GitSignsAdd.bg = "NONE";
+    GitSignsChange.bg = "NONE";
+    GitSignsDelete.bg = "NONE";
+    GitSignsChangedelete.bg = "NONE";
+    GitSignsTopdelete.bg = "NONE";
+    GitSignsUntracked.bg = "NONE";
   };
 
   keymaps = [
