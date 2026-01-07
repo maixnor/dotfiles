@@ -5,6 +5,8 @@
 
   config = {
     environment.systemPackages = with pkgs; [
+      zoxide
+      sqlite
       openconnect
       traceroute
       gh git
