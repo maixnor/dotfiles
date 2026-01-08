@@ -44,10 +44,7 @@ in
     options = "--delete-older-than 30d";
   };
 
-  services.autoupdate = {
-    enable = true;
-    hostname = "${hostname}";
-  };
+  services.autoupdate.enable = true;
 
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";

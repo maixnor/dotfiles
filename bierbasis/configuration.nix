@@ -16,8 +16,11 @@
       #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      ../services/autoupdate.nix
       (import "${inputs.home-manager}/nixos")
     ];
+
+  services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
