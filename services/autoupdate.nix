@@ -27,6 +27,7 @@ in
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnCalendar = "daily";
+        OnBootSec = "5min";
         Persistent = true;
         Unit = "autoupdate.service";
       };
@@ -34,12 +35,21 @@ in
 
     systemd.services.autoupdate = {
       description = "Update system to latest state on GitHub";
-      path = with pkgs; [ git just ];
+      path = with pkgs; [ git just coreutils ];
       serviceConfig = {
         Type = "oneshot";
         WorkingDirectory = "/home/maixnor/repo/dotfiles";
         User = "maixnor";
+        Nice = 19;
+        CPUSchedulingPolicy = "idle";
+        IOSchedulingClass = "idle";
         ExecStart = pkgs.writeShellScript "autoupdate.sh" ''
+          # Wait if system just booted to avoid resource contention
+          uptime_s=$(cat /proc/uptime | cut -d. -f1)
+          if [ "$uptime_s" -lt 300 ]; then
+            sleep $((300 - uptime_s))
+          fi
+
           if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
             git pull origin main
             just ${config.networking.hostName}
