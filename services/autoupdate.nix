@@ -84,6 +84,7 @@ in
           routers:
             webhook-update:
               rule: "Host(`${cfg.webhook.domain}`) && Path(`/update`)"
+              priority: 100
               service: "webhook-update"
               entryPoints:
                 - "websecure"
