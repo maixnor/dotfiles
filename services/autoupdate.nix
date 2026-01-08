@@ -86,10 +86,16 @@ in
               rule: "Host(`${cfg.webhook.domain}`) && Path(`/update`)"
               priority: 100
               service: "webhook-update"
+              middlewares:
+                - "autoupdate-rewrite"
               entryPoints:
                 - "websecure"
               tls:
                 certResolver: "letsencrypt"
+          middlewares:
+            autoupdate-rewrite:
+              replacePath:
+                path: "/hooks/update"
           services:
             webhook-update:
               loadBalancer:
