@@ -19,6 +19,7 @@
       fzf jq
       just ranger
       static-server
+      ffmpeg_8-headless
     ];
 
     environment.shellAliases = {

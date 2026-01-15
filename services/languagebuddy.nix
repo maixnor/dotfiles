@@ -111,7 +111,7 @@ in
     after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
     requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_22 ];
+    path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
     script = "node -v && node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/test";
@@ -139,7 +139,7 @@ in
     after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
     requires = [ "languagebuddy-setup.service" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_22 ];
+    path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
     script = "node -v && node main.js";
     serviceConfig = {
       WorkingDirectory = "/var/www/languagebuddy/prod";

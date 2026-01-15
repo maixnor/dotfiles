@@ -23,6 +23,7 @@
       ngrok
       josm
       nextcloud-client
+      ffmpeg_8-headless
 
       # nixos
       nix-index
