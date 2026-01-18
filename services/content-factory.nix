@@ -65,6 +65,14 @@
     group = "windmill";
   };
 
+  # Satisfy NixOS user assertions for the content-factory service user
+  users.groups.content_factory = {};
+  users.users.content_factory = {
+    isSystemUser = true;
+    group = "content_factory";
+    extraGroups = [ "windmill" ]; # Might need access to shared secrets/files
+  };
+
   # 5. Secrets (Single .env file)
   age.secrets."content-factory.env" = {
     file = ../secrets/content-factory.env.age;
