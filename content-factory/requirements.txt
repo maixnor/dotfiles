@@ -1,0 +1,7 @@
+google-genai
+alembic
+sqlalchemy
+psycopg2-binary
+beautifulsoup4
+httpx
+pillow

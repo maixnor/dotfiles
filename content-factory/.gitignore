@@ -1,0 +1,17 @@
+.env
+# Local Databases
+*.db
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+
+# Project Specific
+preview/
+maya_description.txt
+requirements.txt.log
