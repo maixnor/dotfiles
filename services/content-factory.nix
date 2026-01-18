@@ -52,16 +52,18 @@
 
   # 4. Content Factory Environment Setup
   system.activationScripts.content-factory-setup = ''
-    mkdir -p /var/lib/content-factory/assets
-    mkdir -p /var/www/maixnor.com/maya-blog
-    
-    # Grant permissions to both maixnor and the windmill user
-    chown -R maixnor:maixnor /var/lib/content-factory /var/www/maixnor.com/maya-blog
-    chmod -R 775 /var/lib/content-factory /var/www/maixnor.com/maya-blog
+    # empty for now because I don't exactly how to publish to my blog site :)
   '';
 
-  # Declaratively add windmill user to maixnor group
-  users.users.windmill.extraGroups = [ "maixnor" ];
+  # Ensure the windmill group exists and maixnor is a member
+  users.groups.windmill = {};
+  users.users.maixnor.extraGroups = [ "windmill" ];
+
+  # Satisfy NixOS user assertions for the windmill service user
+  users.users.windmill = {
+    isSystemUser = true;
+    group = "windmill";
+  };
 
   # 5. Secrets (Single .env file)
   age.secrets."content-factory.env" = {
