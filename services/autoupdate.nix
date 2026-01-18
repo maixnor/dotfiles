@@ -38,7 +38,7 @@ in
       description = "Update system to latest state on GitHub";
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
-      path = with pkgs; [ git just coreutils ];
+      path = with pkgs; [ git just coreutils bash ];
       serviceConfig = {
         Type = "oneshot";
         WorkingDirectory = "/home/maixnor/repo/dotfiles";
