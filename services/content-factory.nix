@@ -63,6 +63,7 @@
     chmod -R 775 /var/lib/content-factory /var/www/maixnor.com/maya-blog
     
     # Ensure the repo itself is readable by the group
+    chmod g+x /home/maixnor
     chmod -R g+rX /home/maixnor/repo/dotfiles
     
     if id "windmill" >/dev/null 2>&1; then
@@ -71,12 +72,30 @@
   '';
 
   # 5. Windmill Environment
-  systemd.services.windmill.serviceConfig.Environment = [
-    "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
-  ];
-  systemd.services.windmill-worker.serviceConfig.Environment = [
-    "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
-  ];
+  let
+    cf-python = pkgs.python3.withPackages (ps: with ps; [
+      alembic
+      sqlalchemy
+      psycopg2
+      beautifulsoup4
+      httpx
+      google-genai
+      pillow
+    ]);
+  in {
+    systemd.services.windmill-server.serviceConfig.Environment = [
+      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
+    ];
+    systemd.services.windmill-worker.serviceConfig.Environment = [
+      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
+    ];
+    systemd.services.windmill-worker-native.serviceConfig.Environment = [
+      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
+    ];
+  };
 
   # 5. Publisher Service (Now just a helper, triggers moved to Windmill)
   systemd.services.maya-publisher = {
