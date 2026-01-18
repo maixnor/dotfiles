@@ -9,11 +9,11 @@
     ensureUsers = [
       {
         name = "content_admin";
-        ensureDBOwnership = true;
+        ensureDBOwnership = false;
       }
       {
         name = "windmill_user";
-        ensureDBOwnership = true;
+        ensureDBOwnership = false;
       }
     ];
     authentication = pkgs.lib.mkOverride 10 ''
