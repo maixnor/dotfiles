@@ -9,7 +9,7 @@
       sqlite
       openconnect
       traceroute
-      gh git
+      git
       wget xh
       freshfetch
       btop iftop iotop

@@ -12,6 +12,7 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./gaming.nix
+      ../modules/gh-auth.nix
       #../modules/moodle.nix
       #../modules/services.nix
       ../modules/dev.nix

@@ -9,6 +9,7 @@
     [
       ./hardware-configuration.nix
       ../modules/dev.nix
+      ../modules/gh-auth.nix
       ../modules/zerotier.nix
       ../modules/content-factory-cli.nix
       ../modules/laptop-power.nix

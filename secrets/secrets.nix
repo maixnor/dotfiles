@@ -14,4 +14,5 @@ in
 {
   # The single source of truth for all Content Factory keys
   "content-factory.env.age".publicKeys = all;
+  "github.age".publicKeys = all;
 }

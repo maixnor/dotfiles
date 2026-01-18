@@ -62,7 +62,6 @@
       })
 
       # general development stuff
-      gh
       vscodium
       chromium
       static-server

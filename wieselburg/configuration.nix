@@ -9,6 +9,7 @@ in
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
     ../modules/misc-server.nix
+    ../modules/gh-auth.nix
     ../modules/zerotier.nix
     ../modules/content-factory-cli.nix
     ../services/autoupdate.nix
@@ -81,7 +82,7 @@ in
 
   ### System Packages
   environment.systemPackages = with pkgs; [ 
-    git gh just
+    git just
     wormhole-william
     #appflowy
   ];
