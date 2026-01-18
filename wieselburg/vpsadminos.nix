@@ -15,7 +15,7 @@ let
   ];
 in {
   networking.nameservers = mkDefault nameservers;
-  services.resolved = mkDefault { fallbackDns = nameservers; };
+  services.resolved.settings.Resolve.FallbackDNS = mkDefault (concatStringsSep " " nameservers);
   networking.dhcpcd.extraConfig = "noipv4ll";
 
   systemd.services.systemd-sysctl.enable = false;
