@@ -63,30 +63,34 @@
   # Declaratively add windmill user to maixnor group
   users.users.windmill.extraGroups = [ "maixnor" ];
 
-  # 5. Secrets
-  age.secrets.gemini-api-key = {
-    file = ../secrets/gemini-api-key.age;
+  # 5. Secrets (Single .env file)
+  age.secrets."content-factory.env" = {
+    file = ../secrets/content-factory.env.age;
     owner = "windmill";
     group = "maixnor";
   };
 
   # 6. Windmill Environment Fixes
-  systemd.services.windmill-server.serviceConfig.Environment = [
-    "PYTHONPATH=${contentFactory.cf-src}"
-    "GEMINI_API_KEY_FILE=/run/secrets/gemini-api-key"
-  ];
-  systemd.services.windmill-worker.serviceConfig.Environment = [
-    "PYTHONPATH=${contentFactory.cf-src}"
-    "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
-    "GEMINI_API_KEY_FILE=/run/secrets/gemini-api-key"
-  ];
-  systemd.services.windmill-worker-native.serviceConfig.Environment = [
-    "PYTHONPATH=${contentFactory.cf-src}"
-    "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
-    "GEMINI_API_KEY_FILE=/run/secrets/gemini-api-key"
-  ];
+  systemd.services.windmill-server.serviceConfig = {
+    Environment = [ "PYTHONPATH=${contentFactory.cf-src}" ];
+    EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
+  };
+  systemd.services.windmill-worker.serviceConfig = {
+    Environment = [ 
+      "PYTHONPATH=${contentFactory.cf-src}"
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
+    ];
+    EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
+  };
+  systemd.services.windmill-worker-native.serviceConfig = {
+    Environment = [ 
+      "PYTHONPATH=${contentFactory.cf-src}"
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
+    ];
+    EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
+  };
 
-  # 7. Database Migrations (Automatic)
+  # 7. Database Migrations
   systemd.services.content-factory-migrate = {
     description = "Run database migrations for Content Factory";
     wantedBy = [ "multi-user.target" ];
@@ -95,23 +99,19 @@
       Type = "oneshot";
       User = "content_factory";
       ExecStart = "${contentFactory.maya-migrate}/bin/maya-migrate";
+      EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
       RemainAfterExit = true;
-    };
-    environment = {
-      DATABASE_URL = "postgresql://content_factory@localhost:5432/content_factory";
     };
   };
 
-  # 7. Publisher Service
+  # 8. Publisher Service
   systemd.services.maya-publisher = {
     description = "Publish scheduled Maya blog posts";
     serviceConfig = {
       Type = "oneshot";
       User = "maixnor";
       ExecStart = "${contentFactory.maya-publish}/bin/maya-publish";
-    };
-    environment = {
-      DATABASE_URL = "postgresql://content_factory@localhost:5432/content_factory";
+      EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
     };
   };
 }

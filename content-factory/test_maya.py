@@ -9,9 +9,9 @@ def generate_preview_pack(topic="The secret etiquette of ordering tapas in Sevil
     """
     Generates a full 4-language preview pack in content-factory/preview/
     """
-    api_key = get_secret("GEMINI_API_KEY", "GEMINI_API_KEY_FILE")
+    api_key = get_secret("GEMINI_API_KEY")
     if not api_key:
-        print("CRITICAL ERROR: Gemini API key not found. Set GEMINI_API_KEY or GEMINI_API_KEY_FILE.")
+        print("CRITICAL ERROR: Gemini API key not found.")
         return
 
     preview_dir = "preview"

@@ -3,9 +3,9 @@ from google import genai
 from utils import get_secret
 
 def list_available_models():
-    api_key = get_secret("GEMINI_API_KEY", "GEMINI_API_KEY_FILE")
+    api_key = get_secret("GEMINI_API_KEY")
     if not api_key:
-        print("Error: Gemini API key not found. Set GEMINI_API_KEY or GEMINI_API_KEY_FILE.")
+        print("Error: Gemini API key not found.")
         return
 
     client = genai.Client(api_key=api_key)

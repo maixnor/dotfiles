@@ -18,8 +18,10 @@ let
   maya-cli = pkgs.writeShellScriptBin "maya-cli" ''
     export PYTHONPATH="${cf-src}:$PYTHONPATH"
     export MONTSERRAT_FONT="${pkgs.montserrat}/share/fonts/opentype/Montserrat-Bold.otf"
-    if [ -f /run/secrets/gemini-api-key ]; then
-      export GEMINI_API_KEY_FILE=/run/secrets/gemini-api-key
+    
+    # Load secrets if they exist
+    if [ -f /run/secrets/content-factory.env ]; then
+      set -a; source /run/secrets/content-factory.env; set +a
     fi
     exec ${cf-python}/bin/python3 ${cf-src}/main.py "$@"
   '';
@@ -27,8 +29,10 @@ let
   # Specialized wrappers for convenience and for use in systemd/Windmill
   maya-publish = pkgs.writeShellScriptBin "maya-publish" ''
     export PYTHONPATH="${cf-src}:$PYTHONPATH"
-    if [ -f /run/secrets/gemini-api-key ]; then
-      export GEMINI_API_KEY_FILE=/run/secrets/gemini-api-key
+    
+    # Load secrets if they exist
+    if [ -f /run/secrets/content-factory.env ]; then
+      set -a; source /run/secrets/content-factory.env; set +a
     fi
     exec ${cf-python}/bin/python3 ${cf-src}/publisher.py "$@"
   '';
