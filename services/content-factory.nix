@@ -8,12 +8,12 @@
     ensureDatabases = [ "content_factory" "windmill" ];
     ensureUsers = [
       {
-        name = "content_admin";
-        ensureDBOwnership = false;
+        name = "content_factory";
+        ensureDBOwnership = true;
       }
       {
-        name = "windmill_user";
-        ensureDBOwnership = false;
+        name = "windmill";
+        ensureDBOwnership = true;
       }
     ];
     authentication = pkgs.lib.mkOverride 10 ''
@@ -27,7 +27,7 @@
   # 2. Windmill (Native NixOS Service)
   services.windmill = {
     enable = true;
-    database.url = "postgres://windmill_user@localhost:5432/windmill?sslmode=disable";
+    database.url = "postgres://windmill@localhost:5432/windmill?sslmode=disable";
     serverPort = 8001;
   };
 
@@ -78,7 +78,7 @@
       ExecStart = "${pkgs.nix}/bin/nix-shell /home/maixnor/repo/dotfiles/content-factory/shell.nix --run 'python3 publisher.py'";
     };
     environment = {
-      DATABASE_URL = "postgresql://content_admin@localhost:5432/content_factory";
+      DATABASE_URL = "postgresql://content_factory@localhost:5432/content_factory";
     };
   };
 }

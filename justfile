@@ -17,7 +17,7 @@ wieselburg:
   just update wieselburg
 
 cf-migrate:
-  ssh wieselburg "cd ~/repo/dotfiles/content-factory && nix-shell shell.nix --run 'DATABASE_URL=postgresql://content_admin@localhost:5432/content_factory alembic upgrade head'"
+  ssh wieselburg "cd ~/repo/dotfiles/content-factory && nix-shell shell.nix --run 'DATABASE_URL=postgresql://content_factory@localhost:5432/content_factory alembic upgrade head'"
 
 cf-check:
   cd content-factory && nix-shell shell.nix --run "python3 -m py_compile *.py"

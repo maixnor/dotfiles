@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from models import ContentItem, PublicationLog
 
 # Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://content_admin@localhost:5432/content_factory")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://content_factory@localhost:5432/content_factory")
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
