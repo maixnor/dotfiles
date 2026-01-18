@@ -36,6 +36,8 @@ in
 
     systemd.services.autoupdate = {
       description = "Update system to latest state on GitHub";
+      wants = [ "network-online.target" ];
+      after = [ "network-online.target" ];
       path = with pkgs; [ git just coreutils ];
       serviceConfig = {
         Type = "oneshot";
@@ -51,7 +53,24 @@ in
             sleep $((300 - uptime_s))
           fi
 
-          if git fetch origin main && ! git diff --quiet HEAD..origin/main; then
+          # Retry mechanism for git fetch
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if git fetch origin main; then
+              break
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Fetch failed, retrying in 10 seconds... ($RETRY_COUNT/$MAX_RETRIES)"
+            sleep 10
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "Failed to fetch from GitHub after $MAX_RETRIES attempts."
+            exit 1
+          fi
+
+          if ! git diff --quiet HEAD..origin/main; then
             git pull origin main
             just ${config.networking.hostName}
           fi
