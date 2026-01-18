@@ -73,6 +73,16 @@
 
   # 5. Windmill Environment
   let
+    # This derivation "deploys" your scripts into the Nix store
+    content-factory-src = pkgs.stdenv.mkDerivation {
+      name = "content-factory-src";
+      src = ../content-factory;
+      installPhase = ''
+        mkdir -p $out
+        cp -rv $src/* $out/
+      '';
+    };
+
     cf-python = pkgs.python3.withPackages (ps: with ps; [
       alembic
       sqlalchemy
@@ -84,16 +94,19 @@
     ]);
   in {
     systemd.services.windmill-server.serviceConfig.Environment = [
-      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PYTHONPATH=${content-factory-src}"
       "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
     ];
     systemd.services.windmill-worker.serviceConfig.Environment = [
-      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PYTHONPATH=${content-factory-src}"
       "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
+      # Tell Windmill not to try and resolve these local modules via PyPI
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
     ];
     systemd.services.windmill-worker-native.serviceConfig.Environment = [
-      "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+      "PYTHONPATH=${content-factory-src}"
       "PATH=${lib.makeBinPath [ cf-python ]}:/run/current-system/sw/bin"
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
     ];
   };
 
