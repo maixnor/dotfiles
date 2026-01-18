@@ -7,7 +7,7 @@
     http:
       routers:
         maixnor-com:
-          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)"
+          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`)"
           service: "maixnor-com"
           entryPoints:
             - "websecure"

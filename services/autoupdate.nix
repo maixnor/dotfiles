@@ -17,7 +17,8 @@ in
       };
       domain = mkOption {
         type = types.str;
-        default = "wb.maixnor.com";
+        default = "${config.networking.hostName}.maixnor.com";
+        description = "Domain name for the webhook";
       };
     };
   };
