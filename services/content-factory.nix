@@ -62,11 +62,21 @@
     chown -R maixnor:maixnor /var/lib/content-factory /var/www/maixnor.com/maya-blog
     chmod -R 775 /var/lib/content-factory /var/www/maixnor.com/maya-blog
     
-    # Ensure windmill user is in the group if it exists
+    # Ensure the repo itself is readable by the group
+    chmod -R g+rX /home/maixnor/repo/dotfiles
+    
     if id "windmill" >/dev/null 2>&1; then
       usermod -a -G maixnor windmill
     fi
   '';
+
+  # 5. Windmill Environment
+  systemd.services.windmill.serviceConfig.Environment = [
+    "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+  ];
+  systemd.services.windmill-worker.serviceConfig.Environment = [
+    "PYTHONPATH=/home/maixnor/repo/dotfiles/content-factory"
+  ];
 
   # 5. Publisher Service (Now just a helper, triggers moved to Windmill)
   systemd.services.maya-publisher = {
