@@ -16,6 +16,7 @@ in
     ../services/searx.nix
     ../services/languagebuddy.nix
     ../services/observability.nix
+    ../services/content-factory.nix
     # ../services/ai-research.nix
     # ../services/nextcloud.nix
     ../services/immich.nix
@@ -45,6 +46,7 @@ in
   };
 
   services.autoupdate.enable = true;
+  services.autoupdate.webhook.domain = "wieselburg.maixnor.com";
 
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";

@@ -16,6 +16,9 @@ bierbasis:
 wieselburg: 
   just update wieselburg
 
+cf-migrate:
+  ssh wieselburg "cd ~/repo/dotfiles/content-factory && nix-shell shell.nix --run 'DATABASE_URL=postgresql://content_admin@localhost:5432/content_factory alembic upgrade head'"
+
 remove-gtk:
   rm -rf ~/.gtk*
 
