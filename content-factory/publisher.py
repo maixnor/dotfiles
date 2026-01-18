@@ -1,8 +1,6 @@
 import os
 import shutil
 import datetime
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from models import ContentItem, PublicationLog, Session
 import httpx
 from utils import get_secret
@@ -49,35 +47,66 @@ def publish_to_mastodon(item):
     # ...
     return True
 
-def run_publisher():
+def publish_due_items():
+
     """
+
     Main loop for due items.
+
     """
+
     session = Session()
+
     now = datetime.datetime.utcnow()
+
     
+
     due = session.query(ContentItem).filter(
+
         ContentItem.status == 'scheduled',
+
         ContentItem.scheduled_at <= now
+
     ).all()
+
     
+
     for item in due:
+
         # Publish to all enabled targets
+
         success = publish_to_blog(item)
+
         
+
         if success:
+
             item.status = "posted"
+
             # Log it
+
             log = PublicationLog(
+
                 content_item_id=item.id,
+
                 platform="blog",
+
                 status="published",
+
                 published_at=datetime.datetime.utcnow()
+
             )
+
             session.add(log)
+
             
+
     session.commit()
+
     session.close()
 
+
+
 if __name__ == "__main__":
-    run_publisher()
+
+    publish_due_items()

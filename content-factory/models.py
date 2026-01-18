@@ -1,9 +1,15 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, UUID
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, UUID, create_engine
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 import datetime
 import uuid
+import os
 
 Base = declarative_base()
+
+# Database setup
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://content_factory@localhost:5432/content_factory")
+engine = create_engine(DATABASE_URL)
+Session = sessionmaker(bind=engine)
 
 class TopicIdea(Base):
     """Phase 1: Brainstormed ideas to be selected by you."""

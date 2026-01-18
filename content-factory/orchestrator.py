@@ -1,17 +1,12 @@
 import os
 import uuid
 import datetime
-from sqlalchemy import create_engine, desc
+from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
-from models import ContentItem, TopicIdea, Base
+from models import ContentItem, TopicIdea, Base, Session
 from blog_engine import MayaBlogEngine
 from image_gen import MayaImageGenerator
 from researcher import BlogResearcher
-
-# Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://content_factory@localhost:5432/content_factory")
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
 
 class MayaOrchestrator:
     def __init__(self):
