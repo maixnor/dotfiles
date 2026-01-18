@@ -38,7 +38,7 @@ in
       description = "Update system to latest state on GitHub";
       wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
-      path = [ "/run/wrappers/bin" ] ++ (with pkgs; [ git just coreutils bash nixos-rebuild nix ]);
+      path = with pkgs; [ git just coreutils bash ];
       serviceConfig = {
         Type = "oneshot";
         WorkingDirectory = "/home/maixnor/repo/dotfiles";
@@ -47,6 +47,11 @@ in
         CPUSchedulingPolicy = "idle";
         IOSchedulingClass = "idle";
         ExecStart = pkgs.writeShellScript "autoupdate.sh" ''
+          # Load the global profile to get a standard environment (PATH, etc.)
+          if [ -f /etc/profile ]; then
+            . /etc/profile
+          fi
+
           # Wait if system just booted to avoid resource contention
           uptime_s=$(cat /proc/uptime | cut -d. -f1)
           if [ "$uptime_s" -lt 300 ]; then
