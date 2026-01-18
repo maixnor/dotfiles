@@ -57,9 +57,10 @@
     };
   };
 
-  # Create necessary directories
-  system.activationScripts.maixnorcom-setup = ''
-    mkdir -p /var/www/{maixnor.com,static}
-    chown -R nobody:nogroup /var/www
-  '';
+  # Manage directories and files directly via Nix
+  systemd.tmpfiles.rules = [
+    "d /var/www/maixnor.com 0755 nobody nogroup -"
+    "d /var/www/static 0755 nobody nogroup -"
+    "L+ /var/www/maixnor.com/index.html - nobody nogroup - ${../wieselburg/index.html}"
+  ];
 }

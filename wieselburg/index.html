@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maixnor Realm - Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0f0f12;
+            --card-bg: #1a1b23;
+            --text-color: #e0e0e0;
+            --accent-color: #4f46e5;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --pending-color: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-container form {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid #2d2e3a;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-container form:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            flex-grow: 1;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-container button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .search-container button:hover {
+            opacity: 0.9;
+        }
+
+        .status-summary {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 1200px;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            border: 1px solid #2d2e3a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            gap: 0.4rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background-color: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .status-online .status-dot { background-color: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+
+        .status-offline { background-color: rgba(239, 68, 68, 0.1); color: var(--error-color); }
+        .status-offline .status-dot { background-color: var(--error-color); }
+
+        .status-pending { background-color: rgba(245, 158, 11, 0.1); color: var(--pending-color); }
+        .status-pending .status-dot { background-color: var(--pending-color); }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Maixnor Realm</h1>
+        <p class="subtitle">Self-hosted ecosystem & digital playground</p>
+        
+        <div class="search-container">
+            <form action="https://search.maixnor.com/search" method="GET">
+                <input type="text" name="q" placeholder="Search the web with SearXNG..." aria-label="Search">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="status-summary" id="status-summary">
+            Checking system status...
+        </div>
+    </header>
+
+    <div class="grid" id="service-grid">
+        <!-- Search -->
+        <a href="https://search.maixnor.com" class="card" data-url="https://search.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">SearXNG</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">Privacy-respecting metasearch engine. Aggregate results from 70+ search engines.</p>
+            <div class="card-footer">Go to Search →</div>
+        </a>
+
+        <!-- Photos -->
+        <a href="https://photos.maixnor.com" class="card" data-url="https://photos.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">Immich</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">High performance self-hosted photo and video backup solution.</p>
+            <div class="card-footer">View Library →</div>
+        </a>
+
+        <!-- LanguageBuddy -->
+        <a href="https://languagebuddy.maixnor.com" class="card" data-url="https://languagebuddy.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">LanguageBuddy</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">AI-powered language learning platform for immersive practice.</p>
+            <div class="card-footer">Start Learning →</div>
+        </a>
+
+        <!-- Windmill -->
+        <a href="https://windmill.maixnor.com" class="card" data-url="https://windmill.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">Windmill</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">Low-code platform for automation and content factory orchestration.</p>
+            <div class="card-footer">Open Workspace →</div>
+        </a>
+
+        <!-- Grafana -->
+        <a href="https://grafana.maixnor.com" class="card" data-url="https://grafana.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">Grafana</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">Observability dashboard for monitoring system health and metrics.</p>
+            <div class="card-footer">View Metrics →</div>
+        </a>
+
+        <!-- Prometheus -->
+        <a href="https://prometheus.maixnor.com" class="card" data-url="https://prometheus.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">Prometheus</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">Time-series database and monitoring system for real-time alerting.</p>
+            <div class="card-footer">Query Data →</div>
+        </a>
+
+        <!-- Loki -->
+        <a href="https://loki.maixnor.com" class="card" data-url="https://loki.maixnor.com">
+            <div class="card-header">
+                <span class="card-title">Loki</span>
+                <div class="status-badge status-pending">
+                    <div class="status-dot"></div>
+                    <span class="status-text">Checking</span>
+                </div>
+            </div>
+            <p class="card-description">Log aggregation system inspired by Prometheus. High efficiency logging.</p>
+            <div class="card-footer">Search Logs →</div>
+        </a>
+    </div>
+
+    <footer>
+        &copy; 2026 Maixnor Realm &bull; Powered by NixOS &amp; Traefik
+    </footer>
+
+    <script>
+        let onlineCount = 0;
+        const totalServices = document.querySelectorAll('.card').length;
+
+        function updateSummary() {
+            const summary = document.getElementById('status-summary');
+            if (onlineCount === totalServices) {
+                summary.innerHTML = `<span style="color: var(--success-color)">●</span> All systems operational (${onlineCount}/${totalServices})`;
+            } else if (onlineCount === 0) {
+                summary.innerHTML = `<span style="color: var(--error-color)">●</span> All systems offline (${onlineCount}/${totalServices})`;
+            } else {
+                summary.innerHTML = `<span style="color: var(--pending-color)">●</span> Partial systems operational (${onlineCount}/${totalServices})`;
+            }
+        }
+
+        async function checkHealth(card) {
+            const url = card.getAttribute('data-url');
+            const badge = card.querySelector('.status-badge');
+            const statusText = badge.querySelector('.status-text');
+            const wasOnline = badge.classList.contains('status-online');
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                await fetch(url, { 
+                    mode: 'no-cors',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                badge.className = 'status-badge status-online';
+                statusText.textContent = 'Online';
+                if (!wasOnline) onlineCount++;
+            } catch (error) {
+                badge.className = 'status-badge status-offline';
+                statusText.textContent = 'Offline';
+                if (wasOnline) onlineCount--;
+                console.error(`Error checking ${url}:`, error);
+            }
+            updateSummary();
+        }
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => checkHealth(card));
+        
+        setInterval(() => {
+            cards.forEach(card => checkHealth(card));
+        }, 30000);
+    </script>
+</body>
+</html>
