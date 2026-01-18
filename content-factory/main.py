@@ -5,15 +5,23 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "draft", "approve", "publish", "list-ideas"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "draft", "approve", "publish", "list-ideas", "scrape"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
     parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate")
+    parser.add_argument("--url", type=str, help="URL to scrape")
     
     args = parser.parse_args()
     orc = MayaOrchestrator()
 
-    if args.command == "brainstorm":
+    if args.command == "scrape":
+        if not args.url:
+            print("Error: --url required for scrape command")
+            return
+        from scraper import process_url
+        process_url(args.url)
+
+    elif args.command == "brainstorm":
         orc.step1_morning_brainstorm(count=args.count)
         print("Brainstorming complete.")
 

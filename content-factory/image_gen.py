@@ -4,10 +4,11 @@ from google import genai
 from google.genai import types
 from PIL import Image
 import io
+from utils import get_secret
 
 class MayaImageGenerator:
     def __init__(self, api_key=None):
-        api_key = api_key or os.getenv("GEMINI_API_KEY")
+        api_key = api_key or get_secret("GEMINI_API_KEY", "GEMINI_API_KEY_FILE")
         if not api_key:
             raise ValueError("GEMINI_API_KEY is not set!")
         self.client = genai.Client(api_key=api_key)

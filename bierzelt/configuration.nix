@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      ../modules/content-factory-cli.nix
       ../modules/laptop-power.nix
       ../services/autoupdate.nix
       (import "${inputs.home-manager}/nixos")

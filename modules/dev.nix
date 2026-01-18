@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 let 
   r-with-my-packages = with pkgs; rWrapper.override{ packages = with rPackages; [ 
@@ -48,6 +48,8 @@ in {
       jetbrains-toolbox
 
       python314
+
+      inputs.agenix.packages.${system}.default
 
       # rustup 
       # jetbrains.rust-rover

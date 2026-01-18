@@ -27,9 +27,13 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-generators, ... } @inputs :
+  outputs = { nixpkgs, home-manager, nixos-generators, agenix, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
@@ -49,18 +53,27 @@
     in {
       nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit system; inherit inputs; inherit nixvim; };
-          modules = [ ./bierbasis/configuration.nix ];
+          modules = [ 
+            ./bierbasis/configuration.nix 
+            agenix.nixosModules.default
+          ];
       };
 
       nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit system; inherit inputs; inherit nixvim; };
-        modules = [ ./bierzelt/configuration.nix ];
+        modules = [ 
+          ./bierzelt/configuration.nix 
+          agenix.nixosModules.default
+        ];
       };
 
       nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
         specialArgs = { inherit system; inherit inputs; inherit nixvim; };
-        modules = [ ./wieselburg/configuration.nix ];
+        modules = [ 
+          ./wieselburg/configuration.nix 
+          agenix.nixosModules.default
+        ];
       };
 
       nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {

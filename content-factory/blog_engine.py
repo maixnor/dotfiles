@@ -3,10 +3,11 @@ from google import genai
 from google.genai import types
 from PIL import Image
 from persona import MAYA_WRITING_STYLE, MAYA_VISUAL_PROMPT
+from utils import get_secret
 
 class MayaBlogEngine:
     def __init__(self, api_key=None):
-        api_key = api_key or os.getenv("GEMINI_API_KEY")
+        api_key = api_key or get_secret("GEMINI_API_KEY", "GEMINI_API_KEY_FILE")
         self.client = genai.Client(api_key=api_key)
         self.model_name = 'gemini-3-flash-preview'
 

@@ -3,14 +3,15 @@ import shutil
 from blog_engine import MayaBlogEngine
 from image_gen import MayaImageGenerator
 from persona import TARGET_LANGUAGES
+from utils import get_secret
 
 def generate_preview_pack(topic="The secret etiquette of ordering tapas in Seville"):
     """
     Generates a full 4-language preview pack in content-factory/preview/
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = get_secret("GEMINI_API_KEY", "GEMINI_API_KEY_FILE")
     if not api_key:
-        print("CRITICAL ERROR: Please export GEMINI_API_KEY=your_key")
+        print("CRITICAL ERROR: Gemini API key not found. Set GEMINI_API_KEY or GEMINI_API_KEY_FILE.")
         return
 
     preview_dir = "preview"

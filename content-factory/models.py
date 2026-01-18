@@ -28,6 +28,9 @@ class ContentItem(Base):
     # Content fields
     headline = Column(String)
     markdown_content = Column(Text)
+    left_column_text = Column(Text)
+    right_column_text = Column(Text)
+    caption = Column(Text)
     local_image_path = Column(Text)
     
     # State management
