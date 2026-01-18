@@ -1,6 +1,6 @@
 
 update host:
-	git pull && sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
+	git pull && /run/wrappers/bin/sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
 
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
