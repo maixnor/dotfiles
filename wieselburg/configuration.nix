@@ -57,11 +57,13 @@ in
 
   users.groups.maixnor = {};
 
-  users.users.maixnor = {
+  users.users.maixnor = let 
+    keys = import ../modules/public-keys.nix;
+  in {
     isNormalUser = true;
     group = "maixnor";
     extraGroups = [ "wheel" "immich" ];
-    openssh.authorizedKeys.keys = (import ../modules/public-keys.nix).users.maixnor;
+    openssh.authorizedKeys.keys = keys.users.maixnor;
     packages = [ nixvim ];
   };
 
