@@ -20,7 +20,10 @@ def get_secret(env_var, default=None):
                         continue
                     if "=" in line:
                         k, v = line.split("=", 1)
-                        if k.strip() == env_var:
+                        key = k.strip()
+                        if key.startswith("export "):
+                            key = key[7:].strip()
+                        if key == env_var:
                             # Strip quotes if present
                             return v.strip().strip('"').strip("'")
         except Exception:

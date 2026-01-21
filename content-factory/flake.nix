@@ -77,46 +77,16 @@
           '';
         };
 
-        cf-src = ./.;
-
-        maya-cli = pkgs.writeShellScriptBin "maya-cli" ''
-          export PYTHONPATH="${cf-src}:$PYTHONPATH"
-          export MONTSERRAT_FONT="${pkgs.montserrat}/share/fonts/opentype/Montserrat-Bold.otf"
-          
-          # Load secrets if they exist
-          if [ -f /run/secrets/content-factory.env ]; then
-            set -a; source /run/secrets/content-factory.env; set +a
-          fi
-          exec ${cf-python}/bin/python3 ${cf-src}/main.py "$@"
-        '';
-
-        maya-publish = pkgs.writeShellScriptBin "maya-publish" ''
-          export PYTHONPATH="${cf-src}:$PYTHONPATH"
-          
-          # Load secrets if they exist
-          if [ -f /run/secrets/content-factory.env ]; then
-            set -a; source /run/secrets/content-factory.env; set +a
-          fi
-          exec ${cf-python}/bin/python3 ${cf-src}/publisher.py "$@"
-        '';
-
-        maya-migrate = pkgs.writeShellScriptBin "maya-migrate" ''
-          export PYTHONPATH="${cf-src}:$PYTHONPATH"
-          cd ${cf-src}
-          exec ${cf-python}/bin/alembic upgrade head
-        '';
-
-        # Single entry point for all commands (useful for Windmill or a single wrapper)
-        maya-all = pkgs.symlinkJoin {
-          name = "maya-all";
-          paths = [ maya-cli maya-publish maya-migrate ];
-        };
-
       in
       {
         packages = {
-          inherit maya-cli maya-publish maya-migrate maya-all maya-package;
-          default = maya-all;
+          inherit maya-package;
+          default = maya-package;
+          # For backward compatibility if anything uses these names
+          maya-cli = maya-package;
+          maya-publish = maya-package;
+          maya-migrate = maya-package;
+          maya-all = maya-package;
         };
 
         devShells.default = pkgs.mkShell {

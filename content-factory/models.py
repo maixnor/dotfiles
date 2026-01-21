@@ -3,11 +3,12 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 import datetime
 import uuid
 import os
+from utils import get_secret
 
 Base = declarative_base()
 
 # Database setup
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://content_factory@localhost:5432/content_factory")
+DATABASE_URL = get_secret("DATABASE_URL", "postgresql://content_factory@localhost:5432/content_factory")
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
