@@ -21,6 +21,47 @@
           pillow
         ]);
 
+        maya-package = pkgs.python3Packages.buildPythonApplication {
+          pname = "maya-content-factory";
+          version = "0.1.0";
+          src = ./.;
+          format = "other"; # It's not a standard setup.py project yet
+
+          propagatedBuildInputs = with pkgs.python3Packages; [
+            alembic
+            sqlalchemy
+            psycopg2
+            beautifulsoup4
+            httpx
+            google-genai
+            pillow
+          ];
+
+          # We just need to wrap the entry points
+          installPhase = ''
+            mkdir -p $out/${pkgs.python3.sitePackages}
+            cp -r . $out/${pkgs.python3.sitePackages}/
+            
+            mkdir -p $out/bin
+            
+            makeWrapper ${cf-python}/bin/python3 $out/bin/maya-cli \
+              --add-flags "$out/${pkgs.python3.sitePackages}/main.py" \
+              --set PYTHONPATH "$out/${pkgs.python3.sitePackages}" \
+              --set MONTSERRAT_FONT "${pkgs.montserrat}/share/fonts/otf/Montserrat-Bold.otf"
+
+            makeWrapper ${cf-python}/bin/python3 $out/bin/maya-publish \
+              --add-flags "$out/${pkgs.python3.sitePackages}/publisher.py" \
+              --set PYTHONPATH "$out/${pkgs.python3.sitePackages}"
+
+            makeWrapper ${cf-python}/bin/alembic $out/bin/maya-migrate \
+              --add-flags "upgrade head" \
+              --set PYTHONPATH "$out/${pkgs.python3.sitePackages}" \
+              --run "cd $out/${pkgs.python3.sitePackages}"
+          '';
+
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+        };
+
         cf-src = ./.;
 
         maya-cli = pkgs.writeShellScriptBin "maya-cli" ''
@@ -59,7 +100,7 @@
       in
       {
         packages = {
-          inherit maya-cli maya-publish maya-migrate maya-all;
+          inherit maya-cli maya-publish maya-migrate maya-all maya-package;
           default = maya-all;
         };
 

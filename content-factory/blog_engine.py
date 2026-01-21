@@ -27,7 +27,7 @@ class MayaBlogEngine:
 
         # 2. Generate Image Context using Headshot as Reference
         # Path relative to the script execution
-        headshot_path = os.path.join(os.path.dirname(__file__), "../persona/maya.png")
+        headshot_path = os.path.join(os.path.dirname(__file__), "persona/maya.png")
         headshot = Image.open(headshot_path)
 
         image_context_prompt = (

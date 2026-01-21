@@ -77,24 +77,25 @@
   age.secrets."content-factory.env" = {
     file = ../secrets/content-factory.env.age;
     owner = "windmill";
-    group = "maixnor";
+    group = "windmill";
+    mode = "0440";
   };
 
   # 6. Windmill Environment Fixes
   systemd.services.windmill-server.serviceConfig = {
-    Environment = [ "PYTHONPATH=${contentFactory.cf-src}" ];
+    Environment = [ "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}" ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
   systemd.services.windmill-worker.serviceConfig = {
     Environment = [ 
-      "PYTHONPATH=${contentFactory.cf-src}"
+      "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
   systemd.services.windmill-worker-native.serviceConfig = {
     Environment = [ 
-      "PYTHONPATH=${contentFactory.cf-src}"
+      "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];

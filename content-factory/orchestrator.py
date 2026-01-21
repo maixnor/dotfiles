@@ -42,7 +42,7 @@ class MayaOrchestrator:
             image_path = os.path.join(asset_dir, f"{topic_group_id}.png")
             
             # Using the headshot for consistency
-            headshot_path = os.path.join(os.path.dirname(__file__), "../persona/maya.png")
+            headshot_path = os.path.join(os.path.dirname(__file__), "persona/maya.png")
             self.image_gen.generate_maya_image(res["image_prompt"], image_path, reference_image_path=headshot_path)
             
             new_item = ContentItem(

@@ -23,7 +23,10 @@ def generate_preview_pack(topic="The secret etiquette of ordering tapas in Sevil
     image_gen = MayaImageGenerator(api_key=api_key)
     
     # Path to Maya's headshot for visual consistency
-    headshot_path = os.path.join(os.path.dirname(__file__), "../persona/maya.png")
+    orc = MayaOrchestrator()
+    headshot_path = os.path.join(os.path.dirname(__file__), "persona/maya.png")
+    
+    print(f"Testing image generation with headshot: {headshot_path}")
 
     print(f"--- GENERATING PREVIEW PACK FOR: {topic} ---")
 
