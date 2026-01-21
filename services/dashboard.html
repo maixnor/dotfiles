@@ -486,28 +486,31 @@
             if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
             
             const logOutput = document.getElementById('log-output');
-
-            // Load initial content first
-            try {
-                const response = await fetch('/update.log?t=' + Date.now());
-                if (response.ok) {
-                    logOutput.textContent = await response.text();
-                    logOutput.scrollTop = logOutput.scrollHeight;
-                }
-            } catch (error) {
-                console.error('Error loading initial logs:', error);
-            }
+            logOutput.textContent = '--- Connecting to real-time log stream... ---\n';
 
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}/ws-logs`;
             
+            const connectionTimeout = setTimeout(() => {
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    logOutput.textContent = '--- Error: Connection to log stream timed out. Retrying... ---\n';
+                }
+            }, 10000);
+
             socket = new WebSocket(wsUrl);
 
             socket.onopen = () => {
+                clearTimeout(connectionTimeout);
                 console.log('Connected to log stream');
+                logOutput.textContent = '--- Stream connected. Waiting for new log lines... ---\n';
             };
 
             socket.onmessage = (event) => {
+                // If it's the first message, we might want to clear the "Waiting" line or just append
+                if (logOutput.textContent.startsWith('--- Stream connected.')) {
+                    logOutput.textContent = '';
+                }
+                
                 // Append all incoming log lines
                 logOutput.textContent += event.data + '\n';
                 // Limit log size to last 2000 lines
@@ -519,13 +522,16 @@
             };
 
             socket.onclose = () => {
+                clearTimeout(connectionTimeout);
                 console.log('Log stream disconnected');
                 socket = null;
                 setTimeout(connectLogs, 5000);
             };
 
             socket.onerror = (error) => {
+                clearTimeout(connectionTimeout);
                 console.error('WebSocket error:', error);
+                logOutput.textContent = '--- Error: Could not connect to log stream. ---\n';
                 socket.close();
             };
         }
