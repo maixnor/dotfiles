@@ -35,6 +35,7 @@ in
             servers:
               - url: "http://127.0.0.1:8091"
   '';
+  };
 
   # Simple HTTP servers for static content
   systemd.services.maixnor-com-server = {
