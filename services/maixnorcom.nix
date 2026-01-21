@@ -11,7 +11,7 @@ in
     http:
       routers:
         maixnor-com:
-          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)"
+          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && !PathPrefix(`/ws-logs`)"
           service: "maixnor-com"
           entryPoints:
             - "websecure"
