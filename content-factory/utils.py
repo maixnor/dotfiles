@@ -2,7 +2,28 @@ import os
 
 def get_secret(env_var, default=None):
     """
-    Simpler version: Secrets are now injected directly into the environment
-    by systemd or the CLI wrapper.
+    Retrieves a secret from environment variables, falling back to 
+    the standard NixOS secret path if not found.
     """
-    return os.getenv(env_var, default)
+    val = os.getenv(env_var)
+    if val:
+        return val
+
+    # Fallback for CLI usage: try to read from the age-encrypted secret path
+    secret_path = "/run/secrets/content-factory.env"
+    if os.path.exists(secret_path):
+        try:
+            with open(secret_path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if "=" in line:
+                        k, v = line.split("=", 1)
+                        if k.strip() == env_var:
+                            # Strip quotes if present
+                            return v.strip().strip('"').strip("'")
+        except Exception:
+            pass # Permissions or other read errors
+            
+    return default

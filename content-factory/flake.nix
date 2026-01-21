@@ -53,14 +53,25 @@
             # This allows the wrappers to find them relative to their location
             cp alembic.ini $out/${python.sitePackages}/
             
-            # Wrap the generated script to include the font path
+            # Helper to source secrets if they exist
+            # Note: we use a string that will be evaluated at runtime on the target system
+            SECRET_LOADER='if [ -f /run/secrets/content-factory.env ]; then set -a; source /run/secrets/content-factory.env; set +a; fi'
+
+            # Wrap the generated script to include the font path and secret loader
             if [ -e $out/bin/maya-cli ]; then
               wrapProgram $out/bin/maya-cli \
+                --run "$SECRET_LOADER" \
                 --set MONTSERRAT_FONT "${pkgs.montserrat}/share/fonts/otf/Montserrat-Bold.otf"
+            fi
+
+            if [ -e $out/bin/maya-publish ]; then
+              wrapProgram $out/bin/maya-publish \
+                --run "$SECRET_LOADER"
             fi
 
             # Create a dedicated migrate command that works from the site-packages dir
             makeWrapper ${pythonPackages.alembic}/bin/alembic $out/bin/maya-migrate \
+              --run "$SECRET_LOADER" \
               --add-flags "upgrade head" \
               --run "cd $out/${python.sitePackages}"
           '';

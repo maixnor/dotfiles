@@ -210,6 +210,7 @@
             overflow-y: auto;
             white-space: pre-wrap;
             line-height: 1.4;
+            scroll-behavior: smooth;
         }
 
         .chevron {
@@ -503,6 +504,7 @@
                 clearTimeout(connectionTimeout);
                 console.log('Connected to log stream');
                 logOutput.textContent = '--- Stream connected. Waiting for new log lines... ---\n';
+                logOutput.scrollTop = logOutput.scrollHeight;
             };
 
             socket.onmessage = (event) => {

@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+from utils import get_secret
 
 # Import your model's MetaData object here
 from models import Base
@@ -19,7 +20,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 def get_url():
-    return os.getenv("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
+    return get_secret("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
