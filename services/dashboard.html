@@ -493,20 +493,25 @@
 
             socket.onopen = () => {
                 console.log('Connected to log stream');
-                if (isUpdating) logOutput.textContent = '--- Connection established, streaming logs ---\n';
+                logOutput.textContent = '--- Connected to real-time log stream ---\n';
             };
 
             socket.onmessage = (event) => {
-                if (!isUpdating) return;
+                // Append all incoming log lines
                 logOutput.textContent += event.data + '\n';
+                // Limit log size to last 1000 lines to prevent browser slowdown
+                const lines = logOutput.textContent.split('\n');
+                if (lines.length > 1000) {
+                    logOutput.textContent = lines.slice(lines.length - 1000).join('\n');
+                }
                 logOutput.scrollTop = logOutput.scrollHeight;
             };
 
             socket.onclose = () => {
                 console.log('Log stream disconnected');
                 socket = null;
-                // Reconnect if still updating
-                if (isUpdating) setTimeout(connectLogs, 2000);
+                // Always try to reconnect
+                setTimeout(connectLogs, 5000);
             };
 
             socket.onerror = (error) => {
@@ -525,15 +530,7 @@
                 document.getElementById('commit-msg').textContent = data.commit_msg.split('\n')[0];
                 document.getElementById('last-check').textContent = new Date(data.timestamp).toLocaleString();
                 
-                const wasUpdating = isUpdating;
                 isUpdating = data.is_updating;
-                
-                if (!isUpdating) {
-                    document.getElementById('log-output').textContent = data.last_log;
-                    if (socket) socket.close();
-                } else {
-                    connectLogs();
-                }
 
                 const banner = document.getElementById('update-banner');
                 if (isUpdating) {
@@ -589,6 +586,7 @@
         cards.forEach(card => checkHealth(card));
         
         fetchStatus();
+        connectLogs();
         setInterval(fetchStatus, 30000);
         
         setInterval(() => {
