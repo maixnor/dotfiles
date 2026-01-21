@@ -31,9 +31,13 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    content-factory = {
+      url = "path:./content-factory";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-generators, agenix, ... } @inputs :
+  outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
@@ -104,6 +108,7 @@
         default = nixvim;
         nixvim = nixvim;
         wieselburg-vm-test = inputs.self.nixosConfigurations.wieselburg-vm-test.config.system.build.vm;
+        content-factory = inputs.content-factory.packages.${system}.maya-all;
       };
 
       apps.x86_64-linux = {
