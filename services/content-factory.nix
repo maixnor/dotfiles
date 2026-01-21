@@ -90,27 +90,31 @@
   # Create a python environment with the maya package included
   # This is the "clean" way: Windmill will see these as pre-installed system packages
   systemd.services.windmill-worker.serviceConfig = let
-    mayaPython = pkgs.python3.withPackages (ps: [ 
-      contentFactory.maya-package 
+    py3 = pkgs.python312;
+    maya-pkg = contentFactory.maya-package.override { python3 = py3; python3Packages = py3.pkgs; };
+    mayaPython = py3.withPackages (ps: [ 
+      maya-pkg
       ps.psycopg2
     ]);
   in {
     Environment = [ 
-      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ pkgs.python3 ]}"
-      "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 ]}"
+      "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
 
   systemd.services.windmill-worker-native.serviceConfig = let
-    mayaPython = pkgs.python3.withPackages (ps: [ 
-      contentFactory.maya-package 
+    py3 = pkgs.python312;
+    maya-pkg = contentFactory.maya-package.override { python3 = py3; python3Packages = py3.pkgs; };
+    mayaPython = py3.withPackages (ps: [ 
+      maya-pkg
     ]);
   in {
     Environment = [ 
-      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ pkgs.python3 ]}"
-      "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 ]}"
+      "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
