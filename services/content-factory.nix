@@ -98,7 +98,7 @@
     ]);
   in {
     Environment = [ 
-      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 ]}"
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 pkgs.curl pkgs.jq ]}"
       "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
@@ -113,7 +113,7 @@
     ]);
   in {
     Environment = [ 
-      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 ]}"
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 pkgs.curl pkgs.jq ]}"
       "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"
       "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
