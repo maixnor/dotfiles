@@ -17,6 +17,13 @@ in
             - "websecure"
           tls:
             certResolver: "letsencrypt"
+        maixnor-com-ws:
+          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && Path(`/ws-logs`)"
+          service: "maixnor-com-ws"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
         static-maixnor-com:
           rule: "Host(`static.maixnor.com`)"
           service: "static-maixnor-com"
@@ -30,6 +37,10 @@ in
           loadBalancer:
             servers:
               - url: "http://127.0.0.1:8090"
+        maixnor-com-ws:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8092"
         static-maixnor-com:
           loadBalancer:
             servers:
@@ -45,8 +56,20 @@ in
     serviceConfig = {
       ExecStart = "${pkgs.python3}/bin/python -m http.server 8090 --directory /var/www/maixnor.com";
       Restart = "always";
-      User = "maixnor"; # Changed to maixnor to have access to logs/files if needed, or just stay as nobody but ensure file permissions
+      User = "maixnor";
       Group = "users";
+    };
+  };
+
+  systemd.services.maixnor-logs-ws = {
+    description = "WebSocket log streamer for maixnor.com";
+    after = [ "network.target" ];
+    wantedBy = [ "default.target" ];
+    path = with pkgs; [ websocketd systemd coreutils ];
+    serviceConfig = {
+      ExecStart = "${pkgs.websocketd}/bin/websocketd --port=8092 --address=127.0.0.1 ${pkgs.systemd}/bin/journalctl -u autoupdate.service -f -n 100";
+      Restart = "always";
+      User = "root"; # Needs root to read journal
     };
   };
 

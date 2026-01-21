@@ -480,21 +480,39 @@
         }
 
         let isUpdating = false;
+        let socket = null;
 
-        async function fetchLiveLog() {
-            if (!isUpdating) return;
-            try {
-                const response = await fetch('/update.log?t=' + Date.now());
-                if (response.ok) {
-                    const text = await response.text();
-                    const logOutput = document.getElementById('log-output');
-                    logOutput.textContent = text;
-                    // Auto-scroll to bottom
-                    logOutput.scrollTop = logOutput.scrollHeight;
-                }
-            } catch (error) {
-                console.error('Error fetching live log:', error);
-            }
+        function connectLogs() {
+            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
+            
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws-logs`;
+            
+            socket = new WebSocket(wsUrl);
+            const logOutput = document.getElementById('log-output');
+
+            socket.onopen = () => {
+                console.log('Connected to log stream');
+                if (isUpdating) logOutput.textContent = '--- Connection established, streaming logs ---\n';
+            };
+
+            socket.onmessage = (event) => {
+                if (!isUpdating) return;
+                logOutput.textContent += event.data + '\n';
+                logOutput.scrollTop = logOutput.scrollHeight;
+            };
+
+            socket.onclose = () => {
+                console.log('Log stream disconnected');
+                socket = null;
+                // Reconnect if still updating
+                if (isUpdating) setTimeout(connectLogs, 2000);
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                socket.close();
+            };
         }
 
         async function fetchStatus() {
@@ -507,9 +525,14 @@
                 document.getElementById('commit-msg').textContent = data.commit_msg.split('\n')[0];
                 document.getElementById('last-check').textContent = new Date(data.timestamp).toLocaleString();
                 
+                const wasUpdating = isUpdating;
                 isUpdating = data.is_updating;
+                
                 if (!isUpdating) {
                     document.getElementById('log-output').textContent = data.last_log;
+                    if (socket) socket.close();
+                } else {
+                    connectLogs();
                 }
 
                 const banner = document.getElementById('update-banner');
@@ -567,7 +590,6 @@
         
         fetchStatus();
         setInterval(fetchStatus, 30000);
-        setInterval(fetchLiveLog, 1000);
         
         setInterval(() => {
             cards.forEach(card => checkHealth(card));
