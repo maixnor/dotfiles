@@ -18,7 +18,8 @@ in
           tls:
             certResolver: "letsencrypt"
         maixnor-com-ws:
-          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && Path(`/ws-logs`)"
+          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && PathPrefix(`/ws-logs`)"
+          priority: 100
           service: "maixnor-com-ws"
           entryPoints:
             - "websecure"
