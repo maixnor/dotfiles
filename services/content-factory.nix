@@ -86,17 +86,32 @@
     Environment = [ "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}" ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
-  systemd.services.windmill-worker.serviceConfig = {
+
+  # Create a python environment with the maya package included
+  # This is the "clean" way: Windmill will see these as pre-installed system packages
+  systemd.services.windmill-worker.serviceConfig = let
+    mayaPython = pkgs.python3.withPackages (ps: [ 
+      contentFactory.maya-package 
+      ps.psycopg2
+    ]);
+  in {
     Environment = [ 
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ pkgs.python3 ]}"
       "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
-      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
-  systemd.services.windmill-worker-native.serviceConfig = {
+
+  systemd.services.windmill-worker-native.serviceConfig = let
+    mayaPython = pkgs.python3.withPackages (ps: [ 
+      contentFactory.maya-package 
+    ]);
+  in {
     Environment = [ 
+      "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ pkgs.python3 ]}"
       "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}"
-      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher"
+      "WM_PYTHON_SKIP_RESOLVE=windmill_scripts,orchestrator,publisher,models,blog_engine,image_gen,persona,researcher,main,utils,scraper,ai_transformer,approval_flow,approval_logic,image_generator,list_models,windmill_trigger"
     ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
