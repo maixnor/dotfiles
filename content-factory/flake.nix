@@ -70,8 +70,10 @@
             fi
 
             # Create a dedicated migrate command that works from the site-packages dir
-            makeWrapper ${pythonPackages.alembic}/bin/alembic $out/bin/maya-migrate \
+            # We use the python environment that has all dependencies
+            makeWrapper ${cf-python}/bin/alembic $out/bin/maya-migrate \
               --run "$SECRET_LOADER" \
+              --prefix PYTHONPATH : "$out/${python.sitePackages}" \
               --add-flags "upgrade head" \
               --run "cd $out/${python.sitePackages}"
           '';
