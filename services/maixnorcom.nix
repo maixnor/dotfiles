@@ -1,13 +1,17 @@
 
-{ pkgs, ... }:
+{ pkgs, config, lib, ... }:
 
+let
+  cfg = config.services.traefik;
+in
 {
-  # Create Traefik configuration file for maixnor.com sites
-  environment.etc."traefik/maixnorcom.yml".text = ''
+  # Create Traefik configuration file for maixnor.com sites if traefik is enabled
+  environment.etc."traefik/maixnorcom.yml" = lib.mkIf cfg.enable {
+    text = ''
     http:
       routers:
         maixnor-com:
-          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`)"
+          rule: "Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)"
           service: "maixnor-com"
           entryPoints:
             - "websecure"
@@ -40,8 +44,69 @@
     serviceConfig = {
       ExecStart = "${pkgs.python3}/bin/python -m http.server 8090 --directory /var/www/maixnor.com";
       Restart = "always";
-      User = "nobody";
-      Group = "nogroup";
+      User = "maixnor"; # Changed to maixnor to have access to logs/files if needed, or just stay as nobody but ensure file permissions
+      Group = "users";
+    };
+  };
+
+  systemd.services.maixnor-status-gen = {
+    description = "Generate status.json for maixnor.com dashboard";
+    after = [ "network.target" ];
+    path = with pkgs; [ systemd git jq coreutils gnugrep bash ];
+    script = ''
+      set -euo pipefail
+      
+      # Ensure directory exists
+      mkdir -p /var/www/maixnor.com
+      
+      IS_UPDATING=$(systemctl is-active autoupdate.service || echo "inactive")
+      # Get the last successful or failed update logs
+      LAST_LOG=$(journalctl -u autoupdate.service -n 100 --no-pager || echo "No logs found")
+      
+      # Use the current repo path
+      REPO_PATH="/home/maixnor/repo/dotfiles"
+      if [ -d "$REPO_PATH/.git" ]; then
+        COMMIT_HASH=$(git -C "$REPO_PATH" rev-parse HEAD || echo "unknown")
+        COMMIT_MSG=$(git -C "$REPO_PATH" log -1 --pretty=%B || echo "unknown")
+      else
+        COMMIT_HASH="not-a-repo"
+        COMMIT_MSG="not-a-repo"
+      fi
+
+      # Use a temporary file to avoid partial reads
+      TMP_FILE=$(mktemp)
+      
+      jq -n \
+        --arg updating "$IS_UPDATING" \
+        --arg log "$LAST_LOG" \
+        --arg hash "$COMMIT_HASH" \
+        --arg msg "$COMMIT_MSG" \
+        --arg host "$(hostname)" \
+        --arg time "$(date -Iseconds)" \
+        '{
+          is_updating: ($updating == "active"),
+          last_log: $log,
+          commit_hash: $hash,
+          commit_msg: $msg,
+          hostname: $host,
+          timestamp: $time
+        }' > "$TMP_FILE"
+      
+      mv "$TMP_FILE" /var/www/maixnor.com/status.json
+      chmod 644 /var/www/maixnor.com/status.json
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root"; # Needs root to read journal for autoupdate.service if not in systemd-journal group
+    };
+  };
+
+  systemd.timers.maixnor-status-gen = {
+    description = "Timer for maixnor-status-gen";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "1min";
+      OnUnitActiveSec = "1min";
     };
   };
 
@@ -61,6 +126,6 @@
   systemd.tmpfiles.rules = [
     "d /var/www/maixnor.com 0755 nobody nogroup -"
     "d /var/www/static 0755 nobody nogroup -"
-    "L+ /var/www/maixnor.com/index.html - nobody nogroup - ${../wieselburg/index.html}"
+    "L+ /var/www/maixnor.com/index.html - nobody nogroup - ${./dashboard.html}"
   ];
 }
