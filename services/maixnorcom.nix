@@ -65,11 +65,12 @@ in
     description = "WebSocket log streamer for maixnor.com";
     after = [ "network.target" ];
     wantedBy = [ "default.target" ];
-    path = with pkgs; [ websocketd systemd coreutils ];
+    path = with pkgs; [ websocketd coreutils ];
     serviceConfig = {
-      ExecStart = "${pkgs.websocketd}/bin/websocketd --port=8092 --address=127.0.0.1 ${pkgs.systemd}/bin/journalctl -u autoupdate.service -f -n 100";
+      ExecStart = "${pkgs.websocketd}/bin/websocketd --port=8092 --address=127.0.0.1 ${pkgs.coreutils}/bin/tail -f -n 100 /var/www/maixnor.com/update.log";
       Restart = "always";
-      User = "root"; # Needs root to read journal
+      User = "maixnor";
+      Group = "users";
     };
   };
 
@@ -80,12 +81,12 @@ in
     script = ''
       set -euo pipefail
       
-      # Ensure directory exists
+      # Ensure directory and log file exist
       mkdir -p /var/www/maixnor.com
+      touch /var/www/maixnor.com/update.log
+      chmod 644 /var/www/maixnor.com/update.log
       
       IS_UPDATING=$(systemctl is-active autoupdate.service || echo "inactive")
-      # Get the last successful or failed update logs
-      LAST_LOG=$(journalctl -u autoupdate.service -n 100 --no-pager || echo "No logs found")
       
       # Use the current repo path
       REPO_PATH="/home/maixnor/repo/dotfiles"
@@ -102,14 +103,12 @@ in
       
       jq -n \
         --arg updating "$IS_UPDATING" \
-        --arg log "$LAST_LOG" \
         --arg hash "$COMMIT_HASH" \
         --arg msg "$COMMIT_MSG" \
         --arg host "$(hostname)" \
         --arg time "$(date -Iseconds)" \
         '{
           is_updating: ($updating == "active"),
-          last_log: $log,
           commit_hash: $hash,
           commit_msg: $msg,
           hostname: $host,

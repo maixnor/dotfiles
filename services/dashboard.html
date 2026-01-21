@@ -482,27 +482,38 @@
         let isUpdating = false;
         let socket = null;
 
-        function connectLogs() {
+        async function connectLogs() {
             if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
             
+            const logOutput = document.getElementById('log-output');
+
+            // Load initial content first
+            try {
+                const response = await fetch('/update.log?t=' + Date.now());
+                if (response.ok) {
+                    logOutput.textContent = await response.text();
+                    logOutput.scrollTop = logOutput.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error loading initial logs:', error);
+            }
+
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}/ws-logs`;
             
             socket = new WebSocket(wsUrl);
-            const logOutput = document.getElementById('log-output');
 
             socket.onopen = () => {
                 console.log('Connected to log stream');
-                logOutput.textContent = '--- Connected to real-time log stream ---\n';
             };
 
             socket.onmessage = (event) => {
                 // Append all incoming log lines
                 logOutput.textContent += event.data + '\n';
-                // Limit log size to last 1000 lines to prevent browser slowdown
+                // Limit log size to last 2000 lines
                 const lines = logOutput.textContent.split('\n');
-                if (lines.length > 1000) {
-                    logOutput.textContent = lines.slice(lines.length - 1000).join('\n');
+                if (lines.length > 2000) {
+                    logOutput.textContent = lines.slice(lines.length - 2000).join('\n');
                 }
                 logOutput.scrollTop = logOutput.scrollHeight;
             };
@@ -510,7 +521,6 @@
             socket.onclose = () => {
                 console.log('Log stream disconnected');
                 socket = null;
-                // Always try to reconnect
                 setTimeout(connectLogs, 5000);
             };
 
