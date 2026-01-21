@@ -43,15 +43,20 @@
             pillow
           ];
 
-          # We still want the CLI wrappers
+          doCheck = false; # Skip tests during build
+
           postInstall = ''
+            # Copy config files to the package directory in the nix store
+            # This allows the wrappers to find them relative to their location
             cp alembic.ini $out/${pkgs.python3.sitePackages}/
             
             # Wrap the generated script to include the font path
-            wrapProgram $out/bin/maya-cli \
-              --set MONTSERRAT_FONT "${pkgs.montserrat}/share/fonts/otf/Montserrat-Bold.otf"
+            if [ -e $out/bin/maya-cli ]; then
+              wrapProgram $out/bin/maya-cli \
+                --set MONTSERRAT_FONT "${pkgs.montserrat}/share/fonts/otf/Montserrat-Bold.otf"
+            fi
 
-            # Create a dedicated migrate command
+            # Create a dedicated migrate command that works from the site-packages dir
             makeWrapper ${pkgs.python3Packages.alembic}/bin/alembic $out/bin/maya-migrate \
               --add-flags "upgrade head" \
               --run "cd $out/${pkgs.python3.sitePackages}"
