@@ -21,6 +21,8 @@ in
           rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && PathPrefix(`/ws-logs`)"
           priority: 100
           service: "maixnor-com-ws"
+          middlewares:
+            - "ws-strip-prefix"
           entryPoints:
             - "websecure"
           tls:
@@ -32,6 +34,12 @@ in
             - "websecure"
           tls:
             certResolver: "letsencrypt"
+
+      middlewares:
+        ws-strip-prefix:
+          stripPrefix:
+            prefixes:
+              - "/ws-logs"
 
       services:
         maixnor-com:
