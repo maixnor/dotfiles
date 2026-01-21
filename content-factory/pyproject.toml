@@ -14,3 +14,40 @@ dependencies = [
     "google-genai",
     "pillow",
 ]
+
+[tool.setuptools]
+packages = ["persona", "migrations", "migrations.versions"]
+py-modules = [
+    "ai_transformer",
+    "approval_flow",
+    "approval_logic",
+    "blog_engine",
+    "image_gen",
+    "image_generator",
+    "list_models",
+    "main",
+    "models",
+    "orchestrator",
+    "publisher",
+    "researcher",
+    "scraper",
+    "utils",
+    "windmill_scripts",
+    "windmill_trigger",
+]
+
+[tool.setuptools.package-data]
+
+persona = ["*.png", "*.md"]
+
+migrations = ["*.mako", "README"]
+
+"migrations.versions" = ["*.py"]
+
+
+
+[project.scripts]
+
+maya-cli = "main:main"
+
+maya-publish = "publisher:main"

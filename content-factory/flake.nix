@@ -45,16 +45,14 @@
 
           # We still want the CLI wrappers
           postInstall = ''
-            mkdir -p $out/bin
+            cp alembic.ini $out/${pkgs.python3.sitePackages}/
             
-            makeWrapper ${cf-python}/bin/python3 $out/bin/maya-cli \
-              --add-flags "$out/${pkgs.python3.sitePackages}/main.py" \
+            # Wrap the generated script to include the font path
+            wrapProgram $out/bin/maya-cli \
               --set MONTSERRAT_FONT "${pkgs.montserrat}/share/fonts/otf/Montserrat-Bold.otf"
 
-            makeWrapper ${cf-python}/bin/python3 $out/bin/maya-publish \
-              --add-flags "$out/${pkgs.python3.sitePackages}/publisher.py"
-
-            makeWrapper ${cf-python}/bin/alembic $out/bin/maya-migrate \
+            # Create a dedicated migrate command
+            makeWrapper ${pkgs.python3Packages.alembic}/bin/alembic $out/bin/maya-migrate \
               --add-flags "upgrade head" \
               --run "cd $out/${pkgs.python3.sitePackages}"
           '';
