@@ -83,7 +83,7 @@
 
   # 6. Windmill Environment Fixes
   systemd.services.windmill-server.serviceConfig = {
-    Environment = [ "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python3.sitePackages}" ];
+    Environment = [ "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python312.sitePackages}" ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
 
@@ -91,7 +91,7 @@
   # This is the "clean" way: Windmill will see these as pre-installed system packages
   systemd.services.windmill-worker.serviceConfig = let
     py3 = pkgs.python312;
-    maya-pkg = contentFactory.maya-package.override { python3 = py3; python3Packages = py3.pkgs; };
+    maya-pkg = contentFactory.maya-package;
     mayaPython = py3.withPackages (ps: [ 
       maya-pkg
       ps.psycopg2
@@ -107,7 +107,7 @@
 
   systemd.services.windmill-worker-native.serviceConfig = let
     py3 = pkgs.python312;
-    maya-pkg = contentFactory.maya-package.override { python3 = py3; python3Packages = py3.pkgs; };
+    maya-pkg = contentFactory.maya-package;
     mayaPython = py3.withPackages (ps: [ 
       maya-pkg
     ]);

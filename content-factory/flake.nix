@@ -10,8 +10,10 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        python = pkgs.python312;
+        pythonPackages = pkgs.python312Packages;
 
-        cf-python = pkgs.python3.withPackages (ps: with ps; [
+        cf-python = python.withPackages (ps: with ps; [
           alembic
           sqlalchemy
           psycopg2
@@ -21,19 +23,19 @@
           pillow
         ]);
 
-        maya-package = pkgs.python3Packages.buildPythonPackage {
+        maya-package = pythonPackages.buildPythonPackage {
           pname = "maya-content-factory";
           version = "0.1.0";
           src = ./.;
           pyproject = true;
 
           nativeBuildInputs = [
-            pkgs.python3Packages.setuptools
-            pkgs.python3Packages.wheel
+            pythonPackages.setuptools
+            pythonPackages.wheel
             pkgs.makeWrapper
           ];
 
-          propagatedBuildInputs = with pkgs.python3Packages; [
+          propagatedBuildInputs = with pythonPackages; [
             alembic
             sqlalchemy
             psycopg2
@@ -45,10 +47,11 @@
 
           doCheck = false; # Skip tests during build
 
+          # We still want the CLI wrappers
           postInstall = ''
             # Copy config files to the package directory in the nix store
             # This allows the wrappers to find them relative to their location
-            cp alembic.ini $out/${pkgs.python3.sitePackages}/
+            cp alembic.ini $out/${python.sitePackages}/
             
             # Wrap the generated script to include the font path
             if [ -e $out/bin/maya-cli ]; then
@@ -57,9 +60,9 @@
             fi
 
             # Create a dedicated migrate command that works from the site-packages dir
-            makeWrapper ${pkgs.python3Packages.alembic}/bin/alembic $out/bin/maya-migrate \
+            makeWrapper ${pythonPackages.alembic}/bin/alembic $out/bin/maya-migrate \
               --add-flags "upgrade head" \
-              --run "cd $out/${pkgs.python3.sitePackages}"
+              --run "cd $out/${python.sitePackages}"
           '';
         };
 
