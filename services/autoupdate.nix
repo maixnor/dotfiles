@@ -79,7 +79,7 @@ in
             git pull origin main
             just ${config.networking.hostName}
           fi
-        ''} 2>&1 | tee /var/www/maixnor.com/update.log''';
+        ''} 2>&1 | tee /var/www/maixnor.com/update.log'";
       };
     };
 
