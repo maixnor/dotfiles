@@ -438,7 +438,7 @@
         </a>
 
         <!-- Prometheus -->
-        <a href="https://prometheus.maixnor.com" class="card" data-url="https://prometheus.maixnor.com">
+        <a href="https://grafana.maixnor.com" class="card" data-url="https://prometheus.maixnor.com">
             <div class="card-header">
                 <span class="card-title">Prometheus</span>
                 <div class="status-badge status-pending">
@@ -447,11 +447,11 @@
                 </div>
             </div>
             <p class="card-description">Time-series database and monitoring system for real-time alerting.</p>
-            <div class="card-footer">Query Data →</div>
+            <div class="card-footer">Explore in Grafana →</div>
         </a>
 
         <!-- Loki -->
-        <a href="https://loki.maixnor.com" class="card" data-url="https://loki.maixnor.com">
+        <a href="https://grafana.maixnor.com" class="card" data-url="https://loki.maixnor.com">
             <div class="card-header">
                 <span class="card-title">Loki</span>
                 <div class="status-badge status-pending">
@@ -460,7 +460,7 @@
                 </div>
             </div>
             <p class="card-description">Log aggregation system inspired by Prometheus. High efficiency logging.</p>
-            <div class="card-footer">Search Logs →</div>
+            <div class="card-footer">Explore in Grafana →</div>
         </a>
     </div>
 
@@ -479,6 +479,24 @@
             chevron.classList.toggle('active');
         }
 
+        let isUpdating = false;
+
+        async function fetchLiveLog() {
+            if (!isUpdating) return;
+            try {
+                const response = await fetch('/update.log?t=' + Date.now());
+                if (response.ok) {
+                    const text = await response.text();
+                    const logOutput = document.getElementById('log-output');
+                    logOutput.textContent = text;
+                    // Auto-scroll to bottom
+                    logOutput.scrollTop = logOutput.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error fetching live log:', error);
+            }
+        }
+
         async function fetchStatus() {
             try {
                 const response = await fetch('/status.json?t=' + Date.now());
@@ -488,10 +506,14 @@
                 document.getElementById('commit-hash').textContent = data.commit_hash.substring(0, 7);
                 document.getElementById('commit-msg').textContent = data.commit_msg.split('\n')[0];
                 document.getElementById('last-check').textContent = new Date(data.timestamp).toLocaleString();
-                document.getElementById('log-output').textContent = data.last_log;
+                
+                isUpdating = data.is_updating;
+                if (!isUpdating) {
+                    document.getElementById('log-output').textContent = data.last_log;
+                }
 
                 const banner = document.getElementById('update-banner');
-                if (data.is_updating) {
+                if (isUpdating) {
                     banner.classList.add('active');
                 } else {
                     banner.classList.remove('active');
@@ -545,6 +567,7 @@
         
         fetchStatus();
         setInterval(fetchStatus, 30000);
+        setInterval(fetchLiveLog, 1000);
         
         setInterval(() => {
             cards.forEach(card => checkHealth(card));

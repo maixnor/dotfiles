@@ -46,7 +46,7 @@ in
         Nice = 19;
         CPUSchedulingPolicy = "idle";
         IOSchedulingClass = "idle";
-        ExecStart = pkgs.writeShellScript "autoupdate.sh" ''
+        ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.writeShellScript "autoupdate.sh" ''
           # Load the global profile to get a standard environment (PATH, etc.)
           if [ -f /etc/profile ]; then
             . /etc/profile
@@ -79,7 +79,7 @@ in
             git pull origin main
             just ${config.networking.hostName}
           fi
-        '';
+        ''} 2>&1 | tee /var/www/maixnor.com/update.log''';
       };
     };
 
