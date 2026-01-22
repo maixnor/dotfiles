@@ -74,11 +74,21 @@
     };
   };
 
+  # 3c. Poke a hole in Nginx's hardening to allow it to read the assets
+  systemd.services.nginx.serviceConfig = {
+    SupplementaryGroups = [ "windmill" ];
+    ReadWritePaths = [ "/var/lib/content-factory/assets" ];
+  };
+
   # 4. Content Factory Environment Setup
   system.activationScripts.content-factory-setup = ''
     mkdir -p /var/lib/content-factory/assets
+    # Ensure windmill user/group owns everything
     chown -R windmill:windmill /var/lib/content-factory
+    # Ensure group (including nginx) can read and enter directories
     chmod -R 770 /var/lib/content-factory
+    # Ensure newly created files in assets inherit the group
+    chmod g+s /var/lib/content-factory/assets
   '';
 
   # Ensure the windmill group exists and maixnor is a member
