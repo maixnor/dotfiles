@@ -11,16 +11,19 @@ in
     http:
       routers:
         maixnor-com:
-          rule: "Host(`maixnor.com`, `wieselburg.maixnor.com`, `wb.maixnor.com`)"
+          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && !Path(`/ws-logs`)"
+          priority: 10
           service: "maixnor-com"
           entryPoints:
             - "websecure"
           tls:
             certResolver: "letsencrypt"
-        maixnor-ws:
-          rule: "Host(`ws.maixnor.com`)"
-          priority: 1000
+        maixnor-com-ws:
+          rule: "(Host(`maixnor.com`) || Host(`wieselburg.maixnor.com`) || Host(`wb.maixnor.com`)) && Path(`/ws-logs`)"
+          priority: 2000
           service: "maixnor-com-ws"
+          middlewares:
+            - "ws-strip-prefix"
           entryPoints:
             - "websecure"
           tls:
@@ -37,7 +40,7 @@ in
         ws-strip-prefix:
           stripPrefix:
             prefixes:
-              - "/"
+              - "/ws-logs"
 
       services:
         maixnor-com:
