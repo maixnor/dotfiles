@@ -15,6 +15,30 @@ class MayaOrchestrator:
         self.image_gen = MayaImageGenerator()
         self.researcher = BlogResearcher()
 
+    def discovery_phase(self, subreddits=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], rss_feeds=["https://www.bbc.co.uk/learningenglish/english/features/6-minute-english/rss", "https://learningenglish.voanews.com/api/zmgq_v_mpy"]):
+        """Phase 1b: Scrape communities and generate lead-gen topics."""
+        from scraper import scrape_reddit_hot, scrape_news_rss
+        
+        print(f"Scouring {len(subreddits)} subreddits and {len(rss_feeds)} RSS feeds for problems...")
+        all_posts = []
+        for sub in subreddits:
+            all_posts.extend(scrape_reddit_hot(sub))
+        
+        for feed in rss_feeds:
+            all_posts.extend(scrape_news_rss(feed))
+            
+        if not all_posts:
+            print("No new community data found.")
+            return []
+            
+        topics = self.researcher.analyze_community_problems(all_posts)
+        for t in topics:
+            idea = TopicIdea(topic=t, status='suggested', source="discovery")
+            self.session.add(idea)
+        
+        self.session.commit()
+        return topics
+
     def step1_morning_brainstorm(self, count=10):
         """Phase 1: Generate 10 ideas and save to topic_ideas table."""
         print(f"Brainstorming {count} topics...")

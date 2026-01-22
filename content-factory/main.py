@@ -5,8 +5,9 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "draft", "approve", "publish", "list-ideas", "scrape"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "scrape"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
+    parser.add_argument("--subreddits", nargs="+", default=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], help="Subreddits to scour")
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
     parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate")
     parser.add_argument("--url", type=str, help="URL to scrape")
@@ -24,6 +25,10 @@ def main():
     elif args.command == "brainstorm":
         orc.step1_morning_brainstorm(count=args.count)
         print("Brainstorming complete.")
+
+    elif args.command == "discovery":
+        orc.discovery_phase(subreddits=args.subreddits)
+        print("Community discovery complete. Check 'list-ideas' for new lead-gen topics.")
 
     elif args.command == "list-ideas":
         from models import TopicIdea

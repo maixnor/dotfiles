@@ -1,75 +1,52 @@
 import httpx
 from bs4 import BeautifulSoup
-import os
-import sys
-from models import ContentItem, TopicIdea, Session
-from utils import get_secret
+from models import TopicIdea, Session
+import xml.etree.ElementTree as ET
 
-def scrape_article(url):
+def scrape_reddit_hot(subreddit="languagelearning"):
     """
-    Generic scraper that attempts to extract title and body from a language blog.
+    Fetches hot topics from a subreddit to find real user pain points.
     """
-    print(f"Scraping {url}...")
+    url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=15"
+    headers = {"User-Agent": "MayaContentFactory/0.1 (LeadGen Engine)"}
     
-    try:
-        response = httpx.get(url, follow_redirects=True, timeout=10.0)
-        response.raise_for_status()
-    except Exception as e:
-        print(f"Error fetching {url}: {e}")
-        return None
+    with httpx.Client(follow_redirects=True) as client:
+        try:
+            resp = client.get(url, headers=headers)
+            if resp.status_code != 200:
+                return []
+            
+            data = resp.json()
+            posts = []
+            for post in data['data']['children']:
+                p = post['data']
+                if p['is_self']: # Text posts are best for finding problems
+                    posts.append({
+                        "title": p['title'],
+                        "content": p['selftext'][:1000],
+                        "source": f"reddit:r/{subreddit}"
+                    })
+            return posts
+        except Exception as e:
+            print(f"Reddit scrape failed: {e}")
+            return []
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # Attempt to find title
-    title = soup.find('h1').text.strip() if soup.find('h1') else "No Title Found"
-    
-    # Attempt to find main content (heuristics for common blogs)
-    # We look for <article>, <main>, or large <div> blocks
-    content_area = soup.find('article') or soup.find('main') or soup.find('div', class_='entry-content')
-    
-    if not content_area:
-        # Fallback to body
-        content_area = soup.find('body')
-
-    # Strip scripts and styles
-    for script in content_area(["script", "style"]):
-        script.extract()
-
-    body_text = content_area.get_text(separator='\n').strip()
-    
-    return {
-        "title": title,
-        "body": body_text,
-        "source_url": url
-    }
-
-def process_url(url):
+def scrape_news_rss(url):
     """
-    Checks for duplicates and saves to topic_ideas.
+    Fetches news from RSS feeds (BBC Languages, etc.)
     """
-    session = Session()
-    
-    # Check for duplicates
-    existing = session.query(TopicIdea).filter(TopicIdea.source == url).first()
-    if existing:
-        print(f"URL already processed: {url}")
-        return
-    
-    result = scrape_article(url)
-    if result:
-        new_idea = TopicIdea(
-            topic=result["title"],
-            source=url,
-            status='suggested'
-        )
-        session.add(new_idea)
-        session.commit()
-        print(f"Successfully added idea: {result['title']}")
-    
-    session.close()
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: maya-cli scrape <url>")
-    else:
-        process_url(sys.argv[1])
+    with httpx.Client() as client:
+        try:
+            resp = client.get(url)
+            root = ET.fromstring(resp.content)
+            news = []
+            for item in root.findall('.//item'):
+                news.append({
+                    "title": item.find('title').text,
+                    "content": item.find('description').text if item.find('description') is not None else "",
+                    "source": f"rss:{url}"
+                })
+            return news
+        except Exception as e:
+            print(f"RSS scrape failed: {e}")
+            return []
