@@ -42,6 +42,27 @@ def get_content_items(status="draft_en"):
         } for i in items
     ]
 
+def get_scheduled_queue():
+    """
+    Returns the queue of items scheduled for publishing, sorted by date.
+    """
+    orc = MayaOrchestrator()
+    items = orc.session.query(ContentItem).filter(
+        ContentItem.status == 'scheduled'
+    ).order_by(ContentItem.scheduled_at.asc()).all()
+    
+    return [
+        {
+            "id": i.id,
+            "topic_group_id": str(i.topic_group_id),
+            "base_topic": i.base_topic,
+            "target_language": i.target_language,
+            "headline": i.headline,
+            "scheduled_at": i.scheduled_at.isoformat() if i.scheduled_at else None,
+            "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
+        } for i in items
+    ]
+
 def get_preview(topic_group_id: str):
     """
     Returns a full preview of the English version for a specific group.

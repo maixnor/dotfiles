@@ -6,7 +6,7 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "disapprove", "publish", "list-ideas", "list-content", "get-preview", "scrape", "cleanup"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "disapprove", "publish", "list-ideas", "list-content", "list-queue", "get-preview", "scrape", "cleanup"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
     parser.add_argument("--status", type=str, default="draft_en", help="Status to filter content items")
     parser.add_argument("--subreddits", nargs="+", default=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], help="Subreddits to scour")
@@ -67,6 +67,16 @@ def main():
             print(f"\n--- Content Items ({args.status}) ---")
             for i in data:
                 print(f"[{i['id']}] {i['headline']} (Group: {i['topic_group_id']})")
+
+    elif args.command == "list-queue":
+        from windmill_scripts import get_scheduled_queue
+        data = get_scheduled_queue()
+        if args.json:
+            print(json.dumps(data))
+        else:
+            print("\n--- Scheduled Queue (Upcoming First) ---")
+            for i in data:
+                print(f"[{i['scheduled_at']}] {i['target_language']}: {i['headline']} (ID: {i['id']})")
 
     elif args.command == "get-preview":
         if not args.group:
