@@ -51,6 +51,7 @@ class MayaOrchestrator:
 
     def step2_draft_selected_en(self, idea_ids):
         """Phase 2: Generate English draft + Thumbnail for selected ideas."""
+        created_groups = []
         for idea_id in idea_ids:
             idea = self.session.query(TopicIdea).get(idea_id)
             if not idea or idea.status != 'suggested':
@@ -80,8 +81,10 @@ class MayaOrchestrator:
             )
             idea.status = 'drafted'
             self.session.add(new_item)
+            created_groups.append(str(topic_group_id))
         
         self.session.commit()
+        return created_groups
 
     def step3_expand_approved_translations(self, topic_group_id):
         """Phase 3: Once English is approved, generate the other 3 languages."""

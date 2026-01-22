@@ -1,5 +1,6 @@
 import sys
 import argparse
+import json
 from orchestrator import MayaOrchestrator
 from publisher import publish_due_items
 
@@ -11,6 +12,7 @@ def main():
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
     parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate")
     parser.add_argument("--url", type=str, help="URL to scrape")
+    parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     
     args = parser.parse_args()
     orc = MayaOrchestrator()
@@ -23,38 +25,71 @@ def main():
         process_url(args.url)
 
     elif args.command == "brainstorm":
-        orc.step1_morning_brainstorm(count=args.count)
-        print("Brainstorming complete.")
+        topics = orc.step1_morning_brainstorm(count=args.count)
+        if args.json:
+            print(json.dumps({"status": "success", "topics": topics}))
+        else:
+            print("Brainstorming complete.")
 
     elif args.command == "discovery":
-        orc.discovery_phase(subreddits=args.subreddits)
-        print("Community discovery complete. Check 'list-ideas' for new lead-gen topics.")
+        topics = orc.discovery_phase(subreddits=args.subreddits)
+        if args.json:
+            print(json.dumps({"status": "success", "topics": topics}))
+        else:
+            print("Community discovery complete. Check 'list-ideas' for new lead-gen topics.")
 
     elif args.command == "list-ideas":
         from models import TopicIdea
         ideas = orc.session.query(TopicIdea).filter(TopicIdea.status == 'suggested').all()
-        print("\n--- Suggested Topics ---")
-        for i in ideas:
-            print(f"[{i.id}] {i.topic}")
+        
+        if args.json:
+            data = [
+                {
+                    "id": i.id,
+                    "topic": i.topic,
+                    "source": i.source or "brainstorm",
+                    "created_at": i.created_at.isoformat() if i.created_at else None
+                } for i in ideas
+            ]
+            print(json.dumps(data))
+        else:
+            print("\n--- Suggested Topics ---")
+            for i in ideas:
+                print(f"[{i.id}] {i.topic} ({i.source or 'brainstorm'})")
         
     elif args.command == "draft":
         if not args.ids:
-            print("Error: --ids required for draft command")
+            if args.json:
+                print(json.dumps({"status": "error", "message": "--ids required"}))
+            else:
+                print("Error: --ids required for draft command")
             return
-        orc.step2_draft_selected_en(args.ids)
-        print(f"Drafting for IDs {args.ids} complete.")
+        groups = orc.step2_draft_selected_en(args.ids)
+        if args.json:
+            print(json.dumps({"status": "success", "ids": args.ids, "topic_group_ids": groups}))
+        else:
+            print(f"Drafting for IDs {args.ids} complete.")
         
     elif args.command == "approve":
         if not args.group:
-            print("Error: --group (UUID) required for approve command")
+            if args.json:
+                print(json.dumps({"status": "error", "message": "--group required"}))
+            else:
+                print("Error: --group (UUID) required for approve command")
             return
         orc.step3_expand_approved_translations(args.group)
         orc.step4_schedule_queue()
-        print(f"Topic group {args.group} approved and scheduled.")
+        if args.json:
+            print(json.dumps({"status": "success", "group": args.group}))
+        else:
+            print(f"Topic group {args.group} approved and scheduled.")
         
     elif args.command == "publish":
-        publish_due_items()
-        print("Publishing check complete.")
+        count = publish_due_items()
+        if args.json:
+            print(json.dumps({"status": "success", "published_count": count}))
+        else:
+            print(f"Publishing check complete. {count} items published.")
 
 if __name__ == "__main__":
     main()

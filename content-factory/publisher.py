@@ -48,62 +48,37 @@ def publish_to_mastodon(item):
     return True
 
 def publish_due_items():
-
     """
-
     Main loop for due items.
-
     """
-
     session = Session()
-
     now = datetime.datetime.utcnow()
-
     
-
     due = session.query(ContentItem).filter(
-
         ContentItem.status == 'scheduled',
-
         ContentItem.scheduled_at <= now
-
     ).all()
-
     
-
+    published_count = 0
     for item in due:
-
         # Publish to all enabled targets
-
         success = publish_to_blog(item)
-
         
-
         if success:
-
             item.status = "posted"
-
             # Log it
-
             log = PublicationLog(
-
                 content_item_id=item.id,
-
                 platform="blog",
-
                 status="published",
-
                 published_at=datetime.datetime.utcnow()
-
             )
-
             session.add(log)
-
+            published_count += 1
             
-
     session.commit()
-
     session.close()
+    return published_count
 
 
 
