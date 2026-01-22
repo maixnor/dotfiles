@@ -83,6 +83,9 @@
 
   # 6. Windmill Environment Fixes
   systemd.services.windmill-server.serviceConfig = {
+    DynamicUser = lib.mkForce false;
+    User = "windmill";
+    Group = "windmill";
     Environment = [ "PYTHONPATH=${contentFactory.maya-package}/${pkgs.python312.sitePackages}" ];
     EnvironmentFile = [ config.age.secrets."content-factory.env".path ];
   };
@@ -97,6 +100,9 @@
       ps.psycopg2
     ]);
   in {
+    DynamicUser = lib.mkForce false;
+    User = "windmill";
+    Group = "windmill";
     Environment = [ 
       "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 pkgs.curl pkgs.jq ]}"
       "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"
@@ -112,6 +118,9 @@
       maya-pkg
     ]);
   in {
+    DynamicUser = lib.mkForce false;
+    User = "windmill";
+    Group = "windmill";
     Environment = [ 
       "PATH=${mayaPython}/bin:${pkgs.lib.makeBinPath [ py3 pkgs.curl pkgs.jq ]}"
       "PYTHONPATH=${maya-pkg}/${py3.sitePackages}"

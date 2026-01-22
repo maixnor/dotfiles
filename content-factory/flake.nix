@@ -55,7 +55,7 @@
             
             # Helper to source secrets if they exist
             # Note: we use a string that will be evaluated at runtime on the target system
-            SECRET_LOADER='if [ -f /run/secrets/content-factory.env ]; then set -a; source /run/secrets/content-factory.env; set +a; fi'
+            SECRET_LOADER='for p in /run/secrets/content-factory.env /run/agenix/content-factory.env; do if [ -f "$p" ]; then set -a; source "$p"; set +a; break; fi; done'
 
             # Wrap the generated script to include the font path and secret loader
             if [ -e $out/bin/maya-cli ]; then

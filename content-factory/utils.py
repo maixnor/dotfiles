@@ -10,11 +10,13 @@ def get_secret(env_var, default=None):
         return val
 
     # Fallback for CLI usage: try to read from the age-encrypted secret path
-    secret_path = "/run/secrets/content-factory.env"
-    if os.path.exists(secret_path):
-        try:
-            with open(secret_path, "r") as f:
-                for line in f:
+    # Check both common NixOS secret paths
+    secret_paths = ["/run/secrets/content-factory.env", "/run/agenix/content-factory.env"]
+    for secret_path in secret_paths:
+        if os.path.exists(secret_path):
+            try:
+                with open(secret_path, "r") as f:
+                    for line in f:
                     line = line.strip()
                     if not line or line.startswith("#"):
                         continue
