@@ -1,6 +1,7 @@
 import os
 import uuid
 import datetime
+import sys
 from sqlalchemy import desc
 from sqlalchemy.orm import sessionmaker
 from models import ContentItem, TopicIdea, Base, Session
@@ -19,7 +20,7 @@ class MayaOrchestrator:
         """Phase 1b: Scrape communities and generate lead-gen topics."""
         from scraper import scrape_reddit_hot, scrape_news_rss
         
-        print(f"Scouring {len(subreddits)} subreddits and {len(rss_feeds)} RSS feeds for problems...")
+        print(f"Scouring {len(subreddits)} subreddits and {len(rss_feeds)} RSS feeds for problems...", file=sys.stderr)
         all_posts = []
         for sub in subreddits:
             all_posts.extend(scrape_reddit_hot(sub))
@@ -28,7 +29,7 @@ class MayaOrchestrator:
             all_posts.extend(scrape_news_rss(feed))
             
         if not all_posts:
-            print("No new community data found.")
+            print("No new community data found.", file=sys.stderr)
             return []
             
         topics = self.researcher.analyze_community_problems(all_posts)
@@ -41,7 +42,7 @@ class MayaOrchestrator:
 
     def step1_morning_brainstorm(self, count=10):
         """Phase 1: Generate 10 ideas and save to topic_ideas table."""
-        print(f"Brainstorming {count} topics...")
+        print(f"Brainstorming {count} topics...", file=sys.stderr)
         topics = self.researcher.brainstorm_topics(count=count)
         for t in topics:
             idea = TopicIdea(topic=t, status='suggested')
@@ -57,7 +58,7 @@ class MayaOrchestrator:
             if not idea or idea.status != 'suggested':
                 continue
             
-            print(f"Drafting English version for: {idea.topic}")
+            print(f"Drafting English version for: {idea.topic}", file=sys.stderr)
             res = self.blog_engine.generate_blog(idea.topic, "English")
             
             # Generate Image
@@ -98,7 +99,7 @@ class MayaOrchestrator:
             
         languages = ["German", "French", "Spanish"]
         for lang in languages:
-            print(f"Translating {en_version.base_topic} to {lang}...")
+            print(f"Translating {en_version.base_topic} to {lang}...", file=sys.stderr)
             res = self.blog_engine.generate_blog(en_version.base_topic, lang)
             
             new_item = ContentItem(

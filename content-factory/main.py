@@ -6,7 +6,7 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "scrape"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "scrape", "cleanup"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
     parser.add_argument("--subreddits", nargs="+", default=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], help="Subreddits to scour")
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
@@ -90,6 +90,26 @@ def main():
             print(json.dumps({"status": "success", "published_count": count}))
         else:
             print(f"Publishing check complete. {count} items published.")
+
+    elif args.command == "cleanup":
+        from models import TopicIdea
+        # Find topics that look like conversational noise
+        noise = orc.session.query(TopicIdea).filter(
+            TopicIdea.status == 'suggested'
+        ).all()
+        
+        count = 0
+        for i in noise:
+            text = i.topic.lower()
+            if text.startswith(('hey', 'here are', 'i am', 'maya here', 'honestly', 'hi')):
+                orc.session.delete(i)
+                count += 1
+        
+        orc.session.commit()
+        if args.json:
+            print(json.dumps({"status": "success", "deleted_count": count}))
+        else:
+            print(f"Cleanup complete. Deleted {count} junk topics.")
 
 if __name__ == "__main__":
     main()
