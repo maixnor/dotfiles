@@ -17,18 +17,18 @@ def get_secret(env_var, default=None):
             try:
                 with open(secret_path, "r") as f:
                     for line in f:
-                    line = line.strip()
-                    if not line or line.startswith("#"):
-                        continue
-                    if "=" in line:
-                        k, v = line.split("=", 1)
-                        key = k.strip()
-                        if key.startswith("export "):
-                            key = key[7:].strip()
-                        if key == env_var:
-                            # Strip quotes if present
-                            return v.strip().strip('"').strip("'")
-        except Exception:
-            pass # Permissions or other read errors
+                        line = line.strip()
+                        if not line or line.startswith("#"):
+                            continue
+                        if "=" in line:
+                            k, v = line.split("=", 1)
+                            key = k.strip()
+                            if key.startswith("export "):
+                                key = key[7:].strip()
+                            if key == env_var:
+                                # Strip quotes if present
+                                return v.strip().strip('"').strip("'")
+            except Exception:
+                pass # Permissions or other read errors
             
     return default

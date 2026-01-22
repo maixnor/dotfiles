@@ -45,7 +45,11 @@
             pillow
           ];
 
-          doCheck = false; # Skip tests during build
+          doCheck = true;
+          checkPhase = ''
+            # Catch syntax and indentation errors during the build
+            python3 -m compileall .
+          '';
 
           # We still want the CLI wrappers
           postInstall = ''
