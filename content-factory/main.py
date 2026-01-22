@@ -6,12 +6,12 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "list-content", "get-preview", "scrape", "cleanup"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "disapprove", "publish", "list-ideas", "list-content", "get-preview", "scrape", "cleanup"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
     parser.add_argument("--status", type=str, default="draft_en", help="Status to filter content items")
     parser.add_argument("--subreddits", nargs="+", default=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], help="Subreddits to scour")
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
-    parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate")
+    parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate/disapprove")
     parser.add_argument("--url", type=str, help="URL to scrape")
     parser.add_argument("--json", action="store_true", help="Output results in JSON format")
     
@@ -112,6 +112,19 @@ def main():
             print(json.dumps({"status": "success", "group": args.group}))
         else:
             print(f"Topic group {args.group} approved and scheduled.")
+
+    elif args.command == "disapprove":
+        if not args.group:
+            if args.json:
+                print(json.dumps({"status": "error", "message": "--group required"}))
+            else:
+                print("Error: --group (UUID) required for disapprove command")
+            return
+        orc.disapprove_group(args.group)
+        if args.json:
+            print(json.dumps({"status": "success", "group": args.group}))
+        else:
+            print(f"Topic group {args.group} disapproved. Idea reset to suggested.")
         
     elif args.command == "publish":
         count = publish_due_items()

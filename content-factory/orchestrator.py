@@ -138,5 +138,32 @@ class MayaOrchestrator:
             
         self.session.commit()
 
+    def disapprove_group(self, topic_group_id):
+        """Phase 5: Scrap a draft but keep the idea for later (reset to suggested)."""
+        items = self.session.query(ContentItem).filter(
+            ContentItem.topic_group_id == topic_group_id
+        ).all()
+        
+        if not items:
+            print(f"No items found for group {topic_group_id}", file=sys.stderr)
+            return
+
+        base_topic = items[0].base_topic
+        
+        for item in items:
+            item.status = "rejected"
+        
+        # Reset the original idea if it exists
+        idea = self.session.query(TopicIdea).filter(
+            TopicIdea.topic == base_topic,
+            TopicIdea.status == 'drafted'
+        ).first()
+        
+        if idea:
+            idea.status = 'suggested'
+            print(f"Reset idea '{base_topic}' to suggested status.", file=sys.stderr)
+            
+        self.session.commit()
+
 if __name__ == "__main__":
     pass
