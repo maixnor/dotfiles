@@ -12,15 +12,18 @@ def get_suggested_ideas():
     Returns all ideas in 'suggested' state for the Idea Inbox.
     """
     orc = MayaOrchestrator()
-    ideas = orc.session.query(TopicIdea).filter(TopicIdea.status == 'suggested').order_by(TopicIdea.created_at.desc()).all()
-    return [
-        {
-            "id": i.id,
-            "topic": i.topic,
-            "source": i.source or "brainstorm",
-            "created_at": i.created_at.isoformat()
-        } for i in ideas
-    ]
+    try:
+        ideas = orc.session.query(TopicIdea).filter(TopicIdea.status == 'suggested').order_by(TopicIdea.created_at.desc()).all()
+        return [
+            {
+                "id": i.id,
+                "topic": i.topic,
+                "source": i.source or "brainstorm",
+                "created_at": i.created_at.isoformat() if i.created_at else None
+            } for i in ideas
+        ]
+    finally:
+        orc.session.close()
 
 ASSET_URL_BASE = "https://maya-assets.maixnor.com"
 
@@ -29,59 +32,68 @@ def get_content_items(status="draft_en"):
     Returns content items filtered by status (e.g., 'draft_en', 'approved', 'scheduled').
     """
     orc = MayaOrchestrator()
-    items = orc.session.query(ContentItem).filter(ContentItem.status == status).order_by(ContentItem.created_at.desc()).all()
-    return [
-        {
-            "id": i.id,
-            "topic_group_id": str(i.topic_group_id),
-            "base_topic": i.base_topic,
-            "target_language": i.target_language,
-            "headline": i.headline,
-            "status": i.status,
-            "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
-        } for i in items
-    ]
+    try:
+        items = orc.session.query(ContentItem).filter(ContentItem.status == status).order_by(ContentItem.created_at.desc()).all()
+        return [
+            {
+                "id": i.id,
+                "topic_group_id": str(i.topic_group_id) if i.topic_group_id else None,
+                "base_topic": i.base_topic,
+                "target_language": i.target_language,
+                "headline": i.headline,
+                "status": i.status,
+                "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
+            } for i in items
+        ]
+    finally:
+        orc.session.close()
 
 def get_scheduled_queue():
     """
     Returns the queue of items scheduled for publishing, sorted by date.
     """
     orc = MayaOrchestrator()
-    items = orc.session.query(ContentItem).filter(
-        ContentItem.status == 'scheduled'
-    ).order_by(ContentItem.scheduled_at.asc()).all()
-    
-    return [
-        {
-            "id": i.id,
-            "topic_group_id": str(i.topic_group_id),
-            "base_topic": i.base_topic,
-            "target_language": i.target_language,
-            "headline": i.headline,
-            "scheduled_at": i.scheduled_at.isoformat() if i.scheduled_at else None,
-            "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
-        } for i in items
-    ]
+    try:
+        items = orc.session.query(ContentItem).filter(
+            ContentItem.status == 'scheduled'
+        ).order_by(ContentItem.scheduled_at.asc()).all()
+        
+        return [
+            {
+                "id": i.id,
+                "topic_group_id": str(i.topic_group_id) if i.topic_group_id else None,
+                "base_topic": i.base_topic,
+                "target_language": i.target_language,
+                "headline": i.headline,
+                "scheduled_at": i.scheduled_at.isoformat() if i.scheduled_at else None,
+                "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
+            } for i in items
+        ]
+    finally:
+        orc.session.close()
 
 def get_preview(topic_group_id: str):
     """
     Returns a full preview of the English version for a specific group.
     """
     orc = MayaOrchestrator()
-    item = orc.session.query(ContentItem).filter(
-        ContentItem.topic_group_id == uuid.UUID(topic_group_id),
-        ContentItem.target_language == "English"
-    ).first()
-    
-    if not item:
-        return {"error": "Not found"}
+    try:
+        item = orc.session.query(ContentItem).filter(
+            ContentItem.topic_group_id == uuid.UUID(topic_group_id),
+            ContentItem.target_language == "English"
+        ).first()
         
-    return {
-        "headline": item.headline,
-        "content": item.markdown_content,
-        "image_url": f"{ASSET_URL_BASE}/{os.path.basename(item.local_image_path)}" if item.local_image_path else None,
-        "topic": item.base_topic
-    }
+        if not item:
+            return {"error": "Not found"}
+            
+        return {
+            "headline": item.headline,
+            "content": item.markdown_content,
+            "image_url": f"{ASSET_URL_BASE}/{os.path.basename(item.local_image_path)}" if item.local_image_path else None,
+            "topic": item.base_topic
+        }
+    finally:
+        orc.session.close()
 
 # --- Actions ---
 

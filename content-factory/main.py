@@ -4,6 +4,25 @@ import json
 from orchestrator import MayaOrchestrator
 from publisher import publish_due_items
 
+def run_batch_generation(days=7):
+    """
+    Automated flow: Discovery -> Select top topics -> Draft them.
+    """
+    orc = MayaOrchestrator()
+    # 1. Discover new topics
+    topics = orc.discovery_phase()
+    
+    # 2. Get the IDs of the newly suggested topics
+    from models import TopicIdea
+    ideas = orc.session.query(TopicIdea).filter(TopicIdea.status == 'suggested').order_by(TopicIdea.created_at.desc()).limit(days).all()
+    idea_ids = [i.id for i in ideas]
+    
+    # 3. Draft them
+    if idea_ids:
+        orc.step2_draft_selected_en(idea_ids)
+    
+    orc.session.close()
+
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
     parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "disapprove", "publish", "list-ideas", "list-content", "list-queue", "get-preview", "scrape", "cleanup"], help="Command to run")
