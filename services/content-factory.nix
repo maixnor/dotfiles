@@ -52,7 +52,9 @@
 
   # 4. Content Factory Environment Setup
   system.activationScripts.content-factory-setup = ''
-    # empty for now because I don't exactly how to publish to my blog site :)
+    mkdir -p /var/lib/content-factory/assets
+    chown -R windmill:windmill /var/lib/content-factory
+    chmod -R 770 /var/lib/content-factory
   '';
 
   # Ensure the windmill group exists and maixnor is a member
