@@ -490,7 +490,7 @@
             logOutput.textContent = '--- Connecting to real-time log stream... ---\n';
 
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}/ws-logs`;
+            const wsUrl = `${protocol}//ws.maixnor.com`;
             
             const connectionTimeout = setTimeout(() => {
                 if (!socket || socket.readyState !== WebSocket.OPEN) {
