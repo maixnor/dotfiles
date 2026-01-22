@@ -31,7 +31,7 @@
     serverPort = 8001;
   };
 
-  # 3. Traefik Configuration for Windmill
+  # 3. Traefik Configuration for Windmill and Assets
   environment.etc."traefik/windmill.yml".text = ''
     http:
       routers:
@@ -42,13 +42,37 @@
             - "websecure"
           tls:
             certResolver: "letsencrypt"
+        maya-assets:
+          rule: "Host(`maya-assets.maixnor.com`)"
+          service: "maya-assets"
+          entryPoints:
+            - "websecure"
+          tls:
+            certResolver: "letsencrypt"
 
       services:
         windmill:
           loadBalancer:
             servers:
               - url: "http://127.0.0.1:8001"
+        maya-assets:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8095"
   '';
+
+  # 3b. Nginx to serve the assets
+  services.nginx = {
+    enable = true;
+    virtualHosts."maya-assets.internal" = {
+      listen = [ { addr = "127.0.0.1"; port = 8095; } ];
+      root = "/var/lib/content-factory/assets";
+      extraConfig = ''
+        autoindex off;
+        add_header Access-Control-Allow-Origin *;
+      '';
+    };
+  };
 
   # 4. Content Factory Environment Setup
   system.activationScripts.content-factory-setup = ''

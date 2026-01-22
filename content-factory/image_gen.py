@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from google import genai
 from google.genai import types
 from PIL import Image
@@ -29,12 +30,12 @@ class MayaImageGenerator:
         """
         Generates an image of Maya with robust fallback and retry logic.
         """
-        print(f"DEBUG: Generating image with prompt: {prompt[:100]}...")
+        print(f"DEBUG: Generating image with prompt: {prompt[:100]}...", file=sys.stderr)
         
         # 1. Try dedicated Imagen models first
         for model_name in self.imagen_models:
             try:
-                print(f"DEBUG: Trying Imagen model {model_name}...")
+                print(f"DEBUG: Trying Imagen model {model_name}...", file=sys.stderr)
                 response = self.client.models.generate_images(
                     model=model_name,
                     prompt=prompt,
@@ -47,21 +48,21 @@ class MayaImageGenerator:
                 if response.generated_images:
                     return self._save_image(response.generated_images[0].image_bytes, output_path)
             except Exception as e:
-                print(f"DEBUG: Imagen {model_name} failed: {e}")
+                print(f"DEBUG: Imagen {model_name} failed: {e}", file=sys.stderr)
                 if "429" in str(e):
-                    print("DEBUG: Rate limit hit, waiting 5s...")
+                    print("DEBUG: Rate limit hit, waiting 5s...", file=sys.stderr)
                     time.sleep(5)
                 continue
 
         # 2. Try Multimodal Content Generation (supports image context)
-        print("DEBUG: Attempting Multimodal fallbacks...")
+        print("DEBUG: Attempting Multimodal fallbacks...", file=sys.stderr)
         headshot = None
         if reference_image_path and os.path.exists(reference_image_path):
             headshot = Image.open(reference_image_path)
 
         for model_name in self.multimodal_models:
             try:
-                print(f"DEBUG: Trying Multimodal model {model_name}...")
+                print(f"DEBUG: Trying Multimodal model {model_name}...", file=sys.stderr)
                 contents = [prompt]
                 if headshot:
                     contents.append(headshot)
@@ -75,19 +76,19 @@ class MayaImageGenerator:
                     if part.inline_data:
                         return self._save_image(part.inline_data.data, output_path)
             except Exception as e:
-                print(f"DEBUG: Multimodal {model_name} failed: {e}")
+                print(f"DEBUG: Multimodal {model_name} failed: {e}", file=sys.stderr)
                 if "429" in str(e):
-                    print("DEBUG: Rate limit hit, waiting 10s...")
+                    print("DEBUG: Rate limit hit, waiting 10s...", file=sys.stderr)
                     time.sleep(10)
                 continue
 
-        print("ERROR: All image generation methods exhausted.")
+        print("ERROR: All image generation methods exhausted.", file=sys.stderr)
         return None
 
     def _save_image(self, image_bytes, output_path):
         img = Image.open(io.BytesIO(image_bytes))
         img.save(output_path)
-        print(f"DEBUG: Image successfully saved to {output_path}")
+        print(f"DEBUG: Image successfully saved to {output_path}", file=sys.stderr)
         return output_path
 
 if __name__ == "__main__":

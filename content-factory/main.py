@@ -6,8 +6,9 @@ from publisher import publish_due_items
 
 def main():
     parser = argparse.ArgumentParser(description="LanguageBuddy Content Factory CLI")
-    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "scrape", "cleanup"], help="Command to run")
+    parser.add_argument("command", choices=["brainstorm", "discovery", "draft", "approve", "publish", "list-ideas", "list-content", "get-preview", "scrape", "cleanup"], help="Command to run")
     parser.add_argument("--count", type=int, default=10, help="Number of topics to brainstorm")
+    parser.add_argument("--status", type=str, default="draft_en", help="Status to filter content items")
     parser.add_argument("--subreddits", nargs="+", default=["languagelearning", "EnglishLearning", "learnenglish", "grammar", "Spanish", "French", "German"], help="Subreddits to scour")
     parser.add_argument("--ids", nargs="+", type=int, help="Idea IDs to draft")
     parser.add_argument("--group", type=str, help="Topic Group ID to approve/translate")
@@ -56,6 +57,34 @@ def main():
             print("\n--- Suggested Topics ---")
             for i in ideas:
                 print(f"[{i.id}] {i.topic} ({i.source or 'brainstorm'})")
+
+    elif args.command == "list-content":
+        from windmill_scripts import get_content_items
+        data = get_content_items(status=args.status)
+        if args.json:
+            print(json.dumps(data))
+        else:
+            print(f"\n--- Content Items ({args.status}) ---")
+            for i in data:
+                print(f"[{i['id']}] {i['headline']} (Group: {i['topic_group_id']})")
+
+    elif args.command == "get-preview":
+        if not args.group:
+            if args.json:
+                print(json.dumps({"status": "error", "message": "--group required"}))
+            else:
+                print("Error: --group required")
+            return
+        from windmill_scripts import get_preview
+        data = get_preview(args.group)
+        if args.json:
+            print(json.dumps(data))
+        else:
+            print(f"\n--- Preview for {args.group} ---")
+            print(f"Headline: {data.get('headline')}")
+            print(f"Image: {data.get('image_url')}")
+            print("-" * 20)
+            print(data.get('content'))
         
     elif args.command == "draft":
         if not args.ids:

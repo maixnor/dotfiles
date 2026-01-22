@@ -2,6 +2,7 @@ import httpx
 from bs4 import BeautifulSoup
 from models import TopicIdea, Session
 import xml.etree.ElementTree as ET
+import sys
 
 def scrape_reddit_hot(subreddit="languagelearning"):
     """
@@ -28,7 +29,7 @@ def scrape_reddit_hot(subreddit="languagelearning"):
                     })
             return posts
         except Exception as e:
-            print(f"Reddit scrape failed: {e}")
+            print(f"Reddit scrape failed: {e}", file=sys.stderr)
             return []
 
 def scrape_news_rss(url):
@@ -48,5 +49,5 @@ def scrape_news_rss(url):
                 })
             return news
         except Exception as e:
-            print(f"RSS scrape failed: {e}")
+            print(f"RSS scrape failed: {e}", file=sys.stderr)
             return []

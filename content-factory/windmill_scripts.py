@@ -22,6 +22,8 @@ def get_suggested_ideas():
         } for i in ideas
     ]
 
+ASSET_URL_BASE = "https://maya-assets.maixnor.com"
+
 def get_content_items(status="draft_en"):
     """
     Returns content items filtered by status (e.g., 'draft_en', 'approved', 'scheduled').
@@ -36,7 +38,7 @@ def get_content_items(status="draft_en"):
             "target_language": i.target_language,
             "headline": i.headline,
             "status": i.status,
-            "image_path": i.local_image_path
+            "image_url": f"{ASSET_URL_BASE}/{os.path.basename(i.local_image_path)}" if i.local_image_path else None
         } for i in items
     ]
 
@@ -56,7 +58,7 @@ def get_preview(topic_group_id: str):
     return {
         "headline": item.headline,
         "content": item.markdown_content,
-        "image_path": item.local_image_path,
+        "image_url": f"{ASSET_URL_BASE}/{os.path.basename(item.local_image_path)}" if item.local_image_path else None,
         "topic": item.base_topic
     }
 
