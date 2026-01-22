@@ -84,6 +84,7 @@
   # Ensure the windmill group exists and maixnor is a member
   users.groups.windmill = {};
   users.users.maixnor.extraGroups = [ "windmill" ];
+  users.users.nginx.extraGroups = [ "windmill" ];
 
   # Satisfy NixOS user assertions for the windmill service user
   users.users.windmill = {
