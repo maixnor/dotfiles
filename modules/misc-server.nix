@@ -5,6 +5,7 @@
 
   config = {
     environment.systemPackages = with pkgs; [
+      opencode
       zoxide
       sqlite
       openconnect
