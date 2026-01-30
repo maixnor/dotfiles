@@ -167,6 +167,7 @@ in
   systemd.tmpfiles.rules = [
     "d /var/www/maixnor.com 0755 maixnor users -"
     "d /var/www/static 2775 web-static web-static -"
+    "Z /var/www/static 2775 web-static web-static -"
     "L+ /var/www/maixnor.com/index.html - nobody nogroup - ${./dashboard.html}"
   ];
 }
