@@ -56,6 +56,11 @@ in
 
   time.timeZone = "Europe/Amsterdam";
 
+  swapDevices = [ {
+    device = "/var/lib/swapfile";
+    size = 4096; # 4GB
+  } ];
+
   users.groups.maixnor = {};
 
   users.users.maixnor = let 

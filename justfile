@@ -16,6 +16,9 @@ bierbasis:
 wieselburg: 
   just update wieselburg
 
+deploy-wieselburg:
+  nixos-rebuild switch --flake .#wieselburg --target-host wieselburg --use-remote-sudo
+
 cf-check:
   cd content-factory && nix-shell shell.nix --run "python3 -m py_compile *.py"
 
