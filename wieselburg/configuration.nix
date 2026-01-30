@@ -15,6 +15,7 @@ in
     ../services/autoupdate.nix
     ../services/traefik-base.nix
     ../services/maixnorcom.nix
+    ../services/priority-oil-com.nix
     ../services/searx.nix
     ../services/languagebuddy.nix
     ../services/observability.nix
