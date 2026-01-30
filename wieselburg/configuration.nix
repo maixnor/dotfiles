@@ -68,7 +68,7 @@ in
   in {
     isNormalUser = true;
     group = "maixnor";
-    extraGroups = [ "wheel" "immich" ];
+    extraGroups = [ "wheel" "immich" "web-static" ];
     openssh.authorizedKeys.keys = keys.users.maixnor;
     packages = [ nixvim ];
   };

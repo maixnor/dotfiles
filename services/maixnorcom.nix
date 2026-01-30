@@ -161,10 +161,10 @@ in
     isSystemUser = true;
     group = "web-static";
   };
-  users.users.maixnor.extraGroups = [ "web-static" ];
 
   # Manage directories and files directly via Nix
   systemd.tmpfiles.rules = [
+    "d /var/www 0755 root root -"
     "d /var/www/maixnor.com 0755 maixnor users -"
     "d /var/www/static 2775 web-static web-static -"
     "Z /var/www/static 2775 web-static web-static -"
