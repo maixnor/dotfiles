@@ -13,7 +13,7 @@
       git
       wget xh
       freshfetch
-      btop iftop iotop
+      iftop iotop
       ripgrep
       ripgrep-all
       inotify-tools
@@ -22,6 +22,8 @@
       static-server
       ffmpeg_8-headless
     ];
+
+    programs.btop.enable = true;
 
     environment.shellAliases = {
       z = "{pkgs.zoxide}/bin/zoxide";

@@ -28,6 +28,19 @@ let
       sf
       rnaturalearth
       rnaturalearthdata
+      # bachelor thesis
+      haven         
+      data.table    
+      rio           
+      labelled      
+      fixest        
+      sandwich      
+      lmtest        
+      broom         
+      modelsummary  
+      stargazer     
+      patchwork     
+      texreg        
     ];
   };
 in {

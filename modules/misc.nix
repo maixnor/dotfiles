@@ -12,7 +12,7 @@
       presenterm
       calc
       miraclecast
-      btop iftop iotop
+      iftop iotop
       inotify-tools
       ripgrep-all
       # geogebra6
@@ -73,6 +73,8 @@
       obsidian
       discord
     ];
+
+    programs.btop.enable = true;
   };
 
 }
