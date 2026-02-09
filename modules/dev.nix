@@ -30,7 +30,7 @@ let
       rnaturalearthdata
       # bachelor thesis
       haven         
-      data.table    
+      #data.table    
       rio           
       labelled      
       fixest        
