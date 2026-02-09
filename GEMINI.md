@@ -58,5 +58,5 @@ For convenience, a `justfile` is provided with common commands:
 
 -   **Nix Flakes:** All configurations are managed using Nix flakes, ensuring that dependencies are pinned and environments are reproducible.
 -   **Modular Configuration:** Configurations are broken down into smaller, reusable `.nix` modules, promoting organization and ease of maintenance.
--   **`nixfmt-rfc-style`:** The `flake.nix` specifies `pkgs.nixfmt-rfc-style` as the formatter, indicating a preference for consistent code formatting within the Nix files.
+-   **`nixfmt`:** The `flake.nix` specifies `pkgs.nixfmt` as the formatter, indicating a preference for consistent code formatting within the Nix files.
 -   **Secrets Management:** Sensitive information, such as API keys and JWT secrets, is handled through dedicated secrets files (e.g., `/var/lib/immich/secrets.env`), generated via activation scripts where appropriate.

@@ -127,6 +127,6 @@
                 in "${vmSystem.config.system.build.vm}/bin/run-wieselburg-vm-test-vm";
               };
             };      
-      formatter.x86_64-linux = pkgs.nixfmt-rfc-style;
+      formatter.x86_64-linux = pkgs.nixfmt;
     };
 }
