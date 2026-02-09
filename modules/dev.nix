@@ -29,6 +29,53 @@ let
       rnaturalearth
       rnaturalearthdata
       # bachelor thesis
+         readstata13
+  ggrepel
+  emmeans
+  devtools
+  slopes
+  #CGPfunctions
+  reporttools
+  xtable
+  wesanderson
+  countrycode
+  AER
+  summarytools
+  ggeffects
+  sjPlot
+  expss
+  dotwhisker
+  ggpubr
+  ggridges
+  effects
+  interactions
+  #hrbrthemes
+  ggstance
+
+         ape
+   ClustOfVar
+   future
+   ggdist
+   ggforce
+   ggpubr
+   ggrepel
+   ggridges
+   ggtext
+   ggtree
+   matrixStats
+   mice
+   ri2
+   rsparse
+   text2vec
+   textcat
+   tidytext
+   tm
+   treemapify
+   WDI
+   xtable
+
+      DeclareDesign
+      psych
       haven         
       #data.table    
       rio           
