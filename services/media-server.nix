@@ -105,7 +105,7 @@ in
       http:
         routers:
           jellyfin:
-            rule: "Host(`media.maixnor.com`) && !PathPrefix(`/metube`) && !PathPrefix(`/hooks`)"
+            rule: "Host(`media.maixnor.com`) && !PathPrefix(`/downloader`) && !PathPrefix(`/hooks`)"
             service: "jellyfin"
             entryPoints:
               - "websecure"

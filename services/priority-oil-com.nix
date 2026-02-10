@@ -15,7 +15,7 @@
   services.nginx = {
     enable = true;
     virtualHosts."priority-oil.com" = {
-      listen = [ { addr = "127.0.0.1"; port = 8096; } ];
+      listen = [ { addr = "127.0.0.1"; port = 8097; } ];
       root = "/var/www/priority-oil.com";
       extraConfig = ''
         autoindex off;
@@ -40,7 +40,7 @@
           priority-oil-com:
             loadBalancer:
               servers:
-                - url: "http://127.0.0.1:8096"
+                - url: "http://127.0.0.1:8097"
     '';
   };
 
