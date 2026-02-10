@@ -5,7 +5,6 @@
 
   config = {
     environment.systemPackages = with pkgs; [
-      opencode
       zoxide
       sqlite
       openconnect
@@ -21,12 +20,11 @@
       just ranger
       static-server
       ffmpeg_8-headless
+      btop
     ];
 
-    programs.btop.enable = true;
-
     environment.shellAliases = {
-      z = "{pkgs.zoxide}/bin/zoxide";
+      z = "${pkgs.zoxide}/bin/zoxide";
     };
   };
 
