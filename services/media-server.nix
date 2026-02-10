@@ -18,8 +18,7 @@ in
   # YouTube cookies secret from agenix
   age.secrets."youtube-cookies" = {
     file = ../secrets/youtube-cookies.txt.age;
-    owner = "web-static";
-    mode = "0400";
+    mode = "0444"; # Loosened as requested
   };
 
   # Add web-static to keys group to ensure it can enter /run/agenix.d
@@ -41,7 +40,7 @@ in
             ${pkgs.yt-dlp}/bin/yt-dlp \
               --cookies "${config.age.secrets."youtube-cookies".path}" \
               --impersonate chrome \
-              --extractor-args "youtube:player-client=android,ios" \
+              --extractor-args "youtube:player-client=ios,android,mweb;po_token=web+YOUR_PO_TOKEN_HERE" \
               -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" \
               -o "${downloadDir}/%(playlist_title&{} - |)s%(playlist_index&{} - |)s%(title)s.%(ext)s" \
               "$URL"
