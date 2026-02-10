@@ -34,7 +34,11 @@
         acme = {
           email = "benjamin@meixner.org";
           storage = "/var/lib/traefik/acme.json";
-          httpChallenge.entryPoint = "web";
+          dnsChallenge = {
+            provider = "namecheap";
+            # Using a custom resolver can help with DNS propagation issues
+            resolvers = [ "1.1.1.1:53" "8.8.8.8:53" ];
+          };
         };
       };
       api = {
@@ -50,6 +54,8 @@
     };
   };
 
+  systemd.services.traefik.serviceConfig.EnvironmentFile = [ "/var/lib/traefik/secrets.env" ];
+
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   # ensuring /var/lib/traefik/acme.json exists with 600 permissions (othewise no certficate challenge)
@@ -64,8 +70,9 @@
     script = ''
       mkdir -p /var/lib/traefik
       touch /var/lib/traefik/acme.json
-      chown traefik:traefik /var/lib/traefik/acme.json
-      chmod 600 /var/lib/traefik/acme.json
+      touch /var/lib/traefik/secrets.env
+      chown traefik:traefik /var/lib/traefik/acme.json /var/lib/traefik/secrets.env
+      chmod 600 /var/lib/traefik/acme.json /var/lib/traefik/secrets.env
     '';
   };
 
