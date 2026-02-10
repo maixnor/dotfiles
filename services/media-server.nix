@@ -18,8 +18,12 @@ in
   # YouTube cookies secret from agenix
   age.secrets."youtube-cookies" = {
     file = ../secrets/youtube-cookies.txt.age;
-    mode = "0444";
+    owner = "web-static";
+    mode = "0400";
   };
+
+  # Add web-static to keys group to ensure it can enter /run/agenix.d
+  users.users.web-static.extraGroups = [ "keys" ];
 
   # Webhook listener for downloads
   systemd.services.webhook-downloader = {
