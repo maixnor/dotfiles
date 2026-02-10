@@ -42,62 +42,71 @@ in
     };
   };
 
-  # Static HTML for the downloader UI
-  systemd.tmpfiles.rules = [
-    "d ${downloadDir}/downloader 0775 web-static web-static -"
-    "L+ ${downloadDir}/downloader/index.html - - - ${pkgs.writeText "downloader.html" ''
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Maya Downloader</title>
-          <style>
-              body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #121212; color: white; }
-              .container { background: #1e1e1e; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
-              h1 { margin-top: 0; color: #00a4dc; }
-              input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #333; border-radius: 4px; background: #2c2c2c; color: white; box-sizing: border-box; }
-              button { width: 100%; padding: 10px; background: #00a4dc; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; }
-              button:hover { background: #0085b2; }
-              #status { margin-top: 15px; font-size: 0.9rem; }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <h1>Maya Downloader</h1>
-              <p>Paste a YouTube URL to download it to Jellyfin.</p>
-              <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
-              <button onclick="download()">Download</button>
-              <div id="status"></div>
-          </div>
-          <script>
-              async function download() {
-                  const url = document.getElementById('url').value;
-                  const status = document.getElementById('status');
-                  if (!url) return;
-                  
-                  status.innerText = "Sending request...";
-                  try {
-                      const response = await fetch('/hooks/download', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ url: url })
-                      });
-                      if (response.ok) {
-                          status.innerText = "Download triggered successfully!";
-                          document.getElementById('url').value = "";
-                      } else {
-                          status.innerText = "Error: " + await response.text();
+  # Dedicated service for the downloader UI
+  systemd.services.downloader-ui = {
+    description = "Downloader UI server";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.python3}/bin/python -m http.server 6780";
+      WorkingDirectory = pkgs.linkFarm "downloader-ui" [
+        { name = "index.html"; path = pkgs.writeText "downloader.html" ''
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Maya Downloader</title>
+              <style>
+                  body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #121212; color: white; }
+                  .container { background: #1e1e1e; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
+                  h1 { margin-top: 0; color: #00a4dc; }
+                  input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #333; border-radius: 4px; background: #2c2c2c; color: white; box-sizing: border-box; }
+                  button { width: 100%; padding: 10px; background: #00a4dc; border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer; }
+                  button:hover { background: #0085b2; }
+                  #status { margin-top: 15px; font-size: 0.9rem; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>Maya Downloader</h1>
+                  <p>Paste a YouTube URL to download it to Jellyfin.</p>
+                  <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+                  <button onclick="download()">Download</button>
+                  <div id="status"></div>
+              </div>
+              <script>
+                  async function download() {
+                      const url = document.getElementById('url').value;
+                      const status = document.getElementById('status');
+                      if (!url) return;
+                      
+                      status.innerText = "Sending request...";
+                      try {
+                          const response = await fetch('/hooks/download', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ url: url })
+                          });
+                          if (response.ok) {
+                              status.innerText = "Download triggered successfully!";
+                              document.getElementById('url').value = "";
+                          } else {
+                              status.innerText = "Error: " + await response.text();
+                          }
+                      } catch (e) {
+                          status.innerText = "Error: " + e.message;
                       }
-                  } catch (e) {
-                      status.innerText = "Error: " + e.message;
                   }
-              }
-          </script>
-      </body>
-      </html>
-    ''}"
-  ];
+              </script>
+          </body>
+          </html>
+        ''; }
+      ];
+      User = "web-static";
+      Group = "web-static";
+    };
+  };
 
   # Traefik configuration for media.maixnor.com
   environment.etc."traefik/media.yml" = lib.mkIf cfg.enable {
@@ -115,6 +124,8 @@ in
           downloader-ui:
             rule: "Host(`media.maixnor.com`) && PathPrefix(`/downloader`)"
             service: "downloader-ui"
+            middlewares:
+              - "downloader-strip-prefix"
             entryPoints:
               - "websecure"
             tls:
@@ -128,16 +139,22 @@ in
             tls:
               certResolver: "letsencrypt"
 
+        middlewares:
+          downloader-strip-prefix:
+            stripPrefix:
+              prefixes:
+                - "/downloader"
+
         services:
           jellyfin:
             loadBalancer:
               servers:
-                - url: "http://127.0.0.1:8096"
+                - url: "http://127.0.0.1:6789"
           
           downloader-ui:
             loadBalancer:
               servers:
-                - url: "http://127.0.0.1:8091"
+                - url: "http://127.0.0.1:6780"
           
           downloader-webhook:
             loadBalancer:
@@ -145,4 +162,6 @@ in
                 - url: "http://127.0.0.1:${toString webhookPort}"
     '';
   };
+}
+}
 }
