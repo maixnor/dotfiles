@@ -19,7 +19,7 @@ in
   systemd.services.webhook-downloader = {
     description = "Webhook listener for YouTube downloads";
     wantedBy = [ "multi-user.target" ];
-    path = with pkgs; [ webhook yt-dlp coreutils bash ];
+    path = with pkgs; [ webhook yt-dlp ffmpeg coreutils bash ];
     serviceConfig = {
       ExecStart = "${pkgs.webhook}/bin/webhook -hooks ${pkgs.writeText "download-hooks.json" (builtins.toJSON [
         {
