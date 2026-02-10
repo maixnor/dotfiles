@@ -22,7 +22,7 @@ in
   # Create the 404 page
   systemd.tmpfiles.rules = [
     "d ${errorPageDir} 0755 web-static web-static -"
-    "L+ ${errorPageDir}/index.html - - - ${pkgs.writeText "404.html" ''
+    "L+ ${errorPageDir}/index.html - - - - ${pkgs.writeText "404.html" ''
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -241,13 +241,20 @@ in
       http:
         routers:
           catch-all:
-            rule: "HostRegexp(`{subdomain:[a-z0-9-]+}.maixnor.com`)"
+            rule: "HostRegexp(`{host:.+\\.maixnor\\.com}`)"
             priority: 1
             service: "error-page-service"
+            middlewares:
+              - "error-rewrite"
             entryPoints:
               - "websecure"
             tls:
               certResolver: "letsencrypt"
+
+        middlewares:
+          error-rewrite:
+            replacePath:
+              path: "/"
 
         services:
           error-page-service:
