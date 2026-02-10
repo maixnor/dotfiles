@@ -38,10 +38,8 @@ in
             URL=$1
             echo "Downloading $URL to ${downloadDir}"
             ${pkgs.yt-dlp}/bin/yt-dlp \
-              --cookies "${config.age.secrets."youtube-cookies".path}" \
-              --impersonate chrome \
-              --extractor-args "youtube:player-client=ios,android,mweb;po_token=web+YOUR_PO_TOKEN_HERE" \
-              -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" \
+              --extractor-args "youtube:player-client=android,ios" \
+              -f "best" \
               -o "${downloadDir}/%(playlist_title&{} - |)s%(playlist_index&{} - |)s%(title)s.%(ext)s" \
               "$URL"
             chmod 664 "${downloadDir}"/*
