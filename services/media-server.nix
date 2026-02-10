@@ -18,9 +18,7 @@ in
   # YouTube cookies secret from agenix
   age.secrets."youtube-cookies" = {
     file = ../secrets/youtube-cookies.txt.age;
-    owner = "web-static";
-    group = "web-static";
-    mode = "0440";
+    mode = "0444";
   };
 
   # Webhook listener for downloads
