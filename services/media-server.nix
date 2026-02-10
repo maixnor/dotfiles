@@ -115,8 +115,6 @@ in
           downloader-ui:
             rule: "Host(`media.maixnor.com`) && PathPrefix(`/downloader`)"
             service: "downloader-ui"
-            middlewares:
-              - "downloader-strip-prefix"
             entryPoints:
               - "websecure"
             tls:
@@ -130,12 +128,6 @@ in
             tls:
               certResolver: "letsencrypt"
 
-        middlewares:
-          downloader-strip-prefix:
-            stripPrefix:
-              prefixes:
-                - "/downloader"
-
         services:
           jellyfin:
             loadBalancer:
@@ -145,7 +137,7 @@ in
           downloader-ui:
             loadBalancer:
               servers:
-                - url: "http://127.0.0.1:8091/downloader/index.html"
+                - url: "http://127.0.0.1:8091"
           
           downloader-webhook:
             loadBalancer:
