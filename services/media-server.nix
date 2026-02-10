@@ -30,9 +30,8 @@ in
             echo "Downloading $URL to ${downloadDir}"
             # Added bypass flags and forced mp4 for Xbox compatibility
             ${pkgs.yt-dlp}/bin/yt-dlp \
-              --cookies "${downloadDir}/youtube-cookies.txt" \
-              --client-impersonate chrome \
-              --extractor-args "youtube:player-client=ios,web,android" \
+              --impersonate chrome \
+              --extractor-args "youtube:player-client=android,ios" \
               -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" \
               -o "${downloadDir}/%(playlist_title&{} - |)s%(playlist_index&{} - |)s%(title)s.%(ext)s" \
               "$URL"
