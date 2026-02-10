@@ -54,6 +54,7 @@ in
         }
       ])} -port ${toString webhookPort} -verbose";
       User = "web-static";
+      SupplementaryGroups = [ "keys" ];
       WorkingDirectory = downloadDir;
     };
   };
