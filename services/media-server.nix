@@ -15,6 +15,14 @@ in
   # Add jellyfin to web-static group to read downloaded videos
   users.users.jellyfin.extraGroups = [ "web-static" ];
 
+  # YouTube cookies secret from agenix
+  age.secrets."youtube-cookies" = {
+    file = ../secrets/youtube-cookies.txt.age;
+    owner = "web-static";
+    group = "web-static";
+    mode = "0440";
+  };
+
   # Webhook listener for downloads
   systemd.services.webhook-downloader = {
     description = "Webhook listener for YouTube downloads";
@@ -28,8 +36,8 @@ in
             set -euo pipefail
             URL=$1
             echo "Downloading $URL to ${downloadDir}"
-            # Added bypass flags and forced mp4 for Xbox compatibility
             ${pkgs.yt-dlp}/bin/yt-dlp \
+              --cookies "${config.age.secrets."youtube-cookies".path}" \
               --impersonate chrome \
               --extractor-args "youtube:player-client=android,ios" \
               -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" \
