@@ -145,7 +145,7 @@ in
           downloader-ui:
             loadBalancer:
               servers:
-                - url: "http://127.0.0.1:8091/downloader/"
+                - url: "http://127.0.0.1:8091/downloader/index.html"
           
           downloader-webhook:
             loadBalancer:
