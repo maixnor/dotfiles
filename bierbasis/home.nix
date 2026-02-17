@@ -58,5 +58,7 @@
         credential.helper = "${pkgs.gh}/bin/gh auth git-credential";
       };
     };
+
+    services.ssh-agent.enable = true;
   };
 }

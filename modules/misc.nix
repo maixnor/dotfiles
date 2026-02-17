@@ -2,9 +2,7 @@
 
 {
   config = {
-    age.secrets.slack_term = {
-      file = ../secrets/slack_term.age;
-    };
+
 
     home.packages = with pkgs; [
       opencode
@@ -80,7 +78,7 @@
       # slack-term
       slack-term
       (pkgs.writeShellScriptBin "slack" ''
-        exec ${pkgs.slack-term}/bin/slack-term -config "${config.age.secrets.slack_term.path}" "$@"
+        exec ${pkgs.slack-term}/bin/slack-term -config "/run/agenix/slack_term" "$@"
       '')
     ];
 

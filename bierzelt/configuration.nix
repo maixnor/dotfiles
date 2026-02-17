@@ -17,6 +17,12 @@
       (import "${inputs.home-manager}/nixos")
     ];
 
+  age.secrets.slack_term = {
+    file = ../secrets/slack_term.age;
+    mode = "0400";
+    owner = "maixnor";
+  };
+
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
