@@ -69,6 +69,8 @@
       root = "/var/lib/content-factory/assets";
       extraConfig = ''
         autoindex off;
+        port_in_redirect off;
+        absolute_redirect off;
         add_header Access-Control-Allow-Origin *;
       '';
     };
