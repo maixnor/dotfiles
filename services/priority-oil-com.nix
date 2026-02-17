@@ -19,6 +19,8 @@
       root = "/var/www/priority-oil.com";
       extraConfig = ''
         autoindex off;
+        port_in_redirect off;
+        absolute_redirect off;
       '';
     };
   };

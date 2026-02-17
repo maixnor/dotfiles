@@ -25,6 +25,7 @@
       josm
       nextcloud-client
       ffmpeg_8-headless
+      mdcat
 
       # nixos
       nix-index
