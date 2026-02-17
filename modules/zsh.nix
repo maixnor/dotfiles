@@ -31,7 +31,8 @@
     enable = true;
     enableCompletion = true;
     shellAliases = {
-			nix-shell = "export NIXPKGS_ALLOW_UNFREE=1 && nix-shell ";
+      g = "nvim -c Git -c only";
+      nix-shell = "export NIXPKGS_ALLOW_UNFREE=1 && nix-shell ";
       ping = "gping";
       ps = "procs";
       ls = "lsd";

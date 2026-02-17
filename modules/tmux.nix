@@ -93,6 +93,9 @@
       unbind r
       bind r source-file ~/.tmux.conf
 
+      bind g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
+      bind-key -n C-g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
+
       bind -r j resize-pane -D 5
       bind -r k resize-pane -U 5
       bind -r l resize-pane -R 5
