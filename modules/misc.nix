@@ -1,8 +1,11 @@
 { pkgs, config, ... }:
 
 {
-
   config = {
+    age.secrets.slack_term = {
+      file = ../secrets/slack_term.age;
+    };
+
     home.packages = with pkgs; [
       opencode
       openconnect
@@ -73,6 +76,12 @@
       # unfree
       obsidian
       discord
+
+      # slack-term
+      slack-term
+      (pkgs.writeShellScriptBin "slack" ''
+        exec ${pkgs.slack-term}/bin/slack-term -config "${config.age.secrets.slack_term.path}" "$@"
+      '')
     ];
 
     programs.btop.enable = true;

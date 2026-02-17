@@ -214,5 +214,9 @@
       action = "<cmd>UndotreeShow<CR>";
       key = "<leader>u";
     }
+    {
+      action = "<cmd>qa<CR>";
+      key = "<M-q>";
+    }
   ];
 }

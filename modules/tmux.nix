@@ -44,37 +44,37 @@
 		clock24 = true;
     plugins = with pkgs.tmuxPlugins;
       [
-				{ 
-				  plugin = tmux-thumbs;
-				  extraConfig = "set -g @thumbs-key F";
-				}
-				{ 
-				  plugin = fuzzback;
-				  extraConfig = "set -g @fuzzback-bind k";
-				}
+        { 
+          plugin = tmux-thumbs;
+          extraConfig = "set -g @thumbs-key M-f";
+        }
+        { 
+          plugin = fuzzback;
+          extraConfig = "set -g @fuzzback-bind M-b";
+        }
         {
           plugin = session-wizard;
-          extraConfig = "set -g @session-wizard 'e'";
+          extraConfig = "set -g @session-wizard 'M-e'";
         }
-				{ 
-				  plugin = tmux-fzf;
-				  extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
-				}
-			  { 
-				  plugin = better-mouse-mode;
-				  extraConfig = "";
-				}
-				{ 
-				  plugin = resurrect;
-				  extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
-				}
-				{ 
-				  plugin = continuum;
-				  extraConfig = ''
-						set -g @continuum-restore 'on'
-						set -g @continuum-save-interval '1'
-				  '';
-				}
+        { 
+          plugin = tmux-fzf;
+          extraConfig = ''TMUX_FZF_LAUNCH_KEY="M-t"'';
+        }
+        { 
+          plugin = better-mouse-mode;
+          extraConfig = "";
+        }
+        { 
+          plugin = resurrect;
+          extraConfig = "set -g @resurrect-capture-pane-contents 'on'";
+        }
+        { 
+          plugin = continuum;
+          extraConfig = ''
+            set -g @continuum-restore 'on'
+            set -g @continuum-save-interval '1'
+          '';
+        }
         vim-tmux-navigator
       ];
     extraConfig = ''
@@ -82,30 +82,26 @@
       unbind C-b
       bind-key C-a send-prefix
       
-      unbind %
-      bind | split-window -h -c "#{pane_current_path}"
+      # Global Alt Bindings (No Prefix)
+      bind-key -n M-c new-window      -c "#{pane_current_path}"
+      bind-key -n M-| split-window -h -c "#{pane_current_path}"
+      bind-key -n M-- split-window -v -c "#{pane_current_path}"
+      bind-key -n M-m resize-pane -Z
+      bind-key -n M-r source-file ~/.config/tmux/tmux.conf
+      bind-key -n M-g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
       
-      unbind '"'
-      bind - split-window -v -c "#{pane_current_path}"
+      # Copy/Paste
+      bind-key -n M-[ copy-mode
+      bind-key -n M-] paste-buffer
 
-      bind c new-window      -c "#{pane_current_path}"
-      
-      unbind r
-      bind r source-file ~/.tmux.conf
-
-      bind g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
-      bind-key -n C-g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
-
-      bind -r j resize-pane -D 5
-      bind -r k resize-pane -U 5
-      bind -r l resize-pane -R 5
-      bind -r h resize-pane -L 5
-      
-      bind -r m resize-pane -Z
+      # Resizing (Alt + hjkl)
+      bind-key -n M-j resize-pane -D 5
+      bind-key -n M-k resize-pane -U 5
+      bind-key -n M-l resize-pane -R 5
+      bind-key -n M-h resize-pane -L 5
 
       set -g mode-keys vi
       set -g status off
-			# set -g status-position top
       
       bind-key -T copy-mode-vi 'v' send -X begin-selection # start selecting text with "v"
       bind-key -T copy-mode-vi 'y' send -X copy-selection # copy text with "y"
