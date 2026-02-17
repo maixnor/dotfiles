@@ -21,14 +21,14 @@ in
     mode = "0444"; # Loosened as requested
   };
 
-  # Add web-static to keys group to ensure it can enter /run/agenix.d
+  # Add web-static to keys group to ensure it can enter /run/agenix
   users.users.web-static.extraGroups = [ "keys" ];
 
   # Webhook listener for downloads
   systemd.services.webhook-downloader = {
     description = "Webhook listener for YouTube downloads";
     wantedBy = [ "multi-user.target" ];
-    path = with pkgs; [ webhook yt-dlp ffmpeg coreutils bash ];
+    path = with pkgs; [ webhook yt-dlp ffmpeg coreutils findutils bash ];
     serviceConfig = {
       ExecStart = "${pkgs.webhook}/bin/webhook -hooks ${pkgs.writeText "download-hooks.json" (builtins.toJSON [
         {
@@ -38,11 +38,17 @@ in
             URL=$1
             echo "Downloading $URL to ${downloadDir}"
             ${pkgs.yt-dlp}/bin/yt-dlp \
-              --extractor-args "youtube:player-client=android,ios" \
-              -f "best" \
-              -o "${downloadDir}/%(playlist_title&{} - |)s%(playlist_index&{} - |)s%(title)s.%(ext)s" \
+              --cookies /run/agenix/youtube-cookies \
+              -f "bv*+ba/b" \
+              --embed-metadata \
+              --embed-chapters \
+              --embed-thumbnail \
+              -o "${downloadDir}/%(playlist_title&{}/|)s%(playlist_index&{:0>2d} - |)s%(title)s.%(ext)s" \
               "$URL"
-            chmod 664 "${downloadDir}"/*
+            
+            # Ensure permissions are correct for Jellyfin (dirs: 775, files: 664)
+            find "${downloadDir}" -type d -exec chmod 775 {} +
+            find "${downloadDir}" -type f -exec chmod 664 {} +
           ''}";
           pass-arguments-to-command = [
             { source = "payload"; name = "url"; }
