@@ -5,6 +5,7 @@
   
   imports = [
     inputs.stylix.homeModules.stylix
+    inputs.agenix.homeManagerModules.default
     ../modules/minecraft.nix
     ../modules/tmux.nix
     ../modules/terminal.nix

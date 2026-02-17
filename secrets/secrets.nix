@@ -16,4 +16,5 @@ in
   "content-factory.env.age".publicKeys = all;
   "github.age".publicKeys = all;
   "youtube-cookies.txt.age".publicKeys = all;
+  "slack_term.age".publicKeys = all;
 }
