@@ -218,5 +218,25 @@
       action = "<cmd>qa<CR>";
       key = "<M-q>";
     }
+    {
+      action = "<nop>";
+      key = "<Up>";
+      mode = [ "n" "v" ];
+    }
+    {
+      action = "<nop>";
+      key = "<Down>";
+      mode = [ "n" "v" ];
+    }
+    {
+      action = "<nop>";
+      key = "<Left>";
+      mode = [ "n" "v" ];
+    }
+    {
+      action = "<nop>";
+      key = "<Right>";
+      mode = [ "n" "v" ];
+    }
   ];
 }
