@@ -106,82 +106,60 @@ in
 
 
 
-  systemd.services.languagebuddy-api-test = {
-    description = "LanguageBuddy API Test Environment";
-    after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
-    requires = [ "languagebuddy-setup.service" ];
-    wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
-    script = "node -v && node main.js";
-    serviceConfig = {
-      WorkingDirectory = "/var/www/languagebuddy/test";
-      StateDirectory = "languagebuddy-api-test";
-      EnvironmentFile = "/var/www/languagebuddy/test/.env";
-      Restart = "always";
-      User = "languagebuddy";
-      Group = "languagebuddy";
-      PrivateNetwork = false;
-      IPAddressAllow = [ "127.0.0.1" "::1" ];
-      SyslogIdentifier = "languagebuddy-test";
-    };
-    environment = {
-      PORT = "8081";
-      NODE_ENV = "TEST";
-      LOG_LEVEL = "info";
-      ENVIRONMENT = "TEST";
-      SERVICE_NAME = "languagebuddy";
-      TEMPO_ENDPOINT = "http://127.0.0.1:4318";
-    };
-  };
+  # systemd.services.languagebuddy-api-test = {
+  #   description = "LanguageBuddy API Test Environment";
+  #   after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
+  #   requires = [ "languagebuddy-setup.service" ];
+  #   wantedBy = [ "default.target" ];
+  #   path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
+  #   script = "node -v && node main.js";
+  #   serviceConfig = {
+  #     WorkingDirectory = "/var/www/languagebuddy/test";
+  #     StateDirectory = "languagebuddy-api-test";
+  #     EnvironmentFile = "/var/www/languagebuddy/test/.env";
+  #     Restart = "always";
+  #     User = "languagebuddy";
+  #     Group = "languagebuddy";
+  #     PrivateNetwork = false;
+  #     IPAddressAllow = [ "127.0.0.1" "::1" ];
+  #     SyslogIdentifier = "languagebuddy-test";
+  #   };
+  #   environment = {
+  #     PORT = "8081";
+  #     NODE_ENV = "TEST";
+  #     LOG_LEVEL = "info";
+  #     ENVIRONMENT = "TEST";
+  #     SERVICE_NAME = "languagebuddy";
+  #     TEMPO_ENDPOINT = "http://127.0.0.1:4318";
+  #   };
+  # };
 
-  systemd.services.languagebuddy-api-prod = {
-    description = "LanguageBuddy API Production";
-    after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
-    requires = [ "languagebuddy-setup.service" ];
-    wantedBy = [ "default.target" ];
-    path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
-    script = "node -v && node main.js";
-    serviceConfig = {
-      WorkingDirectory = "/var/www/languagebuddy/prod";
-      StateDirectory = "languagebuddy-api-prod";
-      EnvironmentFile = "/var/www/languagebuddy/prod/.env";
-      Restart = "always";
-      User = "languagebuddy";
-      Group = "languagebuddy";
-      PrivateNetwork = false;
-      IPAddressAllow = [ "127.0.0.1" "::1" ];
-      SyslogIdentifier = "languagebuddy-prod";
-    };
-    environment = {
-      PORT = "8080";
-      NODE_ENV = "PRODUCTION";
-      LOG_LEVEL = "info";
-      ENVIRONMENT = "PROD";
-      SERVICE_NAME = "languagebuddy";
-      TEMPO_ENDPOINT = "http://127.0.0.1:4318";
-    };
-  };
-
-  services.redis = {
-    servers = {
-      languagebuddy-test = {
-        enable = true;
-        port = 6381;
-        requirePassFile = /etc/languagebuddy-dev.scrt;
-        appendOnly = true;
-        openFirewall = true;
-        bind = null;
-      };
-      languagebuddy-prod = {
-        enable = true;
-        port = 6380;
-        requirePassFile = /etc/languagebuddy-prod.scrt;
-        appendOnly = true;
-        openFirewall = true;
-        bind = null;
-      };
-    };
-  };
-  
+  # systemd.services.languagebuddy-api-prod = {
+  #   description = "LanguageBuddy API Production";
+  #   after = [ "network.target" "redis.service" "languagebuddy-setup.service" ];
+  #   requires = [ "languagebuddy-setup.service" ];
+  #   wantedBy = [ "default.target" ];
+  #   path = with pkgs; [ nodejs_22 ffmpeg_8-headless ];
+  #   script = "node -v && node main.js";
+  #   serviceConfig = {
+  #     WorkingDirectory = "/var/www/languagebuddy/prod";
+  #     StateDirectory = "languagebuddy-api-prod";
+  #     EnvironmentFile = "/var/www/languagebuddy/prod/.env";
+  #     Restart = "always";
+  #     User = "languagebuddy";
+  #     Group = "languagebuddy";
+  #     PrivateNetwork = false;
+  #     IPAddressAllow = [ "127.0.0.1" "::1" ];
+  #     SyslogIdentifier = "languagebuddy-prod";
+  #   };
+  #   environment = {
+  #     PORT = "8080";
+  #     NODE_ENV = "PRODUCTION";
+  #     LOG_LEVEL = "info";
+  #     ENVIRONMENT = "PROD";
+  #     SERVICE_NAME = "languagebuddy";
+  #     TEMPO_ENDPOINT = "http://127.0.0.1:4318";
+  #   };
+  # };
 
 }
