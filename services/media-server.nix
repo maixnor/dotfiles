@@ -28,7 +28,7 @@ in
   systemd.services.webhook-downloader = {
     description = "Webhook listener for YouTube downloads";
     wantedBy = [ "multi-user.target" ];
-    path = with pkgs; [ webhook yt-dlp ffmpeg coreutils findutils bash ];
+    path = with pkgs; [ webhook yt-dlp ffmpeg coreutils findutils bash transmission_4 ];
     serviceConfig = {
       ExecStart = "${pkgs.webhook}/bin/webhook -hooks ${pkgs.writeText "download-hooks.json" (builtins.toJSON [
         {
@@ -36,19 +36,30 @@ in
           execute-command = "${pkgs.writeShellScript "download-video.sh" ''
             set -euo pipefail
             URL=$1
-            echo "Downloading $URL to ${downloadDir}"
-            ${pkgs.yt-dlp}/bin/yt-dlp \
-              --cookies /run/agenix/youtube-cookies \
-              -f "bv*+ba/b" \
-              --embed-metadata \
-              --embed-chapters \
-              --embed-thumbnail \
-              -o "${downloadDir}/%(playlist_title&{}/|)s%(playlist_index&{:0>2d} - |)s%(title)s.%(ext)s" \
-              "$URL"
+            
+            if [[ "$URL" == magnet:* ]] || [[ "$URL" == *.torrent* ]]; then
+              echo "Adding torrent: $URL"
+              ${pkgs.transmission_4}/bin/transmission-remote -a "$URL"
+            else
+              echo "Downloading $URL to ${downloadDir}"
+              ${pkgs.yt-dlp}/bin/yt-dlp \
+                --cookies /run/agenix/youtube-cookies \
+                -f "bv*+ba/b" \
+                --embed-metadata \
+                --embed-chapters \
+                --embed-thumbnail \
+                -o "${downloadDir}/%(playlist_title&{}/|)s%(playlist_index&{:0>2d} - |)s%(title)s.%(ext)s" \
+                "$URL"
+            fi
             
             # Ensure permissions are correct for Jellyfin (dirs: 775, files: 664)
             find "${downloadDir}" -type d -exec chmod 775 {} +
             find "${downloadDir}" -type f -exec chmod 664 {} +
+            # Also ensure torrent dir permissions if it exists
+            if [ -d "/var/www/torrents" ]; then
+              find "/var/www/torrents" -type d -exec chmod 775 {} +
+              find "/var/www/torrents" -type f -exec chmod 664 {} +
+            fi
           ''}";
           pass-arguments-to-command = [
             { source = "payload"; name = "url"; }
@@ -89,9 +100,10 @@ in
           </head>
           <body>
               <div class="container">
-                  <h1>Maya Downloader</h1>
-                  <p>Paste a YouTube URL to download it to Jellyfin.</p>
-                  <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+                   <h1>Maya Downloader</h1>
+                   <p>Paste a YouTube URL or Torrent/Magnet link.</p>
+                   <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=... or magnet:?xt=...">
+
                   <button onclick="download()">Download</button>
                   <div id="status"></div>
               </div>

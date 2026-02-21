@@ -1,4 +1,4 @@
-{ modulesPath, pkgs, nixvim, ... }:
+{ modulesPath, pkgs, nixvim, inputs, ... }:
 
 let 
   hostname = "wieselburg";
@@ -8,6 +8,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
+    inputs.windscribe.nixosModules.default
     ../modules/misc-server.nix
     ../modules/gh-auth.nix
     ../modules/zerotier.nix
@@ -24,12 +25,15 @@ in
     # ../services/nextcloud.nix
     ../services/immich.nix
     ../services/media-server.nix
+    ../services/torrent-server.nix
     ../services/error-pages.nix
     ../services/adhoc-tunnel.nix
     # ../services/audiobookshelf.nix
     # ../services/navidrome.nix
     # ../services/collabora.nix
   ];
+
+  services.windscribe.enable = true;
 
   virtualisation.vmware.guest.enable = true;
 
