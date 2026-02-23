@@ -16,7 +16,7 @@
     ../modules/zsh.nix
     ../modules/graphics.nix
     ../modules/firefox.nix
-    ../modules/gemini.nix
+    ../modules/agentic.nix
   ];
 
   config = {

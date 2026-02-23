@@ -3,6 +3,7 @@
 {
   home.packages = with pkgs; [
     gemini-cli
+    opencode
   ];
 
   home.file.".gemini/settings.json".text = builtins.toJSON ({
@@ -33,5 +34,10 @@
         selectedType = "oauth-personal";
       };
     };
+  });
+
+  home.file.".config/opencode/opencode.json".text = builtins.toJSON ({
+    "$schema" = "https://opencode.ai/config.json";
+    plugin = [ "opencode-gemini-auth@latest" ];
   });
 }
