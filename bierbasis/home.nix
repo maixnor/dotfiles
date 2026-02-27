@@ -40,6 +40,7 @@
     home.sessionVariables = {
       EDITOR = "nvim";
       LANG = "en_US.UTF-8";
+      SSH_ASKPASS = "ksshaskpass";
     };
 
     programs.home-manager.enable = true;

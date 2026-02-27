@@ -28,6 +28,11 @@
     owner = "maixnor";
   };
 
+  age.secrets."opencode.json" = {
+    file = ../secrets/opencode.json.age;
+    owner = "maixnor";
+  };
+
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
@@ -98,6 +103,7 @@
   environment.systemPackages = with pkgs; [ 
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum
+    kdePackages.ksshaskpass
     wormhole-william
     gnome-network-displays
     podman-compose # drop in replacement for docker-compose
@@ -134,6 +140,7 @@
   services.pulseaudio.enable = false;
   security.polkit.enable = true;
   security.rtkit.enable = true;
+  security.pam.services.sddm.kwallet.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
