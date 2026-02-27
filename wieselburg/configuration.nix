@@ -8,7 +8,6 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     (modulesPath + "/profiles/qemu-guest.nix")
     ./vpsadminos.nix # for vpsfree.cz
-    inputs.windscribe.nixosModules.default
     ../modules/misc-server.nix
     ../modules/gh-auth.nix
     ../modules/zerotier.nix
@@ -32,8 +31,6 @@ in
     # ../services/navidrome.nix
     # ../services/collabora.nix
   ];
-
-  services.windscribe.enable = true;
 
   virtualisation.vmware.guest.enable = true;
 
