@@ -573,7 +573,8 @@
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-mozilla": "nixpkgs-mozilla",
         "nixvim": "nixvim",
-        "stylix": "stylix"
+        "stylix": "stylix",
+        "windscribe": "windscribe"
       }
     },
     "stylix": {
@@ -746,6 +747,26 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
+        "type": "github"
+      }
+    },
+    "windscribe": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1747016386,
+        "narHash": "sha256-mh7dscKnz3uTc26vaO2G+0qbpJMKD1DixQJ6owmrX8M=",
+        "owner": "ItzDerock",
+        "repo": "windscribe-nix",
+        "rev": "a487457d083450cd3bff505990e64b1696b204d0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ItzDerock",
+        "repo": "windscribe-nix",
         "type": "github"
       }
     }
