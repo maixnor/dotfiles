@@ -1,27 +1,11 @@
-{ pkgs, lib, inputs, ... }:
+{ pkgs, lib, ... }:
 
 let
   downloadDir = "/var/www/torrents";
 in
 {
-  imports = [
-    inputs.windscribe.nixosModules.default
-  ];
-
-  services.windscribe.enable = true;
-
-  users.groups.windscribe = {};
-  users.users.windscribe = {
-    isSystemUser = true;
-    group = "windscribe";
-  };
-
-  security.wrappers.windscribe = {
-    owner = "root";
-    group = "windscribe";
-    source = "${inputs.windscribe.packages.${pkgs.system}.default}/bin/windscribe-v2-bin";
-    setgid = true;
-  };
+  # Declarative user and group definitions
+  users.groups.web-static = {};
 
   # Ensure the download directory exists with correct permissions
   systemd.tmpfiles.rules = [
@@ -32,21 +16,24 @@ in
   # Define transmission user and group with fixed IDs for nftables and group access
   users.users.transmission = {
     isSystemUser = true;
-    group = "transmission";
+    group = "web-static";
     uid = lib.mkDefault 700;
-    extraGroups = [ "web-static" "windscribe" ];
   };
   users.groups.transmission.gid = lib.mkDefault 700;
 
   # Ensure access for other users
-  users.users.maixnor.extraGroups = [ "transmission" "web-static" "windscribe" ];
-  users.users.web-static.extraGroups = [ "transmission" ];
+  users.users.maixnor.extraGroups = [ "transmission" "web-static" ];
+  users.users.web-static = {
+    isSystemUser = true;
+    group = "web-static";
+    extraGroups = [ "transmission" ];
+  };
 
   services.transmission = {
     enable = true;
     package = pkgs.transmission_4;
     user = "transmission";
-    group = "transmission";
+    group = "web-static";
     settings = {
       download-dir = downloadDir;
       incomplete-dir-enabled = true;
@@ -63,20 +50,6 @@ in
       dht-enabled = false; # Extra safety to prevent leaking
       lpd-enabled = false;
       pex-enabled = false;
-    };
-  };
-
-  # Auto-connect Windscribe on boot
-  systemd.services.windscribe-autoconnect = {
-    description = "Automatically connect to Windscribe on boot";
-    after = [ "network-online.target" "windscribe.service" ];
-    wants = [ "network-online.target" "windscribe.service" ];
-    # wantedBy = [ "multi-user.target" ]; # Disable for now or make it non-blocking
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${inputs.windscribe.packages.${pkgs.system}.default}/bin/windscribe-v2-bin connect best";
-      ExecStop = "${inputs.windscribe.packages.${pkgs.system}.default}/bin/windscribe-v2-bin disconnect";
     };
   };
 

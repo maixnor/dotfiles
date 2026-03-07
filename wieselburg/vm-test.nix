@@ -64,8 +64,8 @@
   };
 
   # Disable some services that might cause issues in VM
-  services.zerotierone.enable = lib.mkForce false;
-  services.autoupdate.enable = lib.mkForce false;
+  # services.zerotierone.enable = lib.mkForce false;
+  # services.autoupdate.enable = lib.mkForce false;
   
   # Use dummy certificates instead of ACME for testing
   security.acme.acceptTerms = lib.mkForce false;

@@ -35,13 +35,13 @@
       url = "path:./content-factory";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    windscribe = {
-      url = "github:ItzDerock/windscribe-nix";
+    worktrunk = {
+      url = "github:max-sixty/worktrunk";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, windscribe, ... } @inputs :
+  outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, worktrunk, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 

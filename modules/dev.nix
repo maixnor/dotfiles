@@ -110,6 +110,7 @@ in {
       python314
 
       inputs.agenix.packages.${system}.default
+      inputs.worktrunk.packages.${system}.default
 
       # rustup 
       # jetbrains.rust-rover
