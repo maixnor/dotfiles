@@ -52,7 +52,7 @@ in
     options = "--delete-older-than 30d";
   };
 
-  services.autoupdate.enable = true;
+  services.autoupdate.enable = false;
   services.autoupdate.webhook.domain = "wieselburg.maixnor.com";
 
   services.openssh.enable = true;

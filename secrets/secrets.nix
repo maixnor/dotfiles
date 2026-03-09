@@ -17,4 +17,5 @@ in
   "github.age".publicKeys = all;
   "youtube-cookies.txt.age".publicKeys = all;
   "slack_term.age".publicKeys = all;
+  "opencode.json.age".publicKeys = all;
 }

@@ -5,7 +5,6 @@
 
 
     home.packages = with pkgs; [
-      opencode
       openconnect
       traceroute
       wget xh

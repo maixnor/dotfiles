@@ -23,6 +23,11 @@
     owner = "maixnor";
   };
 
+  age.secrets."opencode.json" = {
+    file = ../secrets/opencode.json.age;
+    owner = "maixnor";
+  };
+
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;

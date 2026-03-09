@@ -8,8 +8,8 @@
 
   # Make it available in the shell for gh CLI and other tools
   environment.extraInit = ''
-    if [ -f /run/secrets/github ]; then
-      export GITHUB_TOKEN=$(cat /run/secrets/github)
+    if [ -f /run/agenix/github ]; then
+      export GITHUB_TOKEN=$(cat /run/agenix/github)
     fi
   '';
 

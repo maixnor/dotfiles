@@ -19,6 +19,7 @@
       ../modules/zerotier.nix
       ../modules/content-factory-cli.nix
       ../services/autoupdate.nix
+      ../services/torrent-server.nix
       (import "${inputs.home-manager}/nixos")
     ];
 
@@ -170,7 +171,7 @@
     ];
   };
 
-  networking.nftables.enable = false;
+  networking.nftables.enable = true;
   networking.firewall = { 
     enable = true;
     allowedTCPPortRanges = [ 

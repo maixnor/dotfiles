@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.packages = with pkgs; [
@@ -6,6 +6,12 @@
     claude-code
     opencode
   ];
+
+  home.file.".config/opencode/opencode.json".source = config.lib.file.mkOutOfStoreSymlink "/run/agenix/opencode.json";
+
+  home.activation.createOpencodeDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.config/opencode"
+  '';
 
   home.file.".gemini/settings.json".text = builtins.toJSON ({
     general = {
@@ -37,8 +43,4 @@
     };
   });
 
-  home.file.".config/opencode/opencode.json".text = builtins.toJSON ({
-    "$schema" = "https://opencode.ai/config.json";
-    plugin = [ "opencode-gemini-auth@latest" ];
-  });
 }
