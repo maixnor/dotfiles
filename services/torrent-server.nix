@@ -4,9 +4,12 @@ let
   downloadDir = "/var/www/torrents";
 in
 {
+<<<<<<< HEAD
   # Declarative user and group definitions
   users.groups.web-static = {};
 
+=======
+>>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   # Ensure the download directory exists with correct permissions
   systemd.tmpfiles.rules = [
     "d ${downloadDir} 0775 transmission web-static -"
@@ -18,11 +21,19 @@ in
     isSystemUser = true;
     group = "web-static";
     uid = lib.mkDefault 700;
+<<<<<<< HEAD
+=======
+    extraGroups = [ "web-static" ];
+>>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   };
   users.groups.transmission.gid = lib.mkDefault 700;
 
   # Ensure access for other users
   users.users.maixnor.extraGroups = [ "transmission" "web-static" ];
+<<<<<<< HEAD
+=======
+  users.groups.web-static = {};
+>>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   users.users.web-static = {
     isSystemUser = true;
     group = "web-static";
@@ -52,6 +63,7 @@ in
       pex-enabled = false;
     };
   };
+<<<<<<< HEAD
 
   # Kill Switch via nftables
   # We only allow Transmission to communicate over the VPN interface (tun0 or similar)
@@ -78,3 +90,6 @@ in
     }
   '';
 }
+=======
+}
+>>>>>>> 36e3969 (chore: remove windscribe vpn completely)
