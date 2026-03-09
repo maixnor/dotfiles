@@ -35,7 +35,6 @@
       url = "path:./content-factory";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-<<<<<<< HEAD
     worktrunk = {
       url = "github:max-sixty/worktrunk";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -43,11 +42,6 @@
   };
 
   outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, worktrunk, ... } @inputs :
-=======
-  };
-
-  outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, ... } @inputs :
->>>>>>> 36e3969 (chore: remove windscribe vpn completely)
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { 

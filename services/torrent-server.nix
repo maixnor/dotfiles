@@ -4,12 +4,9 @@ let
   downloadDir = "/var/www/torrents";
 in
 {
-<<<<<<< HEAD
   # Declarative user and group definitions
   users.groups.web-static = {};
 
-=======
->>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   # Ensure the download directory exists with correct permissions
   systemd.tmpfiles.rules = [
     "d ${downloadDir} 0775 transmission web-static -"
@@ -21,19 +18,11 @@ in
     isSystemUser = true;
     group = "web-static";
     uid = lib.mkDefault 700;
-<<<<<<< HEAD
-=======
-    extraGroups = [ "web-static" ];
->>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   };
   users.groups.transmission.gid = lib.mkDefault 700;
 
   # Ensure access for other users
   users.users.maixnor.extraGroups = [ "transmission" "web-static" ];
-<<<<<<< HEAD
-=======
-  users.groups.web-static = {};
->>>>>>> 36e3969 (chore: remove windscribe vpn completely)
   users.users.web-static = {
     isSystemUser = true;
     group = "web-static";
@@ -63,33 +52,4 @@ in
       pex-enabled = false;
     };
   };
-<<<<<<< HEAD
-
-  # Kill Switch via nftables
-  # We only allow Transmission to communicate over the VPN interface (tun0 or similar)
-  # or to the local network for RPC
-  networking.nftables.enable = true;
-  networking.nftables.ruleset = ''
-    table inet filter {
-      chain output {
-        type filter hook output priority 0; policy accept;
-
-        # Mark traffic from transmission user (UID 700)
-        skuid 700 mark set 0x1
-      }
-    }
-
-    table inet vpn_killswitch {
-      chain output {
-        type filter hook output priority 1; policy accept;
-        
-        # Traffic marked 0x1 (from transmission) MUST go through tun0 or lo
-        # Using a set to avoid errors if tun0 doesn't exist yet
-        meta mark 0x1 oifname != { "tun0", "lo" } drop
-      }
-    }
-  '';
 }
-=======
-}
->>>>>>> 36e3969 (chore: remove windscribe vpn completely)
