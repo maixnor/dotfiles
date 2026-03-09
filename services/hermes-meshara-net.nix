@@ -31,7 +31,7 @@
       http:
         routers:
           hermes-meshara-net:
-            rule: "Host(`hermes.meshara.net`) || Host(`www.hermes.meshara.net`)"
+            rule: "Host(`hermes.meshara.net`)"
             service: "hermes-meshara-net"
             entryPoints:
               - "websecure"

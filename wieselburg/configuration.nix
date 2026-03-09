@@ -10,27 +10,22 @@ in
     ./vpsadminos.nix # for vpsfree.cz
     ../modules/misc-server.nix
     ../modules/gh-auth.nix
-    ../modules/zerotier.nix
-    ../modules/content-factory-cli.nix
+    # ../modules/zerotier.nix
+    # ../modules/content-factory-cli.nix
     ../services/autoupdate.nix
     ../services/traefik-base.nix
     ../services/maixnorcom.nix
     ../services/priority-oil-com.nix
     ../services/hermes-meshara-net.nix
     ../services/searx.nix
-    ../services/languagebuddy.nix
+    # ../services/languagebuddy.nix
     ../services/observability.nix
-    ../services/content-factory.nix
-    # ../services/ai-research.nix
     # ../services/nextcloud.nix
     ../services/immich.nix
     ../services/media-server.nix
     # ../services/torrent-server.nix
     ../services/error-pages.nix
     ../services/adhoc-tunnel.nix
-    # ../services/audiobookshelf.nix
-    # ../services/navidrome.nix
-    # ../services/collabora.nix
   ];
 
   virtualisation.vmware.guest.enable = true;

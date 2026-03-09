@@ -57,6 +57,12 @@
         module = import ./modules/nixvim.nix;
         extraSpecialArgs = {};
       };
+
+      nixvim-lite = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
+        inherit pkgs;
+        module = import ./modules/nixvim-lite.nix;
+        extraSpecialArgs = {};
+      };
 # TODO build utility function with loop
     in {
             nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
@@ -77,16 +83,16 @@
       
             nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-              specialArgs = { inherit inputs; inherit nixvim; };
-              modules = [ 
-                ./wieselburg/configuration.nix 
+              specialArgs = { inherit inputs; nixvim = nixvim-lite; };
+              modules = [
+                ./wieselburg/configuration.nix
                 agenix.nixosModules.default
               ];
             };
       
             nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
               system = "x86_64-linux";
-              specialArgs = { inherit inputs; inherit nixvim; };
+              specialArgs = { inherit inputs; nixvim = nixvim-lite; };
               modules = [ ./wieselburg/vm-test.nix ];
             };
       
@@ -120,6 +126,7 @@
             packages.x86_64-linux = {
               default = nixvim;
               nixvim = nixvim;
+              nixvim-lite = nixvim-lite;
               wieselburg-vm-test = inputs.self.nixosConfigurations.wieselburg-vm-test.config.system.build.vm;
               content-factory = inputs.content-factory.packages.${system}.maya-all;
             };
