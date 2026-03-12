@@ -96,5 +96,5 @@ in
   security.sudo.wheelNeedsPassword = false;
   nix.settings.trusted-users = [ "@wheel" "maixnor" "backup" ];
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.11";
 }

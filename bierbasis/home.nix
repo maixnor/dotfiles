@@ -19,7 +19,6 @@
   ];
 
   config = {
-    nixpkgs.config.allowUnfree = true;
     home.username = "maixnor";
     home.homeDirectory = "/home/maixnor";
 
@@ -35,7 +34,7 @@
       enable = true;
     };
 
-    home.stateVersion = "24.11";
+    home.stateVersion = "25.11";
 
     home.sessionVariables = {
       EDITOR = "nvim";

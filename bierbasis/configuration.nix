@@ -37,6 +37,11 @@
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = [
+    (final: prev: {
+      xrdb = final.xorg.xrdb;
+    })
+  ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
   nix.settings.cores = 7; # I have 8 cores and would like 1 to still be reactive during a build
@@ -156,6 +161,8 @@
   users.groups.maixnor = {};
 
   home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
     extraSpecialArgs = { inherit inputs; };
     users.maixnor = import ./home.nix;
   };
@@ -238,6 +245,6 @@
     };
   };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.11";
 
 }
