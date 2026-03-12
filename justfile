@@ -26,6 +26,6 @@ remove-gtk:
   rm -rf ~/.gtk*
 
 expire:
-  sudo nix-collect-garbage --delete-older-than 30d
-  nix-collect-garbage --delete-older-than 30d
+  sudo nix-collect-garbage --delete-older-than 7d
+  nix-collect-garbage --delete-older-than 7d
 

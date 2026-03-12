@@ -2,7 +2,7 @@
   description = "Maixnor's NixOs and Home-Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/master";
+    nixpkgs.url = "github:nixos/nixpkgs";
 		nixvim = {
 			url = "github:nix-community/nixvim";
 			inputs.nixpkgs.follows = "nixpkgs";
@@ -22,7 +22,6 @@
     impermanence.url = "github:nix-community/impermanence";
     nix-colors.url = "github:misterio77/nix-colors";
     stylix.url = "github:danth/stylix";
-    nixpkgs-mozilla.url = "github:mozilla/nixpkgs-mozilla";
     nixos-generators = {
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,9 +43,8 @@
   outputs = { nixpkgs, home-manager, nixos-generators, agenix, content-factory, worktrunk, ... } @inputs :
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { 
+      pkgs = import nixpkgs {
         inherit system;
-        overlays = [ inputs.nixpkgs-mozilla.overlay ];
         config = {
             allowUnfree = true;
         };
