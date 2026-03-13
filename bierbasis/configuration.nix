@@ -171,7 +171,7 @@
     isNormalUser = true;
     description = "Benjamin Meixner";
     group = "maixnor";
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" "dialout" "uucp" ];
     packages = [
       nixvim
       # pkgs go here
