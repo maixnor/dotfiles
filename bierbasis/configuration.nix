@@ -55,7 +55,7 @@
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
 
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
 
   hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;
@@ -197,17 +197,15 @@
   };
 
   programs.dconf.enable = true;
-  #virtualisation = {
-  #  libvirtd = {
-  #    enable = true;
-  #    qemu = {
-  #      swtpm.enable = true;
-  #      ovmf.enable = true;
-  #      ovmf.packages = [ pkgs.OVMFFull.fd ];
-  #    };
-  #  };
-  #  spiceUSBRedirection.enable = true;
-  #};
+  virtualisation = {
+    libvirtd = {
+      enable = true;
+      qemu = {
+        swtpm.enable = true;
+      };
+    };
+    spiceUSBRedirection.enable = true;
+  };
 
 
   #services.ollama = {
