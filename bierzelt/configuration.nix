@@ -42,7 +42,7 @@
   systemd.services.NetworkManager-wait-online.enable = false;
 
   boot.supportedFilesystems = lib.mkForce [ "btrfs" "reiserfs" "vfat" "f2fs" "xfs" "ntfs" "cifs" ];
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_6_12;
 
   hardware.bluetooth.enable = true;
   hardware.enableRedistributableFirmware = true;

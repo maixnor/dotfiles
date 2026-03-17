@@ -116,7 +116,7 @@
   };
 
   # Brightness control for power saving
-  programs.light.enable = true;
+  hardware.acpilight.enable = true;
   
   # Enable TLP as alternative (COMMENTED OUT - conflicts with auto-cpufreq)
   # Uncomment and disable auto-cpufreq if you prefer TLP instead
