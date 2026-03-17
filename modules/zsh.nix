@@ -94,7 +94,7 @@
 
     # Post-create hook: automatically allow direnv if .envrc exists
     [post-create]
-    direnv = "test -f .envrc && direnv allow || true"
+    direnv = "test -f {{ worktree_path }}/.envrc && cd {{ worktree_path }} && direnv allow || true"
 
     # Uncomment and configure if you want LLM-generated commit messages
     # [commit.generation]
