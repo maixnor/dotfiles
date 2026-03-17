@@ -9,6 +9,7 @@
     [
       ./hardware-configuration.nix
       ../modules/dev.nix
+      ../modules/email.nix
       #../modules/gh-auth.nix
       ../modules/zerotier.nix
       ../modules/content-factory-cli.nix

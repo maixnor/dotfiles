@@ -26,10 +26,6 @@
       ffmpeg_8-headless
       mdcat
 
-      # email
-      evolution
-      evolution-ews
-
       # nixos
       nix-index
       nixos-anywhere

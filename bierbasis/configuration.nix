@@ -13,6 +13,7 @@
       ./nvidia.nix
       ./gaming.nix
       ../modules/gh-auth.nix
+      ../modules/email.nix
       #../modules/moodle.nix
       #../modules/services.nix
       ../modules/dev.nix
