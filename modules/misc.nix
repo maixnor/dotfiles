@@ -20,12 +20,15 @@
       inkscape
       mpv
       anki
-      thunderbird
       ngrok
       josm
       nextcloud-client
       ffmpeg_8-headless
       mdcat
+
+      # email
+      evolution
+      evolution-ews
 
       # nixos
       nix-index
