@@ -99,6 +99,10 @@ in {
       settings.cacheSize = 5000;
     };
 
+    environment.sessionVariables = {
+      CARGO_TARGET_DIR = "$HOME/.cargo/target";
+    };
+
     environment.systemPackages = with pkgs; [
       sqlite
       sqlitebrowser
