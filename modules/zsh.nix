@@ -98,7 +98,7 @@
 
     # LLM-generated commit messages using Claude with Haiku model
     [commit.generation]
-    command = "MAX_THINKING_TOKENS=0 claude -p --no-session-persistence --model=haiku --tools='''' --disable-slash-commands --setting-sources='''' --system-prompt=''''"
+    command = "MAX_THINKING_TOKENS=0 claude -p --no-session-persistence --model=haiku --disable-slash-commands"
   '';
 
 }
