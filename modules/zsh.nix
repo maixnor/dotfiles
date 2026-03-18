@@ -96,9 +96,9 @@
     [post-create]
     direnv = "test -f {{ worktree_path }}/.envrc && cd {{ worktree_path }} && direnv allow || true"
 
-    # Uncomment and configure if you want LLM-generated commit messages
-    # [commit.generation]
-    # command = "claude -p --no-session-persistence --model=haiku"
+    # LLM-generated commit messages using Claude with Haiku model
+    [commit.generation]
+    command = "MAX_THINKING_TOKENS=0 claude -p --no-session-persistence --model=haiku --tools='''' --disable-slash-commands --setting-sources='''' --system-prompt=''''"
   '';
 
 }

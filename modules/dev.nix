@@ -101,6 +101,7 @@ in {
 
     environment.sessionVariables = {
       CARGO_TARGET_DIR = "$HOME/.cargo/target";
+      ANTHROPIC_MODEL = "haiku";
     };
 
     environment.systemPackages = with pkgs; [
