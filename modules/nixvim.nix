@@ -97,7 +97,7 @@
       html.enable = true;
       jsonls.enable = true;
       yamlls.enable = true;
-      ccls.enable = true;
+      clangd.enable = true;
       rust_analyzer = {
         enable = true;
         installCargo = false;
