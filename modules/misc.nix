@@ -5,6 +5,7 @@
 
 
     home.packages = with pkgs; [
+      psmisc
       openconnect
       traceroute
       wget xh
