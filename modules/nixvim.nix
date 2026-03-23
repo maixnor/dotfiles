@@ -97,6 +97,7 @@
       html.enable = true;
       jsonls.enable = true;
       yamlls.enable = true;
+      ccls.enable = true;
       rust_analyzer = {
         enable = true;
         installCargo = false;
@@ -119,37 +120,6 @@
       };
     };
   };
-
-  #plugins = {
-    # lsp = {
-    #   enable = true;
-    #   servers = {
-    #     omnisharp = {
-    #       enable = true;
-    #       settings.enableImportCompletion = true;
-    #       settings.organizeImportsOnFormat = true;
-    #     };
-    #     java-language-server.enable = true;
-    # 		ts-ls.enable = true;
-
-    #     ltex = {
-    #       enable = true;
-    #       settings = {
-    #         enable = [ "latex" "markdown" "html" ];
-    #         checkFrequency = "edit";
-    #         language = "en-US";
-    #         statusBarItem = true;
-    #         completionEnabled = true;
-    #         languageToolHttpServerUri = "http://127.0.0.1:6767/";
-    #       };
-    #     };
-
-    #     html.enable = true;
-    #     jsonls.enable = true;
-    #     yamlls.enable = true;
-    #   };
-    # };
-  #};
 
   highlightOverride = {
     Comment.fg = "#f47ac9";
