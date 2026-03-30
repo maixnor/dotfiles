@@ -32,6 +32,11 @@
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = [
+    (final: prev: {
+      xrdb = prev.xorg.xrdb;
+    })
+  ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
 
@@ -96,6 +101,7 @@
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.xserver.videoDrivers = [ "displaylink" "modesetting" ];
+  services.xserver.enable = false;
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";
@@ -133,9 +139,12 @@
   users.groups.maixnor = {};
 
   home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
     extraSpecialArgs = { inherit inputs; };
     users.maixnor = import ./home.nix;
   };
+
   users.users.maixnor = {
     isNormalUser = true;
     description = "Benjamin Meixner";

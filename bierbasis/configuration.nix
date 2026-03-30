@@ -38,11 +38,6 @@
   services.autoupdate.enable = true;
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.overlays = [
-    (final: prev: {
-      xrdb = final.xorg.xrdb;
-    })
-  ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
   nix.settings.cores = 7; # I have 8 cores and would like 1 to still be reactive during a build
@@ -86,6 +81,7 @@
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
+  services.xserver.enable = false;
   services.xserver.xkb = {
     layout = "us";
     variant = "workman";

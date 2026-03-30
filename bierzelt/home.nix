@@ -6,10 +6,10 @@
   imports = [
     inputs.stylix.homeModules.stylix
     inputs.agenix.homeManagerModules.default
-    ../modules/minecraft.nix
+    #../modules/minecraft.nix
     ../modules/tmux.nix
     ../modules/terminal.nix
-    ../modules/zed.nix
+    #../modules/zed.nix
     ../modules/office.nix
     ../modules/misc.nix
     ../modules/stylix.nix
@@ -20,7 +20,6 @@
   ];
 
   config = {
-    nixpkgs.config.allowUnfree = true;
     home.username = "maixnor";
     home.homeDirectory = "/home/maixnor";
 

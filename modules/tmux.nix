@@ -46,19 +46,19 @@
       [
         { 
           plugin = tmux-thumbs;
-          extraConfig = "set -g @thumbs-key M-f";
+          extraConfig = "set -g @thumbs-key f";
         }
         { 
           plugin = fuzzback;
-          extraConfig = "set -g @fuzzback-bind M-b";
+          extraConfig = "set -g @fuzzback-bind b";
         }
         {
           plugin = session-wizard;
-          extraConfig = "set -g @session-wizard 'M-e'";
+          extraConfig = "set -g @session-wizard 'e'";
         }
         { 
           plugin = tmux-fzf;
-          extraConfig = ''TMUX_FZF_LAUNCH_KEY="M-t"'';
+          extraConfig = ''TMUX_FZF_LAUNCH_KEY="tab"'';
         }
         { 
           plugin = better-mouse-mode;
@@ -84,9 +84,9 @@
       
       # Global Alt Bindings (No Prefix)
       bind-key -n M-c new-window      -c "#{pane_current_path}"
-      bind-key -n M-| split-window -h -c "#{pane_current_path}"
+      bind-key -n M-\ split-window -h -c "#{pane_current_path}"
       bind-key -n M-- split-window -v -c "#{pane_current_path}"
-      bind-key -n M-m resize-pane -Z
+      bind-key -n M-z resize-pane -Z
       bind-key -n M-r source-file ~/.config/tmux/tmux.conf
       bind-key -n M-g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
       
