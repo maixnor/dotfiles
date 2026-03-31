@@ -107,23 +107,6 @@
         "type": "github"
       }
     },
-    "content-factory": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "path": "./content-factory",
-        "type": "path"
-      },
-      "original": {
-        "path": "./content-factory",
-        "type": "path"
-      },
-      "parent": []
-    },
     "crane": {
       "locked": {
         "lastModified": 1767744144,
@@ -581,7 +564,6 @@
     "root": {
       "inputs": {
         "agenix": "agenix",
-        "content-factory": "content-factory",
         "disko": "disko",
         "firefox-addons": "firefox-addons",
         "home-manager": "home-manager_2",

@@ -18,7 +18,6 @@
       #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
-      ../modules/content-factory-cli.nix
       ../services/autoupdate.nix
       ../services/torrent-server.nix
       (import "${inputs.home-manager}/nixos")

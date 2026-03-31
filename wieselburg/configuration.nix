@@ -11,7 +11,6 @@ in
     ../modules/misc-server.nix
     ../modules/gh-auth.nix
     # ../modules/zerotier.nix
-    # ../modules/content-factory-cli.nix
     ../services/autoupdate.nix
     ../services/traefik-base.nix
     ../services/maixnorcom.nix
