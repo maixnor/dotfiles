@@ -39,7 +39,7 @@
       diff = "delta";
       cd = "z";
     };
-    initExtra = ''
+    initContent = ''
       # Worktrunk shell integration
       eval "$(wt config shell init zsh)"
     '';
