@@ -58,27 +58,6 @@
     secretsFile = "/var/lib/immich/secrets.env";
   };
 
-  # Ensure PostgreSQL is configured properly for Immich
-  services.postgresql = {
-    enable = true;
-    ensureDatabases = [ "immich" ];
-    ensureUsers = [
-      {
-        name = "immich";
-        ensureDBOwnership = true;
-      }
-    ];
-    # Declarative way to install extensions after database is created
-    initialScript = pkgs.writeText "immich-init.sql" ''
-      -- Create extensions for Immich
-      \c immich;
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-      CREATE EXTENSION IF NOT EXISTS cube;
-      CREATE EXTENSION IF NOT EXISTS earthdistance;
-      CREATE EXTENSION IF NOT EXISTS vectors;
-    '';
-  };
-
   # Configure Redis server for Immich (separate from your languagebuddy instances)
   services.redis.servers.immich = {
     enable = true;
