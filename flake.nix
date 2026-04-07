@@ -37,7 +37,7 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, nixos-generators, agenix, worktrunk, ... } @inputs :
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, nixos-generators, agenix, worktrunk, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -45,6 +45,16 @@
         config = {
             allowUnfree = true;
         };
+        overlays = [
+          (final: prev: {
+            unstable = import nixpkgs-unstable {
+              inherit system;
+              config = {
+                allowUnfree = true;
+              };
+            };
+          })
+        ];
       };
 
       nixvim = inputs.nixvim.legacyPackages.${system}.makeNixvimWithModule {
@@ -61,6 +71,7 @@
 # TODO build utility function with loop
     in {
             nixosConfigurations."bierbasis" = nixpkgs.lib.nixosSystem {
+                inherit pkgs;
                 specialArgs = { inherit inputs; inherit nixvim; };
                 modules = [ 
                   ./bierbasis/configuration.nix 
@@ -69,6 +80,7 @@
             };
       
             nixosConfigurations."bierzelt" = nixpkgs.lib.nixosSystem {
+              inherit pkgs;
               specialArgs = { inherit inputs; inherit nixvim; };
               modules = [ 
                 ./bierzelt/configuration.nix 
@@ -77,7 +89,7 @@
             };
       
             nixosConfigurations."wieselburg" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+              inherit pkgs;
               specialArgs = { inherit inputs; nixvim = nixvim-lite; };
               modules = [
                 ./wieselburg/configuration.nix

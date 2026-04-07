@@ -28,9 +28,9 @@
     owner = "maixnor";
   };
 
+  services.onedrive.enable = true;
   services.autoupdate.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [
     (final: prev: {
       xrdb = prev.xorg.xrdb;

@@ -2,9 +2,9 @@
 
 {
   home.packages = with pkgs; [
-    gemini-cli
-    claude-code
-    opencode
+    unstable.gemini-cli
+    unstable.claude-code
+    unstable.opencode
   ];
 
   home.file.".config/opencode/opencode.json".source = config.lib.file.mkOutOfStoreSymlink "/run/agenix/opencode.json";

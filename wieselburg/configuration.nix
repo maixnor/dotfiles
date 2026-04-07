@@ -15,6 +15,7 @@ in
     ../services/traefik-base.nix
     ../services/maixnorcom.nix
     ../services/priority-oil-com.nix
+    ../services/imognimma-maixnor-com.nix
     ../services/hermes-meshara-net.nix
     ../services/searx.nix
     # ../services/languagebuddy.nix
@@ -29,7 +30,6 @@ in
 
   virtualisation.vmware.guest.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.cores = 2;
   nix.settings.max-jobs = 1;
