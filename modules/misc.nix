@@ -26,6 +26,7 @@
       nextcloud-client
       ffmpeg_8-headless
       mdcat
+      nh
 
       # nixos
       nix-index
