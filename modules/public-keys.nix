@@ -24,6 +24,7 @@ let
     wieselburg = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP9onF8hjTqY9iuWwv1eCjIhkwnBlmU8n9+foef422/H root@nixos";
     bierzelt   = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCK7tXv+thAIgB3BMFgBPq56LuzVmVkSg6/mpDmpEfT root@bierzelt";
     bierbasis  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHJWpPGBkuLR6riBJT3xIFKRjYfIWdJ4PieuF1qbTjnn root@Bierbasis";
+    ottakring  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBg4Y4+V238XyNvf8bVZE7+749rzyEbb2pht2zvX/OKo root@nixos";
   };
 in
 {

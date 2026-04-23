@@ -19,6 +19,12 @@ wieselburg:
 deploy-wieselburg:
   nixos-rebuild switch --flake .#wieselburg --target-host wieselburg.maixnor.com --sudo
 
+ottakring:
+  just update ottakring
+
+deploy-ottakring:
+  nixos-rebuild switch --flake .#ottakring --target-host probatio@172.16.32.135 --sudo --ask-sudo-password
+
 remove-gtk:
   rm -rf ~/.gtk*
 

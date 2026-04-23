@@ -44,6 +44,9 @@
         inherit system;
         config = {
             allowUnfree = true;
+            permittedInsecurePackages = [
+              "python3.12-pypdf2-3.0.1"
+            ];
         };
         overlays = [
           (final: prev: {
@@ -93,6 +96,15 @@
               specialArgs = { inherit inputs; nixvim = nixvim-lite; };
               modules = [
                 ./wieselburg/configuration.nix
+                agenix.nixosModules.default
+              ];
+            };
+            
+            nixosConfigurations."ottakring" = nixpkgs.lib.nixosSystem {
+              inherit pkgs;
+              specialArgs = { inherit inputs; nixvim = nixvim-lite; };
+              modules = [
+                ./ottakring/configuration.nix
                 agenix.nixosModules.default
               ];
             };

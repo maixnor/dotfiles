@@ -7,6 +7,7 @@ let
     keys.hosts.wieselburg
     keys.hosts.bierzelt
     keys.hosts.bierbasis
+    keys.hosts.ottakring
   ];
 
   all = maixnor ++ activeSystems;
