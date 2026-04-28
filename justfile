@@ -1,6 +1,6 @@
 
 update host:
-	git pull && sudo nixos-rebuild switch --flake ~/repo/dotfiles#{{host}}
+	git pull && nh os switch .
 
 vm host:
 	sudo nixos-rebuild build-vm --flake ~/repo/dotfiles#{{host}} 
@@ -23,7 +23,7 @@ ottakring:
   just update ottakring
 
 deploy-ottakring:
-  nixos-rebuild switch --flake .#ottakring --target-host probatio@172.16.32.135 --sudo --ask-sudo-password
+  nixos-rebuild switch --flake .#ottakring --target-host 172.16.32.135 --sudo
 
 remove-gtk:
   rm -rf ~/.gtk*
