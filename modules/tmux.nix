@@ -84,8 +84,8 @@
       
       # Global Alt Bindings (No Prefix)
       bind-key -n M-c new-window      -c "#{pane_current_path}"
-      bind-key -n M-\ split-window -h -c "#{pane_current_path}"
-      bind-key -n M-- split-window -v -c "#{pane_current_path}"
+      bind-key -n M-/ split-window -h -c "#{pane_current_path}"
+      bind-key -n M-v split-window -v -c "#{pane_current_path}"
       bind-key -n M-z resize-pane -Z
       bind-key -n M-r source-file ~/.config/tmux/tmux.conf
       bind-key -n M-g display-popup -d "#{pane_current_path}" -w 90% -h 90% -E "nvim -c Git -c only"
