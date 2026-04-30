@@ -31,6 +31,8 @@
       enable = true;
     };
 
+    home.enableNixpkgsReleaseCheck = false;
+
     home.stateVersion = "25.11";
 
     home.sessionVariables = {

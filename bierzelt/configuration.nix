@@ -31,11 +31,6 @@
   services.onedrive.enable = true;
   services.autoupdate.enable = true;
 
-  nixpkgs.overlays = [
-    (final: prev: {
-      xrdb = prev.xorg.xrdb;
-    })
-  ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
 
@@ -114,6 +109,11 @@
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
+  };
+
+  systemd.services.avahi-daemon.serviceConfig = {
+    ExecStartPre = "+${pkgs.coreutils}/bin/rm -f /run/avahi-daemon/pid";
+    ReadWritePaths = [ "/run/avahi-daemon" ];
   };
 
   nix.gc = {

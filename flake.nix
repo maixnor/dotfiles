@@ -41,7 +41,7 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
-        inherit system;
+        localSystem = system;
         config = {
             allowUnfree = true;
             permittedInsecurePackages = [
@@ -51,11 +51,12 @@
         overlays = [
           (final: prev: {
             unstable = import nixpkgs-unstable {
-              inherit system;
+              localSystem = system;
               config = {
                 allowUnfree = true;
               };
             };
+            xrdb = prev.xorg.xrdb;
           })
         ];
       };
@@ -110,7 +111,7 @@
             };
       
             nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
-              system = "x86_64-linux";
+              inherit pkgs;
               specialArgs = { inherit inputs; nixvim = nixvim-lite; };
               modules = [ ./wieselburg/vm-test.nix ];
             };
@@ -158,7 +159,7 @@
                 type = "app";
                 program = let
                   vmSystem = nixpkgs.lib.nixosSystem {
-                    system = "x86_64-linux";
+                    inherit pkgs;
                     specialArgs = { inherit inputs; inherit nixvim; };
                     modules = [ ./wieselburg/vm-test.nix ];
                   };

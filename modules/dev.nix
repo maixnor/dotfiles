@@ -114,8 +114,8 @@ in {
 
       python314
 
-      inputs.agenix.packages.${system}.default
-      inputs.worktrunk.packages.${system}.default
+      inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.worktrunk.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # rustup 
       # jetbrains.rust-rover

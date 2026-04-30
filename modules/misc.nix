@@ -75,6 +75,8 @@
       # unfree
       obsidian
       discord
+      anydesk
+      signal-desktop
 
       # slack-term
       slack-term

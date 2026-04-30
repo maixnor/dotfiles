@@ -22,6 +22,7 @@
   config = {
     home.username = "maixnor";
     home.homeDirectory = "/home/maixnor";
+    home.enableNixpkgsReleaseCheck = false;
 
     home.file."justfile".text = ''
       update:

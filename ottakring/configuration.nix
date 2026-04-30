@@ -11,6 +11,8 @@ in
     ../services/cloudflared.nix
     ../services/odoo.nix
     ../services/n8n.nix
+    ../services/erpnext/erpnext.nix
+    ../services/openvas.nix
   ];
 
   # Bootloader.

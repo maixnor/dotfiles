@@ -10,6 +10,7 @@
 
   programs.firefox = {
     enable = true;
+    configPath = ".mozilla/firefox";
     /* ---- PREFERENCES ---- */
     # Check about:config for options.
     profiles.maixnor.settings = { 

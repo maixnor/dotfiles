@@ -3,6 +3,7 @@
 {
   stylix = {
     enable = true;
+    overlays.enable = false;
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
     fonts = {
@@ -39,7 +40,11 @@
       nixvim.transparentBackground.signColumn = true;
       qt.enable = false;
       kde.enable = false;
+      neovim.enable = false;
+      neovide.enable = false;
       firefox.profileNames = [ "maixnor" ];
     };
   };
+
+  gtk.gtk4.theme = null;
 }
