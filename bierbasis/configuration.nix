@@ -7,8 +7,6 @@
 {
   imports =
     [ 
-      #inputs.disko.nixosModules.default
-      #(import ./disko.nix { device = "/dev/sdc"; })
       ./hardware-configuration.nix
       ./nvidia.nix
       ./gaming.nix

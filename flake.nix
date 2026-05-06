@@ -8,10 +8,6 @@
 			url = "github:nix-community/nixvim/nixos-25.11";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
-    disko = { 
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -20,24 +16,14 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    impermanence.url = "github:nix-community/impermanence";
-    nix-colors.url = "github:misterio77/nix-colors";
     stylix.url = "github:danth/stylix";
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    worktrunk = {
-      url = "github:max-sixty/worktrunk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, home-manager, nixos-generators, agenix, worktrunk, ... } @inputs :
+  outputs = { nixpkgs, nixpkgs-unstable, home-manager, agenix, ... } @inputs :
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -101,14 +87,6 @@
               ];
             };
             
-            nixosConfigurations."ottakring" = nixpkgs.lib.nixosSystem {
-              inherit pkgs;
-              specialArgs = { inherit inputs; nixvim = nixvim-lite; };
-              modules = [
-                ./ottakring/configuration.nix
-                agenix.nixosModules.default
-              ];
-            };
       
             nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
               inherit pkgs;
