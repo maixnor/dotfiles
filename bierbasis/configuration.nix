@@ -32,7 +32,7 @@
     owner = "maixnor";
   };
 
-    services.onedrive.enable = true;
+  services.onedrive.enable = true;
   services.autoupdate.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -226,8 +226,9 @@
     enableSSHSupport = true;
   };
 
-	programs.nix-ld.enable = true;
-	programs.nix-ld.libraries = with pkgs; [
+  programs.nix-ld.enable = true;
+  programs.fuse.userAllowOther = true;
+  programs.nix-ld.libraries = with pkgs; [
     # place libraries here
 	];
   

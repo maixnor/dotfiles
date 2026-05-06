@@ -16,6 +16,7 @@
     ../modules/graphics.nix
     ../modules/firefox.nix
     ../modules/agentic.nix
+    ../modules/google-drive.nix
   ];
 
   config = {
@@ -30,6 +31,8 @@
     services.kdeconnect = {
       enable = true;
     };
+
+    systemd.user.startServices = "sd-switch";
 
     home.enableNixpkgsReleaseCheck = false;
 

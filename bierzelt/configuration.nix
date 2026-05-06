@@ -185,8 +185,9 @@
     enableSSHSupport = true;
   };
 
-	programs.nix-ld.enable = true;
-	programs.nix-ld.libraries = with pkgs; [
+  programs.nix-ld.enable = true;
+  programs.fuse.userAllowOther = true;
+  programs.nix-ld.libraries = with pkgs; [
 		# place libraries here
 	];
   
