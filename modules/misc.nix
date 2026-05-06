@@ -24,7 +24,6 @@
       ngrok
       josm
       nextcloud-client
-      insync
       ffmpeg_8-headless
       mdcat
       nh
