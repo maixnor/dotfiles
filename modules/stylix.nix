@@ -1,9 +1,13 @@
-{ pkgs, ... }:
+{ pkgs, lib, options, ... }:
 
 {
-  stylix = {
+  stylix = lib.mkIf (options ? stylix) {
     enable = true;
-    overlays.enable = false;
+    image = pkgs.runCommand "placeholder.png" {
+      nativeBuildInputs = [ pkgs.imagemagick ];
+    } ''
+      convert -size 1920x1080 canvas:black $out
+    '';
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
     fonts = {
@@ -38,10 +42,8 @@
     targets = {
       nixvim.transparentBackground.main = true;
       nixvim.transparentBackground.signColumn = true;
-      qt.enable = false;
       kde.enable = false;
       neovim.enable = false;
-      neovide.enable = false;
       firefox.profileNames = [ "maixnor" ];
     };
   };

@@ -15,6 +15,7 @@ in
 {
   # The single source of truth for all Content Factory keys
   "github.age".publicKeys = all;
+  "github-nix-conf.age".publicKeys = all;
   "youtube-cookies.txt.age".publicKeys = all;
   "slack_term.age".publicKeys = all;
   "opencode.json.age".publicKeys = all;
