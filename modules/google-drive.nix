@@ -2,32 +2,33 @@
 
 let
   mountPoint = "${config.home.homeDirectory}/cloud/probatio/gdrive";
-in {
-  home.packages = with pkgs; [ fuse3 rclone ];
+  sharedDrivesBase = "${config.home.homeDirectory}/cloud/probatio/shared";
+  
+  # List of shared drives found
+  sharedDrives = [
+    { name = "Knowledge_Base"; id = "0AHK9So00yj9YUk9PVA"; }
+    { name = "Official";       id = "0ACp7XJF4uqjTUk9PVA"; }
+    { name = "Projects";       id = "0ALr3MEQ5FpwPUk9PVA"; }
+  ];
 
-  age.secrets.rclone-gdrive = {
-    file = ../secrets/rclone-gdrive.age;
-  };
-
-  systemd.user.services.rclone-gdrive-mount = {
+  # Helper to create a systemd service for a mount
+  mkMountService = { name, remote, path, id ? null, extraArgs ? "" }: {
     Unit = {
-      Description = "rclone Google Drive Mount";
+      Description = "rclone mount for ${name}";
       After = [ "network-online.target" ];
       Wants = [ "network-online.target" ];
     };
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
+    Install = { WantedBy = [ "default.target" ]; };
     Service = {
       Type = "simple";
-      # Ensure the secret file exists before starting
       ExecStartPre = [
-        "${pkgs.coreutils}/bin/mkdir -p ${mountPoint}"
-        "-/run/wrappers/bin/fusermount3 -u ${mountPoint}"
-        "${pkgs.bash}/bin/bash -c 'test -f ${config.age.secrets.rclone-gdrive.path} || (echo \"Secret file missing! Run agenix -e secrets/rclone-gdrive.age\" && exit 1)'"
+        "${pkgs.coreutils}/bin/mkdir -p ${path}"
+        "-/run/wrappers/bin/fusermount3 -u ${path}"
       ];
-      ExecStart = ''
-        ${pkgs.rclone}/bin/rclone mount gdrive: ${mountPoint} \
+      ExecStart = let
+        remotePath = if id == null then "${remote}:" else "${remote},team_drive=${id},root_folder_id=:";
+      in ''
+        ${pkgs.rclone}/bin/rclone mount "${remotePath}" "${path}" \
           --config ${config.age.secrets.rclone-gdrive.path} \
           --vfs-cache-mode full \
           --vfs-cache-max-age 24h \
@@ -39,13 +40,42 @@ in {
           --buffer-size 128M \
           --no-modtime \
           --vfs-fast-fingerprint \
-          --stats 1m
+          --stats 1m ${extraArgs}
       '';
-      ExecStop = "/run/wrappers/bin/fusermount3 -u ${mountPoint}";
+      ExecStop = "/run/wrappers/bin/fusermount3 -u ${path}";
       Restart = "on-failure";
       RestartSec = "10s";
-      # Ensure system wrappers are in path for setuid fusermount3
       Environment = [ "PATH=/run/wrappers/bin:${pkgs.fuse3}/bin:$PATH" ];
+    };
+  };
+
+in {
+  home.packages = with pkgs; [ 
+    fuse3 
+    rclone 
+    (pkgs.writeShellScriptBin "list-shared-drives-nix" ''
+      # Fetch shared drives and format them as Nix attributes
+      ${pkgs.rclone}/bin/rclone backend drives gdrive-probatio: --config ${config.age.secrets.rclone-gdrive.path} | \
+      ${pkgs.jq}/bin/jq -r '.[] | "{ name = \"\(.name | gsub(" "; "_") | gsub("[^a-zA-Z0-9_]"; ""))\"; id = \"\(.id)\"; } # \(.name)"'
+    '')
+  ];
+
+  age.secrets.rclone-gdrive = {
+    file = ../secrets/rclone-gdrive.age;
+  };
+
+  systemd.user.services = (lib.listToAttrs (map (drive: {
+    name = "rclone-mount-${drive.name}";
+    value = mkMountService {
+      inherit (drive) name id;
+      remote = "gdrive-probatio";
+      path = "${sharedDrivesBase}/${drive.name}";
+    };
+  }) sharedDrives)) // {
+    rclone-gdrive-mount = mkMountService {
+      name = "Main Google Drive";
+      remote = "gdrive-probatio";
+      path = mountPoint;
     };
   };
 }

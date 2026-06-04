@@ -18,6 +18,7 @@
     ../modules/firefox.nix
     ../modules/agentic.nix
     ../modules/google-drive.nix
+    ../modules/ssh.nix
   ];
 
   config = {
@@ -57,6 +58,5 @@
       };
     };
 
-    services.ssh-agent.enable = true;
   };
 }
