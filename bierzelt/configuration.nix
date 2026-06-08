@@ -28,9 +28,7 @@
     owner = "maixnor";
   };
 
-  services.onedrive.enable = true;
   services.autoupdate.enable = true;
-
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
 

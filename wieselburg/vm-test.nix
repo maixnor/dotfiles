@@ -56,10 +56,8 @@
       { from = "host"; host.port = 8301; guest.port = 3001; }  # AnythingLLM
       { from = "host"; host.port = 8310; guest.port = 3010; }  # Perplexica backend
       { from = "host"; host.port = 8311; guest.port = 3011; }  # Perplexica frontend
-      { from = "host"; host.port = 8453; guest.port = 4533; }  # Navidrome
       { from = "host"; host.port = 8800; guest.port = 8080; }  # SearXNG
       { from = "host"; host.port = 8998; guest.port = 9980; }  # Collabora
-      { from = "host"; host.port = 8378; guest.port = 13378; } # Audiobookshelf
     ];
   };
 
@@ -78,7 +76,7 @@
         { addr = "0.0.0.0"; port = 80; }
       ];
       locations."/" = {
-        return = "200 'Wieselburg VM Test Server is running!\n\nAvailable test services:\n- AnythingLLM: http://localhost:8301\n- Perplexica: http://localhost:8311\n- SearXNG: http://localhost:8800\n- Immich: http://localhost:8281\n- Navidrome: http://localhost:8453\n- Audiobookshelf: http://localhost:8378\n- Collabora: http://localhost:8998'";
+        return = "200 'Wieselburg VM Test Server is running!\n\nAvailable test services:\n- AnythingLLM: http://localhost:8301\n- Perplexica: http://localhost:8311\n- SearXNG: http://localhost:8800\n- Immich: http://localhost:8281\n- Collabora: http://localhost:8998'";
         extraConfig = "add_header Content-Type text/plain;";
       };
     };

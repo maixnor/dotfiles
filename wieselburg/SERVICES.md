@@ -15,22 +15,12 @@ This directory contains configuration for your self-hosted services running on t
 - **Purpose**: Photo and video management (Google Photos alternative)
 - **Features**: AI-powered face recognition, automatic backup from mobile, timeline view, albums
 
-### 3. Audiobookshelf - Podcasts & Audiobooks
-- **URL**: https://podcasts.maixnor.com
-- **Purpose**: Podcast and audiobook server with mobile apps
-- **Features**: Podcast subscriptions, progress tracking, mobile apps available
-
-### 4. Navidrome - Music Streaming
-- **URL**: https://music.maixnor.com
-- **Purpose**: Music streaming server (Spotify alternative for your music collection)
-- **Features**: Subsonic-compatible, mobile apps, playlists, scrobbling
-
-### 5. Collabora Online - Office Suite
+### 3. Collabora Online - Office Suite
 - **URL**: https://office.maixnor.com
 - **Purpose**: Online office suite (Google Docs/LibreOffice alternative)
 - **Features**: Word processing, spreadsheets, presentations, real-time collaboration
 
-### 6. AI Research Stack - Advanced AI Platform
+### 4. AI Research Stack - Advanced AI Platform
 - **AnythingLLM**: https://ai.maixnor.com - Comprehensive AI platform with document processing
 - **Perplexica**: https://research.maixnor.com - AI research assistant with web search integration
 - **SearXNG**: https://search.maixnor.com - Privacy-focused metasearch engine
@@ -54,8 +44,6 @@ Add these DNS records to your domain:
 ```
 cloud.maixnor.com      A    YOUR_SERVER_IP
 photos.maixnor.com     A    YOUR_SERVER_IP  
-podcasts.maixnor.com   A    YOUR_SERVER_IP
-music.maixnor.com      A    YOUR_SERVER_IP
 office.maixnor.com     A    YOUR_SERVER_IP
 ai.maixnor.com         A    YOUR_SERVER_IP
 research.maixnor.com   A    YOUR_SERVER_IP
@@ -63,20 +51,6 @@ search.maixnor.com     A    YOUR_SERVER_IP
 ```
 
 ### 3. Content Organization
-
-#### For Navidrome (Music):
-```bash
-# Upload your music to:
-/var/lib/navidrome/music/
-# Structure: Artist/Album/Track.mp3
-```
-
-#### For Audiobookshelf:
-```bash
-# Upload podcasts and audiobooks to:
-/var/lib/audiobookshelf/podcasts/
-/var/lib/audiobookshelf/audiobooks/
-```
 
 #### For Immich (Photos):
 ```bash
@@ -98,8 +72,6 @@ search.maixnor.com     A    YOUR_SERVER_IP
 
 - **Nextcloud**: Official Nextcloud app
 - **Immich**: Official Immich app  
-- **Audiobookshelf**: Official Audiobookshelf app
-- **Navidrome**: Any Subsonic-compatible app (Ultrasonic, DSub, Submariner)
 
 ## Monitoring and Maintenance
 
@@ -118,8 +90,6 @@ sudo journalctl -fu container@servicename
 ### Backup Important Data:
 - `/var/lib/nextcloud/` - Nextcloud data
 - `/var/lib/immich/` - Photo database and uploads
-- `/var/lib/navidrome/data/` - Music database
-- `/var/lib/audiobookshelf/config/` - Podcast/audiobook database
 
 ## Troubleshooting
 

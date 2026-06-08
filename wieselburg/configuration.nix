@@ -82,6 +82,9 @@ in
     };
   };
 
+  # Use plain PostgreSQL 17
+  services.postgresql.package = pkgs.postgresql_17;
+
   networking.hostName = "${hostname}";
 
   ### System Packages

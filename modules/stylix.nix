@@ -43,6 +43,7 @@
       nixvim.transparentBackground.main = true;
       nixvim.transparentBackground.signColumn = true;
       kde.enable = false;
+      qt.enable = false;
       neovim.enable = false;
       firefox.profileNames = [ "maixnor" ];
     };
