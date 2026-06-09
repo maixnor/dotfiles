@@ -11,6 +11,7 @@
       ./nvidia.nix
       ./gaming.nix
       ../modules/gh-auth.nix
+      ../modules/gdrive-secrets.nix
       ../modules/email.nix
       #../modules/moodle.nix
       #../modules/services.nix

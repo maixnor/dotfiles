@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ../modules/dev.nix
       ../modules/email.nix
+      ../modules/gdrive-secrets.nix
       #../modules/gh-auth.nix
       ../modules/zerotier.nix
       ../modules/laptop-power.nix

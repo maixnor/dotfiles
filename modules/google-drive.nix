@@ -29,7 +29,7 @@ let
         remotePath = if id == null then "${remote}:" else "${remote},team_drive=${id},root_folder_id=:";
       in ''
         ${pkgs.rclone}/bin/rclone mount "${remotePath}" "${path}" \
-          --config ${config.age.secrets.rclone-gdrive.path} \
+          --config /run/agenix/rclone-gdrive \
           --vfs-cache-mode full \
           --vfs-cache-max-age 24h \
           --vfs-cache-max-size 10G \
@@ -55,14 +55,10 @@ in {
     rclone 
     (pkgs.writeShellScriptBin "list-shared-drives-nix" ''
       # Fetch shared drives and format them as Nix attributes
-      ${pkgs.rclone}/bin/rclone backend drives gdrive-probatio: --config ${config.age.secrets.rclone-gdrive.path} | \
+      ${pkgs.rclone}/bin/rclone backend drives gdrive-probatio: --config /run/agenix/rclone-gdrive | \
       ${pkgs.jq}/bin/jq -r '.[] | "{ name = \"\(.name | gsub(" "; "_") | gsub("[^a-zA-Z0-9_]"; ""))\"; id = \"\(.id)\"; } # \(.name)"'
     '')
   ];
-
-  age.secrets.rclone-gdrive = {
-    file = ../secrets/rclone-gdrive.age;
-  };
 
   systemd.user.services = (lib.listToAttrs (map (drive: {
     name = "rclone-mount-${drive.name}";
