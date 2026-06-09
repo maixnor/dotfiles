@@ -151,8 +151,6 @@
   };
 
   environment.systemPackages = with pkgs; [ 
-    kdePackages.qt6ct
-    kdePackages.qtstyleplugin-kvantum
     kdePackages.ksshaskpass
     wormhole-william
     gnome-network-displays

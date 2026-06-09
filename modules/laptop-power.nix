@@ -38,7 +38,7 @@
   boot.kernelParams = [
     # Intel GPU power saving
     "i915.enable_fbc=1"           # Enable framebuffer compression
-    "i915.enable_psr=2"           # Enable Panel Self Refresh (PSR2 for better savings)
+    "i915.enable_psr=0"           # Disable Panel Self Refresh (often causes flickering)
     "i915.fastboot=1"             # Faster boot, less power waste
     
     # NVMe power saving (APST = Autonomous Power State Transition)

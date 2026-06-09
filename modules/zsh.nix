@@ -92,8 +92,8 @@
     # Run project hooks during merge
     verify = true
 
-    # Post-create hook: automatically allow direnv if .envrc exists
-    [post-create]
+    # Pre-start hook: automatically allow direnv if .envrc exists
+    [pre-start]
     direnv = "test -f {{ worktree_path }}/.envrc && cd {{ worktree_path }} && direnv allow || true"
 
     # LLM-generated commit messages using Claude with Haiku model
