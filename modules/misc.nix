@@ -7,11 +7,11 @@
     home.packages = with pkgs; [
       psmisc lsof
       openconnect
-      traceroute
+      traceroute dig
       wget xh
       freshfetch
       presenterm
-      calc
+      calc tree
       miraclecast
       iftop iotop
       inotify-tools
