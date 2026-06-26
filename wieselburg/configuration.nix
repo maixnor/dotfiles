@@ -15,6 +15,7 @@ in
     ../services/traefik-base.nix
     ../services/maixnorcom.nix
     ../services/priority-oil-com.nix
+    ../services/fibs-maixnor-com.nix
     ../services/imognimma-maixnor-com.nix
     ../services/hermes-meshara-net.nix
     ../services/searx.nix
@@ -26,6 +27,7 @@ in
     # ../services/torrent-server.nix
     ../services/error-pages.nix
     ../services/adhoc-tunnel.nix
+    ../services/pixel-track.nix
   ];
 
   virtualisation.vmware.guest.enable = true;

@@ -2,7 +2,7 @@
 
 {
   home.packages = with pkgs; [
-    unstable.gemini-cli
+    unstable.antigravity-cli
     claude-code
     opencode
   ];
@@ -13,34 +13,21 @@
     $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.config/opencode"
   '';
 
-  home.file.".gemini/settings.json".text = builtins.toJSON ({
-    general = {
-      vimMode = true;
-      previewFeatures = true;
-      disableAutoUpdate = true;
-      sessionRetention = {
-        enabled = true;
-      };
+  home.file.".config/antigravity-cli/settings.json".text = builtins.toJSON ({
+    toolPermission = "request-review";
+    verbosity = "high";
+    renderingMode = "auto";
+    colorScheme = "terminal";
+    editor = "vim";
+    enableTerminalSandbox = true;
+    statusLine = {
+      enabled = true;
     };
-    output = {
-      format = "text";
-    };
-    ui = {
-      footer = {
-        hideContextPercentage = false;
-      };
-      hideBanner = true;
-      showLineNumbers = false;
-      showCitations = true;
-      accessibility = {
-        disableLoadingPhrases = true;
-      };
-    };
-    security = {
-      auth = {
-        selectedType = "oauth-personal";
-      };
+    trustedWorkspaces = [
+      "${config.home.homeDirectory}/repo/dotfiles"
+    ];
+    telemetry = {
+      enabled = false;
     };
   });
-
 }

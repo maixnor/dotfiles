@@ -99,7 +99,7 @@ EOF
     cat "$LOG_FILE"
 
     if [ $EXIT_CODE -ne 0 ]; then
-      if grep -q -E "must run --resync|filters file md5 hash not found" "$LOG_FILE"; then
+      if grep -q -i -E "must run --resync|filters file md5 hash not found" "$LOG_FILE"; then
         echo "Detected first run or filter change. Running automatic --resync..."
         ${pkgs.rclone}/bin/rclone bisync "${localKB}" "${remoteKB}" \
           --config ${rcloneConfig} \
