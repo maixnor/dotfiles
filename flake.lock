@@ -350,6 +350,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1778443072,
+        "narHash": "sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1767799921,
         "narHash": "sha256-r4GVX+FToWVE2My8VVZH4V0pTIpnu2ZE8/Z4uxGEMBE=",
         "owner": "NixOS",
@@ -436,6 +452,24 @@
         "type": "github"
       }
     },
+    "pi-flake": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1782905449,
+        "narHash": "sha256-ld0fvMgfrJYaj3JvnKhdez/lbuyyR0Rhy55OFjMEFRY=",
+        "owner": "ChauDucToan",
+        "repo": "pi-flake",
+        "rev": "4ab4b1580dffc5a9df936e3a76b1fe3fa9ed88b1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ChauDucToan",
+        "repo": "pi-flake",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
@@ -444,6 +478,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvim": "nixvim",
+        "pi-flake": "pi-flake",
         "stylix": "stylix"
       }
     },
@@ -456,7 +491,7 @@
         "firefox-gnome-theme": "firefox-gnome-theme",
         "flake-parts": "flake-parts_2",
         "gnome-shell": "gnome-shell",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "nur": "nur",
         "systems": "systems_4",
         "tinted-foot": "tinted-foot",

@@ -10,7 +10,7 @@ in
     ./vpsadminos.nix # for vpsfree.cz
     ../modules/misc-server.nix
     ../modules/gh-auth.nix
-    # ../modules/zerotier.nix
+    ../modules/zerotier.nix
     ../services/autoupdate.nix
     ../services/traefik-base.nix
     ../services/maixnorcom.nix

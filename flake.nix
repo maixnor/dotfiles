@@ -21,6 +21,9 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pi-flake = {
+      url = "github:ChauDucToan/pi-flake";
+    };
   };
 
   outputs = { nixpkgs, nixpkgs-unstable, home-manager, agenix, ... } @inputs :

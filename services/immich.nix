@@ -52,6 +52,7 @@
     # Environment variables
     environment = {
       LOG_LEVEL = "log";
+      TMPDIR = "/var/lib/immich/tmp";
     };
     
     # Secrets file for sensitive configuration like JWT_SECRET
@@ -65,9 +66,17 @@
     bind = "localhost";
   };
 
+  # Set OOM adjustments for Immich services due to vpsFree memory constraints
+  systemd.services.immich-server = {
+    serviceConfig = {
+      OOMScoreAdjust = -500;
+    };
+  };
+
   # Ensure the machine learning service has proper permissions
   systemd.services.immich-machine-learning = {
     serviceConfig = {
+      OOMScoreAdjust = -500;
       # Ensure the service can write to the model cache
       ReadWritePaths = [ "/var/lib/immich/model-cache" ];
       # Give the service more time to download models on first run
@@ -102,6 +111,9 @@
       chmod 600 /var/lib/immich/secrets.env
       chown immich:immich /var/lib/immich/secrets.env
     fi
+    
+    # Create persistent tmp directory to prevent RAM usage during uploads
+    mkdir -p /var/lib/immich/tmp
     
     # Set proper ownership for directories
     chown -R immich:immich /var/lib/immich
