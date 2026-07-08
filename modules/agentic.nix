@@ -11,7 +11,7 @@
     models = {
       providers = {
         ollama = {
-          baseUrl = "http://172.16.32.133:11435/v1";
+          baseUrl = "http://172.16.32.133:11434/v1";
           api = "openai-completions";
           apiKey = "ollama";
           models = [
@@ -34,7 +34,27 @@
     opencode
   ];
 
-  home.file.".config/opencode/opencode.json".source = config.lib.file.mkOutOfStoreSymlink "/run/agenix/opencode.json";
+  home.file.".config/opencode/opencode.json".text = builtins.toJSON ({
+    "$schema" = "https://opencode.ai/config.json";
+    provider = {
+      ollama = {
+        npm = "@ai-sdk/openai-compatible";
+        name = "Ollama";
+        options = {
+          baseURL = "http://172.16.32.133:11434/v1";
+        };
+        models = {
+          "qwen2.5-coder:1.5b" = { name = "Qwen2.5 Coder (1.5B)"; };
+          "qwen2.5-coder:3b" = { name = "Qwen2.5 Coder (3B)"; };
+          "qwen2.5-coder:7b" = { name = "Qwen2.5 Coder (7B)"; };
+          "qwen2.5-coder:7b-instruct-q8_0" = { name = "Qwen2.5 Coder (7B Q8)"; };
+          "devstral:24b" = { name = "Devstral (24B)"; };
+          "qwen3-coder:30b" = { name = "Qwen3 Coder (30B)"; };
+          "qwen2.5-coder:32b" = { name = "Qwen2.5 Coder (32B)"; };
+        };
+      };
+    };
+  });
 
   home.activation.createOpencodeDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.config/opencode"

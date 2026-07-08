@@ -18,7 +18,6 @@ in
   "github-nix-conf.age".publicKeys = all;
   "youtube-cookies.txt.age".publicKeys = all;
   "slack_term.age".publicKeys = all;
-  "opencode.json.age".publicKeys = all;
   "odoo_db_password.age".publicKeys = all;
   "odoo_master_password.age".publicKeys = all;
   "rclone-gdrive.age".publicKeys = all;
