@@ -94,7 +94,10 @@
             nixosConfigurations."wieselburg-vm-test" = nixpkgs.lib.nixosSystem {
               inherit pkgs;
               specialArgs = { inherit inputs; nixvim = nixvim-lite; };
-              modules = [ ./wieselburg/vm-test.nix ];
+              modules = [
+                ./wieselburg/vm-test.nix
+                agenix.nixosModules.default
+              ];
             };
       
             homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {

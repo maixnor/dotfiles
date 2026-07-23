@@ -22,6 +22,9 @@
 			shell = "${pkgs.zsh}/bin/zsh -c 'tmux new-session -A -s kitty'";
 			hide_window_decorations = "yes";
 			confirm_os_window_close = 0;
+			startup_session = "${pkgs.writeText "kitty-startup.conf" ''
+				os_window_state fullscreen
+			''}";
 		};
 	};
 

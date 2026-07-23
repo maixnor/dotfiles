@@ -1,6 +1,13 @@
 { config, pkgs, lib, modulesPath, ... }: # Disable some services that might cause issues in VM
 
 {
+  imports = [
+    ./configuration.nix
+    (modulesPath + "/virtualisation/qemu-vm.nix")
+  ];
+
+  boot.isContainer = lib.mkForce false;
+
   # Disable Nextcloud for VM testing to avoid complexity
   services.nextcloud.enable = lib.mkForce false;
   services.postgresql.enable = lib.mkForce false;

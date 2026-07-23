@@ -11,9 +11,9 @@
     models = {
       providers = {
         ollama = {
-          baseUrl = "http://172.16.32.133:11434/v1";
+          baseUrl = "http://172.16.32.133:8080/api/v1";
           api = "openai-completions";
-          apiKey = "ollama";
+          apiKey = "sk-eadaa0312689422ba59ae69ba540a78c";
           models = [
             { id = "qwen2.5-coder:1.5b"; }
             { id = "qwen2.5-coder:3b"; }
@@ -38,10 +38,11 @@
     "$schema" = "https://opencode.ai/config.json";
     provider = {
       ollama = {
-        npm = "@ai-sdk/openai-compatible";
+        npm = "ollama-ai-provider-v2";
         name = "Ollama";
         options = {
-          baseURL = "http://172.16.32.133:11434/v1";
+          baseURL = "http://172.16.32.133:11434/api";
+          apiKey = "sk-this-is-just-a-dummy";
         };
         models = {
           "qwen2.5-coder:1.5b" = { name = "Qwen2.5 Coder (1.5B)"; };
@@ -77,4 +78,9 @@
       enabled = false;
     };
   });
+
+  home.sessionVariables = {
+    ANTHROPIC_BASE_URL = "http://172.16.32.133:11434";
+    ANTHROPIC_API_KEY = "sk-this-is-just-a-dummy";
+  };
 }
