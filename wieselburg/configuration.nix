@@ -20,8 +20,9 @@ in
     ../services/hermes-meshara-net.nix
     ../services/searx.nix
     # ../services/languagebuddy.nix
-    ../services/observability.nix
+    #../services/observability.nix
     # ../services/nextcloud.nix
+    ../services/tracking.nix
     ../services/immich.nix
     ../services/media-server.nix
     # ../services/torrent-server.nix
