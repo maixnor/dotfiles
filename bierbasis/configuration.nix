@@ -17,6 +17,7 @@
       #../modules/services.nix
       ../modules/dev.nix
       ../modules/zerotier.nix
+      # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
       ../services/torrent-server.nix
       (import "${inputs.home-manager}/nixos")
@@ -28,6 +29,8 @@
     owner = "maixnor";
   };
 
+
+  # programs.barracudavpn.enable = true;
 
   services.autoupdate.enable = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

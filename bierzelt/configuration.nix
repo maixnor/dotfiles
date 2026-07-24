@@ -14,6 +14,7 @@
       #../modules/gh-auth.nix
       ../modules/zerotier.nix
       ../modules/laptop-power.nix
+      # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
       (import "${inputs.home-manager}/nixos")
     ];
@@ -25,6 +26,7 @@
   };
 
 
+  # programs.barracudavpn.enable = true;
   services.autoupdate.enable = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.auto-optimise-store = true;
