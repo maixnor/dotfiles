@@ -69,6 +69,11 @@
     allowedUDPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
+    extraCommands = ''
+      iptables -A nixos-fw -p tcp --dport 22 -s 10.0.0.0/8 -j ACCEPT
+      iptables -A nixos-fw -p tcp --dport 22 -s 172.16.0.0/12 -j ACCEPT
+      iptables -A nixos-fw -p tcp --dport 22 -s 192.168.0.0/16 -j ACCEPT
+    '';
   }; 
 
   time.timeZone = "Europe/Vienna";
@@ -86,7 +91,11 @@
     LC_TIME = "de_AT.UTF-8";
   };
 
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    openFirewall = false;
+    authorizedKeysInHomedir = true;
+  };
 
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
@@ -141,11 +150,14 @@
     users.maixnor = import ./home.nix;
   };
 
-  users.users.maixnor = {
+  users.users.maixnor = let 
+    keys = import ../modules/public-keys.nix;
+  in {
     isNormalUser = true;
     description = "Benjamin Meixner";
     group = "maixnor";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" "dialout" "uucp" ];
+    openssh.authorizedKeys.keys = keys.users.maixnor;
     packages = [ nixvim ]; # nixvim
   };
 

@@ -19,7 +19,7 @@
       ../modules/zerotier.nix
       # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
-      ../services/torrent-server.nix
+      #../services/torrent-server.nix
       (import "${inputs.home-manager}/nixos")
     ];
 
@@ -164,11 +164,14 @@
     users.maixnor = import ./home.nix;
   };
 
-  users.users.maixnor = {
+  users.users.maixnor = let 
+    keys = import ../modules/public-keys.nix;
+  in {
     isNormalUser = true;
     description = "Benjamin Meixner";
     group = "maixnor";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" "dialout" "uucp" ];
+    openssh.authorizedKeys.keys = keys.users.maixnor;
     packages = [
       nixvim
       # pkgs go here
@@ -184,6 +187,9 @@
     allowedUDPPortRanges = [ 
       { from = 1714; to = 1764; } # KDE Connect
     ];  
+    extraInputRules = ''
+      ip saddr { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 } tcp dport 22 accept
+    '';
   }; 
 
   # Virtualization / Containers
@@ -232,12 +238,14 @@
   
   services.openssh = {
     enable = true;
-    openFirewall = true;
+    openFirewall = false;
+    authorizedKeysInHomedir = true;
     settings = {
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;
       AllowUsers = [ "maixnor" ];
       X11Forwarding = false;
       PermitRootLogin = "no";
+      PubkeyAcceptedKeyTypes = "+ssh-rsa";
     };
   };
 
