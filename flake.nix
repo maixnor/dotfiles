@@ -99,24 +99,6 @@
                 agenix.nixosModules.default
               ];
             };
-      
-            homeConfigurations."bierbasis" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              modules = [ 
-                ./bierbasis/home.nix 
-                inputs.agenix.homeManagerModules.default
-              ];
-              extraSpecialArgs = { inherit inputs; inherit nixvim; };
-            };
-      
-            homeConfigurations."bierzelt" = home-manager.lib.homeManagerConfiguration {
-              inherit pkgs;
-              modules = [ 
-                ./bierzelt/home.nix 
-                inputs.agenix.homeManagerModules.default
-              ];
-              extraSpecialArgs = { inherit inputs; inherit nixvim; };
-            };
             
             homeConfigurations."wieselburg" = home-manager.lib.homeManagerConfiguration {
               inherit pkgs;
