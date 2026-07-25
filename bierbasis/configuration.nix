@@ -234,7 +234,7 @@
     enable = true;
     openFirewall = true;
     settings = {
-      PasswordAuthentication = true;
+      PasswordAuthentication = false;
       AllowUsers = [ "maixnor" ];
       X11Forwarding = false;
       PermitRootLogin = "no";
