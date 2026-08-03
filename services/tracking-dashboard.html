@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maixnor Cloud & Tracking Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #6366f1;
+            --accent-hover: #4f46e5;
+            --accent-light: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.15);
+            --badge-ip-bg: rgba(148, 163, 184, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        header {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-bottom: 1px solid var(--card-border);
+            padding: 2rem 1.5rem 1rem 1.5rem;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), #ec4899);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs-container {
+            max-width: 1200px;
+            margin: 1.5rem auto 0 auto;
+            width: 100%;
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-button:hover {
+            color: var(--text-main);
+        }
+
+        .tab-button.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
+
+        /* Main Content Container */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Controls / Filter Bar */
+        .filter-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .search-input, .select-input {
+            background: var(--bg-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 0.5rem 0.85rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input {
+            min-width: 240px;
+            flex: 1;
+        }
+
+        .search-input:focus, .select-input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        .btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-label input[type="checkbox"] {
+            accent-color: var(--accent-primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Logs Table */
+        .table-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--card-border);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .ip-badge {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--badge-ip-bg);
+            color: #38bdf8;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-status {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .status-200 { background: var(--success-bg); color: var(--success); }
+        .status-404 { background: var(--danger-bg); color: var(--danger); }
+        .status-other { background: var(--warning-bg); color: var(--warning); }
+
+        .ua-text {
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* Files Section */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .file-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .file-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-primary);
+        }
+
+        .file-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent-light);
+            color: var(--accent-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .file-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            word-break: break-word;
+        }
+
+        .file-meta {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Pixel Generator Section */
+        .pixel-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pixel-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .pixel-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .code-block-container {
+            position: relative;
+            background: var(--bg-dark);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: #a7f3d0;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--card-border);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="brand-title">
+                <div class="brand-icon">⚡</div>
+                <div>
+                    <h1>Maixnor Cloud & Tracking</h1>
+                    <div class="subtitle">Real-time HTTP Request & Pixel Monitoring</div>
+                </div>
+            </div>
+            <div class="status-pill">
+                <div class="status-dot"></div>
+                Service Active
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs-container">
+            <button class="tab-button active" onclick="switchTab('logs-tab')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Logs & Analytics
+            </button>
+            <button class="tab-button" onclick="switchTab('files-tab')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                Shared Files
+            </button>
+            <button class="tab-button" onclick="switchTab('pixel-tab')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                Tracking Pixel
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- TAB 1: LOGS & ANALYTICS -->
+        <div id="logs-tab" class="tab-content active">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Total Requests</span>
+                    <span class="stat-value" id="stat-total">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Unique IPs</span>
+                    <span class="stat-value" id="stat-unique-ips">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">200 OK Requests</span>
+                    <span class="stat-value" style="color: var(--success);" id="stat-200">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">404 Not Found</span>
+                    <span class="stat-value" style="color: var(--danger);" id="stat-404">0</span>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <input type="text" id="log-search" class="search-input" placeholder="Filter by IP, path, user agent..." oninput="applyFilters()">
+                    <select id="status-filter" class="select-input" onchange="applyFilters()">
+                        <option value="all">All Status Codes</option>
+                        <option value="200">200 OK</option>
+                        <option value="404">404 Not Found</option>
+                    </select>
+                    <label class="toggle-label">
+                        <input type="checkbox" id="hide-scanners" checked onchange="applyFilters()">
+                        Hide Bot Scanners (.php / wp-admin)
+                    </label>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="fetchLogs()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        Refresh
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleRawLogs()" id="raw-toggle-btn">
+                        Raw Text View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log Table -->
+            <div id="table-view" class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Client IP</th>
+                            <th>Status</th>
+                            <th>Requested Route</th>
+                            <th>User Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading log file...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Raw Log Text Container (hidden by default) -->
+            <div id="raw-view" class="code-block-container" style="display: none; max-height: 500px; overflow-y: auto;">
+                <pre id="raw-log-content">Loading raw log...</pre>
+            </div>
+        </div>
+
+        <!-- TAB 2: SHARED FILES -->
+        <div id="files-tab" class="tab-content">
+            <div class="files-grid" id="files-grid-container">
+                <div class="file-card">
+                    <div>
+                        <div class="file-icon">📄</div>
+                        <div class="file-name">log.txt</div>
+                        <div class="file-meta">Live Plain Text Log File</div>
+                    </div>
+                    <a href="/log.txt" target="_blank" class="btn btn-secondary">View File →</a>
+                </div>
+                <div class="file-card">
+                    <div>
+                        <div class="file-icon">🖼️</div>
+                        <div class="file-name">logo.gif</div>
+                        <div class="file-meta">1x1 Transparent Pixel</div>
+                    </div>
+                    <a href="/logo.gif" target="_blank" class="btn btn-secondary">Download Pixel →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: TRACKING PIXEL GENERATOR -->
+        <div id="pixel-tab" class="tab-content">
+            <div class="pixel-box">
+                <h3>HTML Tracking Snippet</h3>
+                <p>Embed this 1x1 transparent image into your HTML emails or webpage footers. Requesters will be logged automatically in real time.</p>
+                <div class="code-block-container">
+                    <code id="snippet-html">&lt;img src="https://cloud.maixnor.com/logo.gif" width="1" height="1" alt="" style="display:none;" /&gt;</code>
+                    <button class="btn copy-btn" onclick="copySnippet('snippet-html')">Copy HTML</button>
+                </div>
+            </div>
+
+            <div class="pixel-box">
+                <h3>Markdown Tracking Snippet</h3>
+                <p>Useful for GitHub READMEs, forum posts, or Notion documents.</p>
+                <div class="code-block-container">
+                    <code id="snippet-md">![](https://cloud.maixnor.com/logo.gif)</code>
+                    <button class="btn copy-btn" onclick="copySnippet('snippet-md')">Copy Markdown</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 Maixnor Cloud &bull; Running on Wieselburg
+    </footer>
+
+    <script>
+        let allLogEntries = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch('/log.txt?t=' + Date.now());
+                if (!res.ok) throw new Error('Could not fetch log.txt');
+                const text = await res.text();
+                
+                document.getElementById('raw-log-content').textContent = text;
+                parseLogs(text);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('log-table-body').innerHTML = 
+                    `<tr><td colspan="5" style="text-align: center; color: var(--danger); padding: 2rem;">Error loading log.txt</td></tr>`;
+            }
+        }
+
+        function parseLogs(text) {
+            const lines = text.trim().split('\n').filter(l => l.trim().length > 0);
+            allLogEntries = [];
+
+            let count200 = 0;
+            let count404 = 0;
+            const uniqueIPs = new Set();
+
+            lines.forEach(line => {
+                // Example format: [16/Jul/2026 11:54:47] IP: 62.40.184.45, User-Agent: Firefox, Request: "GET /log.txt HTTP/1.1" 200 -
+                const timeMatch = line.match(/^\[(.*?)\]/);
+                const ipMatch = line.match(/IP:\s*([^\s,]+)/);
+                const uaMatch = line.match(/User-Agent:\s*(.*?), Request:/);
+                const reqMatch = line.match(/Request:\s*(.*?)(?:\s+(\d{3})\s+|-|\n|$)/);
+                const statusMatch = line.match(/\s(\d{3})\s+-?$/);
+
+                const time = timeMatch ? timeMatch[1] : 'Unknown';
+                const ip = ipMatch ? ipMatch[1] : 'Unknown';
+                const userAgent = uaMatch ? uaMatch[1] : 'Unknown';
+                const requestStr = reqMatch ? reqMatch[1].replace(/^"|"$/g, '') : line;
+                
+                let statusCode = '200';
+                if (statusMatch) {
+                    statusCode = statusMatch[1];
+                } else if (line.includes('404')) {
+                    statusCode = '404';
+                }
+
+                if (ip !== 'Unknown') uniqueIPs.add(ip);
+                if (statusCode === '200') count200++;
+                if (statusCode === '404') count404++;
+
+                allLogEntries.push({
+                    raw: line,
+                    time,
+                    ip,
+                    userAgent,
+                    requestStr,
+                    statusCode
+                });
+            });
+
+            // Update stats
+            document.getElementById('stat-total').textContent = lines.length;
+            document.getElementById('stat-unique-ips').textContent = uniqueIPs.size;
+            document.getElementById('stat-200').textContent = count200;
+            document.getElementById('stat-404').textContent = count404;
+
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchQuery = document.getElementById('log-search').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const hideScanners = document.getElementById('hide-scanners').checked;
+
+            const scannerKeywords = ['.php', 'wp-admin', 'xmlrpc', 'wlwmanifest', 'xSx', 'crgio'];
+
+            const filtered = allLogEntries.filter(entry => {
+                if (statusFilter !== 'all' && entry.statusCode !== statusFilter) return false;
+                
+                if (hideScanners) {
+                    const isScanner = scannerKeywords.some(kw => entry.requestStr.toLowerCase().includes(kw));
+                    if (isScanner) return false;
+                }
+
+                if (searchQuery) {
+                    const matchText = `${entry.ip} ${entry.userAgent} ${entry.requestStr} ${entry.time}`.toLowerCase();
+                    if (!matchText.includes(searchQuery)) return false;
+                }
+
+                return true;
+            });
+
+            renderTable(filtered.slice(-300).reverse());
+        }
+
+        function renderTable(entries) {
+            const tbody = document.getElementById('log-table-body');
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching logs found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = entries.map(e => {
+                let statusClass = 'status-other';
+                if (e.statusCode === '200') statusClass = 'status-200';
+                if (e.statusCode === '404') statusClass = 'status-404';
+
+                return `
+                    <tr>
+                        <td class="time-text">${escapeHtml(e.time)}</td>
+                        <td><span class="ip-badge">${escapeHtml(e.ip)}</span></td>
+                        <td><span class="badge-status ${statusClass}">${e.statusCode}</span></td>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem;">${escapeHtml(e.requestStr)}</td>
+                        <td class="ua-text" title="${escapeHtml(e.userAgent)}">${escapeHtml(e.userAgent)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadFiles() {
+            try {
+                const res = await fetch('/files.json');
+                if (!res.ok) return;
+                const files = await res.json();
+                
+                const container = document.getElementById('files-grid-container');
+                container.innerHTML = files.map(f => `
+                    <div class="file-card">
+                        <div>
+                            <div class="file-icon">${f.name.endsWith('.pdf') ? '📕' : '📄'}</div>
+                            <div class="file-name">${escapeHtml(f.name)}</div>
+                            <div class="file-meta">${formatBytes(f.size)} &bull; ${f.mtime || ''}</div>
+                        </div>
+                        <a href="/${encodeURIComponent(f.name)}" target="_blank" class="btn btn-secondary">Download →</a>
+                    </div>
+                `).join('');
+            } catch(e) {
+                console.log('files.json load omitted or error', e);
+            }
+        }
+
+        function toggleRawLogs() {
+            const tableView = document.getElementById('table-view');
+            const rawView = document.getElementById('raw-view');
+            const btn = document.getElementById('raw-toggle-btn');
+
+            if (tableView.style.display === 'none') {
+                tableView.style.display = 'block';
+                rawView.style.display = 'none';
+                btn.textContent = 'Raw Text View';
+            } else {
+                tableView.style.display = 'none';
+                rawView.style.display = 'block';
+                btn.textContent = 'Table View';
+            }
+        }
+
+        function copySnippet(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text);
+            alert('Snippet copied to clipboard!');
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Initial Load
+        fetchLogs();
+        loadFiles();
+        setInterval(fetchLogs, 15000);
+    </script>
+</body>
+</html>

@@ -58,39 +58,8 @@ in
     after = [ "network.target" ];
     
     preStart = ''
-      cat > ${rootDir}/index.html << 'EOF'
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Tracking Service</title>
-          <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 40px auto; padding: 20px; color: #333; }
-              h1 { color: #2c3e50; }
-              code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
-          </style>
-      </head>
-      <body>
-          <h1>Maixnor Tracking Service</h1>
-          <p>Welcome to the custom tracking service for <code>cloud.maixnor.com</code>.</p>
-          
-          <h2>How It Works</h2>
-          <p>This service operates a simple Python web server that intercepts incoming HTTP requests. Upon receiving a request, it logs:</p>
-          <ul>
-              <li>The real IP address of the requester (via Traefik's <code>X-Forwarded-For</code> header).</li>
-              <li>The User-Agent string from the browser or client.</li>
-          </ul>
-          <p>This data is appended in real-time to a publicly accessible <a href="/log.txt">log.txt</a> file located in the root directory.</p>
-          
-          <h2>Tracking Pixel</h2>
-          <p>You can embed a 1x1 transparent GIF tracking pixel into your emails or websites using the following snippet:</p>
-          <pre><code>&lt;img src="https://cloud.maixnor.com/logo.gif" width="1" height="1" alt=""&gt;</code></pre>
-          <p>When the pixel is loaded, the client's information will be recorded in the log.</p>
-          <p>Here is the pixel in action (invisible): <img src="/logo.gif" width="1" height="1" alt="pixel"></p>
-      </body>
-      </html>
-      EOF
+      cp ${./tracking-dashboard.html} ${rootDir}/index.html
+      chmod 664 ${rootDir}/index.html
       
       # Generate transparent 1x1 GIF
       echo "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" | ${pkgs.coreutils}/bin/base64 -d > ${rootDir}/logo.gif
