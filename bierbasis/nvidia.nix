@@ -4,6 +4,7 @@
   # Opengl
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
 
     # Install additional packages that improve graphics performance and compatibility.
     extraPackages = with pkgs; [

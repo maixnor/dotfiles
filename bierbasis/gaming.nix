@@ -2,8 +2,12 @@
 
 {
 
-  programs.steam.enable = true;
-  programs.steam.gamescopeSession.enable = true;
+  programs.steam = {
+    enable = true;
+    gamescopeSession.enable = true;
+    remotePlay.openFirewall = true;
+  };
+  hardware.steam-hardware.enable = true;
   programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [

@@ -47,6 +47,7 @@
   # Intel GPU optimizations for power saving
   hardware.graphics = {
     enable = true;
+    enable32Bit = true;
     extraPackages = with pkgs; [
       intel-media-driver  # LIBVA_DRIVER_NAME=iHD
       intel-vaapi-driver  # LIBVA_DRIVER_NAME=i965 (older but sometimes better)
@@ -201,9 +202,11 @@
   
   programs.steam = {
     enable = true;
-    #remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     #dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
+
+  hardware.steam-hardware.enable = true;
 
   system.stateVersion = "25.11";
 
