@@ -1,5 +1,22 @@
 { config, pkgs, lib, inputs, ... }:
 
+let
+  allModelNames = [
+    "qwen2.5-coder:1.5b" "qwen2.5-coder:1.5b-fast" "qwen2.5-coder:1.5b-long"
+    "qwen2.5-coder:3b" "qwen2.5-coder:3b-fast" "qwen2.5-coder:3b-long"
+    "qwen2.5-coder:7b" "qwen2.5-coder:7b-fast" "qwen2.5-coder:7b-long"
+    "qwen2.5-coder:7b-instruct-q8_0"
+    "devstral:24b" "devstral:24b-fast" "devstral:24b-long"
+    "qwen3-coder:30b" "qwen3-coder:30b-fast" "qwen3-coder:30b-long"
+    "qwen2.5-coder:32b" "qwen2.5-coder:32b-fast" "qwen2.5-coder:32b-long"
+    "qwen3.6-heretic:40b" "qwen3.6-heretic:40b-fast" "qwen3.6-heretic:40b-long"
+    "llama3.2-moe-heretic:10b"
+    "deepseek-coder-v2:lite"
+  ];
+
+  piModels = map (m: { id = m; }) allModelNames;
+  opencodeModels = lib.listToAttrs (map (m: { name = m; value = { name = m; }; }) allModelNames);
+in
 {
   imports = [
     inputs.pi-flake.homeManagerModules.default
@@ -11,18 +28,10 @@
     models = {
       providers = {
         ollama = {
-          baseUrl = "http://172.16.32.133:8080/api/v1";
+          baseUrl = "http://172.16.32.133:11434/v1";
           api = "openai-completions";
           apiKey = "sk-eadaa0312689422ba59ae69ba540a78c";
-          models = [
-            { id = "qwen2.5-coder:1.5b"; }
-            { id = "qwen2.5-coder:3b"; }
-            { id = "qwen2.5-coder:7b"; }
-            { id = "qwen2.5-coder:7b-instruct-q8_0"; }
-            { id = "devstral:24b"; }
-            { id = "qwen3-coder:30b"; }
-            { id = "qwen2.5-coder:32b"; }
-          ];
+          models = piModels;
         };
       };
     };
@@ -44,15 +53,7 @@
           baseURL = "http://172.16.32.133:11434/api";
           apiKey = "sk-this-is-just-a-dummy";
         };
-        models = {
-          "qwen2.5-coder:1.5b" = { name = "Qwen2.5 Coder (1.5B)"; };
-          "qwen2.5-coder:3b" = { name = "Qwen2.5 Coder (3B)"; };
-          "qwen2.5-coder:7b" = { name = "Qwen2.5 Coder (7B)"; };
-          "qwen2.5-coder:7b-instruct-q8_0" = { name = "Qwen2.5 Coder (7B Q8)"; };
-          "devstral:24b" = { name = "Devstral (24B)"; };
-          "qwen3-coder:30b" = { name = "Qwen3 Coder (30B)"; };
-          "qwen2.5-coder:32b" = { name = "Qwen2.5 Coder (32B)"; };
-        };
+        models = opencodeModels;
       };
     };
   });

@@ -67,6 +67,7 @@
       # general development stuff
       vscodium
       chromium
+      tor-browser
       static-server
       # remmina
       # pandoc

@@ -8,6 +8,7 @@ let
     keys.hosts.bierzelt
     keys.hosts.bierbasis
     keys.hosts.ottakring
+    keys.hosts.zwettl
   ];
 
   all = maixnor ++ activeSystems;

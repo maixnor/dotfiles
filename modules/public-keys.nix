@@ -16,6 +16,8 @@ let
       "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDccFBNnr7PFPslH32SxVAv4WiSmZLadUz06/LBSX6M11dB/ui7yRxAXk5zrZPqLnI1vmH1a3ZqCg71FVCDaPuscEoMsOTCU/ot2Cj88LAkU1s6iS4eYEN4qNsv1qHm+6fYkM7Poxlx6dQKsGTwVLqQIvBY/Gl2VyYOSVTCkTQfndYNUp0YNi13/tahYVhZQJAOWCoNkTupgtq9jXpnb9sUpI3c5LaTJ9vFzGK1NV6/W2jAeGaxSRIU6QS67Tw2tTFRqHpAddbxnnISC3iXsT0V9m7Fqz3eAlHuyLX4V2IZUtoj28QOpIp45hjSe4HzHTmpr9rm3uMaA1tuWWVVj2YTN/uOD9QMoUHgRU1yw8LIfL4VVjn3IDUpeKEF67ulztvJDRu7OohulmQxwPrtNs+WAwQCk5F8pvUj7nEXgRKFEc3vUrVwcOXbnZH4GeQYW2Ekk49hoUb6J/ySl1UrbSrvxKMTl/2WYmrkoqLyoO8hIPJEFvoGALizXLkMj4jhxCWDNlhEWfSFG4ZVvzhqTMzPkmM06WROmOhRaX0nRpJ1RLzx82HjJNeD0Bv2+VdkryP6wxbmFzjT8IapzD8MlF9w0oRFARRPobZcQAnJYOGAW4Xv71+EZytH84IibzF0szhp/ecsUPiCQxOlsXqwBX9aEn5bKD+cqlXPky0L6jstjw== maixnor@wieselburg"
       # wieselburg-ed
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICDxCQgXMMthOLAM2ewMIB2Xudns+bFjnFrGAyUOFjPa maixnor@wieselburg"
+      # zwettl-ed
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICFsSPrGzAWViMwxyjP+6WmYeVidrV79BpwSBSoNE7Vr root@zwettl"
     ];
   };
 
@@ -25,6 +27,7 @@ let
     bierzelt   = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCK7tXv+thAIgB3BMFgBPq56LuzVmVkSg6/mpDmpEfT root@bierzelt";
     bierbasis  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHJWpPGBkuLR6riBJT3xIFKRjYfIWdJ4PieuF1qbTjnn root@Bierbasis";
     ottakring  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBg4Y4+V238XyNvf8bVZE7+749rzyEbb2pht2zvX/OKo root@nixos";
+    zwettl     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICFsSPrGzAWViMwxyjP+6WmYeVidrV79BpwSBSoNE7Vr root@zwettl";
   };
 in
 {

@@ -133,6 +133,7 @@
   services.pulseaudio.enable = false;
   security.polkit.enable = true;
 	security.rtkit.enable = true;
+  security.pam.services.sddm.kwallet.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -192,7 +193,7 @@
 
   programs.gnupg.agent = {
     enable = true;
-    enableSSHSupport = true;
+    enableSSHSupport = false;
   };
 
   programs.nix-ld.enable = true;
