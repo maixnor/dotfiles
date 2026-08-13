@@ -76,7 +76,7 @@
       obsidian
       discord
       anydesk
-      signal-desktop
+      unstable.signal-desktop
 
       # slack-term
       slack-term
