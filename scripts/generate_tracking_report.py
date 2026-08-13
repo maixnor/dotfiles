@@ -22,8 +22,13 @@ def fetch_log_from_server(server="wb.maixnor.com", path="/var/www/cloud.maixnor.
         print(f"Fehler beim Abrufen des Logs via SSH: {e}", file=sys.stderr)
         sys.exit(1)
 
-def parse_logs(log_content, start_date_filter=datetime(2026, 7, 16)):
-    """Analysiert Log-Inhalte, filtert 404-Anfragen und Einträge vor dem 16. Juli 2026 heraus."""
+def parse_logs(log_content, start_date_filter=datetime(2026, 8, 3), exclude_ips=None):
+    """Analysiert Log-Inhalte, filtert 404-Anfragen, Einträge vor dem Startdatum und ausgeschlossene IPs heraus."""
+    if exclude_ips is None:
+        exclude_ips = {"62.40.184.45"}
+    else:
+        exclude_ips = set(exclude_ips)
+
     per_date_data = defaultdict(lambda: defaultdict(list))
     
     lines = log_content.strip().splitlines()
@@ -31,6 +36,7 @@ def parse_logs(log_content, start_date_filter=datetime(2026, 7, 16)):
     total_raw_lines = len(lines)
     excluded_404_count = 0
     excluded_date_count = 0
+    excluded_ip_count = 0
     valid_count = 0
 
     for line in lines:
@@ -49,7 +55,7 @@ def parse_logs(log_content, start_date_filter=datetime(2026, 7, 16)):
         
         date_str = date_match.group(1) if date_match else "Unbekanntes Datum"
         
-        # Startdatum-Filter (16. Juli 2026)
+        # Startdatum-Filter
         try:
             parsed_dt = datetime.strptime(date_str, "%d/%b/%Y")
             if parsed_dt < start_date_filter:
@@ -61,6 +67,11 @@ def parse_logs(log_content, start_date_filter=datetime(2026, 7, 16)):
         # IP-Adresse extrahieren
         ip_match = re.search(r'IP:\s*([^\s,]+)', line)
         ip_address = ip_match.group(1) if ip_match else "Unbekannte IP"
+
+        # IP-Filter
+        if ip_address in exclude_ips:
+            excluded_ip_count += 1
+            continue
 
         # User-Agent extrahieren
         ua_match = re.search(r'User-Agent:\s*(.*?), Request:', line)
@@ -76,21 +87,25 @@ def parse_logs(log_content, start_date_filter=datetime(2026, 7, 16)):
         per_date_data[date_str][ip_address].append(entry)
         valid_count += 1
 
-    return per_date_data, total_raw_lines, excluded_404_count, excluded_date_count, valid_count
+    return per_date_data, total_raw_lines, excluded_404_count, excluded_date_count, excluded_ip_count, valid_count
 
 def format_date_german(d_str):
     """Formatiert '16/Jul/2026' in '16. Juli 2026'."""
     try:
         parts = d_str.split('/')
-        day = parts[0]
+        day = str(int(parts[0]))
         month_de = MONTH_MAP.get(parts[1], parts[1])
         year = parts[2]
         return f"{day}. {month_de} {year}"
     except Exception:
         return d_str
 
-def generate_markdown_report(per_date_data, total_lines, excluded_404, excluded_date, valid_count):
+def generate_markdown_report(per_date_data, total_lines, excluded_404, excluded_date, excluded_ip, valid_count, start_date_filter=datetime(2026, 8, 3), exclude_ips=None):
     """Erstellt einen deutschen Markdown-Bericht in chronologischer Reihenfolge (Alt nach Neu)."""
+    start_day = start_date_filter.day
+    month_name = MONTH_MAP.get(start_date_filter.strftime("%b"), start_date_filter.strftime("%b"))
+    date_filter_label = f"{start_day}. {month_name}"
+
     md = []
     md.append("# 📊 Tracking-Service Protokoll-Bericht")
     md.append(f"*Erstellt am: {datetime.now().strftime('%d.%m.%Y um %H:%M:%S Uhr')}*\n")
@@ -98,8 +113,11 @@ def generate_markdown_report(per_date_data, total_lines, excluded_404, excluded_
     md.append("## 📈 Zusammenfassung")
     md.append(f"- **Gesamtzahl verarbeiteter Log-Einträge:** `{total_lines}`")
     md.append(f"- **Ausgefilterte 404-Fehleranfragen:** `{excluded_404}`")
-    md.append(f"- **Ausgefilterte Einträge vor dem 16. Juli:** `{excluded_date}`")
-    md.append(f"- **Gültige Anfragen (ab 16. Juli):** `{valid_count}`")
+    md.append(f"- **Ausgefilterte Einträge vor dem {date_filter_label}:** `{excluded_date}`")
+    if exclude_ips:
+        ips_str = ", ".join(f"`{ip}`" for ip in sorted(exclude_ips))
+        md.append(f"- **Ausgefilterte Einträge für ausgeschlossene IP(s) ({ips_str}):** `{excluded_ip}`")
+    md.append(f"- **Gültige Anfragen (ab {date_filter_label}):** `{valid_count}`")
     
     all_ips = set()
     for ips in per_date_data.values():
@@ -150,19 +168,35 @@ def generate_markdown_report(per_date_data, total_lines, excluded_404, excluded_
     return "\n".join(md)
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Erstellt den Tracking-Report.")
+    parser.add_argument("logfile", nargs="?", default=None, help="Pfad zur Log-Datei")
+    parser.add_argument("output", nargs="?", default=None, help="Ausgabedatei")
+    parser.add_argument("--ssh", action="store_true", help="Log direkt vom SSH-Server holen")
+    parser.add_argument("--start-date", default="2026-08-03", help="Startdatum im Format YYYY-MM-DD (Standard: 2026-08-03)")
+    parser.add_argument("--exclude-ip", action="append", help="IP-Adresse(n) ausschließen (Standard: 62.40.184.45)")
+    
+    args, unknown = parser.parse_known_args()
+
+    start_date_filter = datetime.strptime(args.start_date, "%Y-%m-%d")
+    exclude_ips = set(args.exclude_ip) if args.exclude_ip else {"62.40.184.45"}
+
     log_content = ""
-    if len(sys.argv) > 1 and sys.argv[1] != "--ssh":
-        with open(sys.argv[1], "r", encoding="utf-8", errors="ignore") as f:
+    if args.logfile and args.logfile != "--ssh":
+        with open(args.logfile, "r", encoding="utf-8", errors="ignore") as f:
             log_content = f.read()
     else:
         log_content = fetch_log_from_server()
 
-    per_date_data, total_lines, excluded_404, excluded_date, valid_count = parse_logs(log_content)
-    report_md = generate_markdown_report(per_date_data, total_lines, excluded_404, excluded_date, valid_count)
+    per_date_data, total_lines, excluded_404, excluded_date, excluded_ip, valid_count = parse_logs(
+        log_content, start_date_filter=start_date_filter, exclude_ips=exclude_ips
+    )
+    report_md = generate_markdown_report(
+        per_date_data, total_lines, excluded_404, excluded_date, excluded_ip, valid_count,
+        start_date_filter=start_date_filter, exclude_ips=exclude_ips
+    )
 
-    output_path = "tracking_report.md"
-    if len(sys.argv) > 2:
-        output_path = sys.argv[2]
+    output_path = args.output if args.output else "tracking_report.md"
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(report_md)
