@@ -171,7 +171,7 @@
     isNormalUser = true;
     description = "Benjamin Meixner";
     group = "maixnor";
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" "docker" "dialout" "uucp" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" "kvm" "docker" "dialout" "uucp" ];
     openssh.authorizedKeys.keys = keys.users.maixnor;
     packages = [
       nixvim
@@ -201,10 +201,13 @@
   };
 
   programs.dconf.enable = true;
+  programs.virt-manager.enable = true;
   virtualisation = {
     libvirtd = {
       enable = true;
       qemu = {
+        package = pkgs.qemu_kvm;
+        runAsRoot = true;
         swtpm.enable = true;
       };
     };
