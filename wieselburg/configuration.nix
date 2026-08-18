@@ -2,6 +2,7 @@
 
 let 
   hostname = "wieselburg";
+  # Public IP: 37.205.9.77
 in
 {
   imports = [ 
