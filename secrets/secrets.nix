@@ -22,4 +22,5 @@ in
   "odoo_db_password.age".publicKeys = all;
   "odoo_master_password.age".publicKeys = all;
   "rclone-gdrive.age".publicKeys = all;
+  "cloudflare-token-maixnor-com.age".publicKeys = all;
 }

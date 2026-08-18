@@ -105,7 +105,6 @@
     wormhole-william
     gnome-network-displays
     podman-compose # drop in replacement for docker-compose
-    #teamviewer # only works with service.teamviewer
     ntfs3g exfat exfatprogs # mounting hdd
     virt-manager
     virt-viewer
@@ -121,6 +120,7 @@
     qgis
   ];
 
+  services.teamviewer.enable = true;
   services.printing.enable = true;
   services.avahi = {
     enable = true;

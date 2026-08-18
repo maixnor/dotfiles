@@ -1,4 +1,4 @@
-{ modulesPath, pkgs, nixvim, inputs, ... }:
+{ modulesPath, pkgs, nixvim, inputs, config, ... }:
 
 let 
   hostname = "wieselburg";
@@ -51,6 +51,33 @@ in
 
   services.autoupdate.enable = false;
   services.autoupdate.webhook.domain = "wieselburg.maixnor.com";
+
+  age.secrets.cloudflare-token = {
+    file = ../secrets/cloudflare-token-maixnor-com.age;
+    owner = "root";
+  };
+
+  services.cloudflare-dyndns = {
+    enable = true;
+    apiTokenFile = config.age.secrets.cloudflare-token.path;
+    domains = [
+      "maixnor.com"
+      "wieselburg.maixnor.com"
+      "wb.maixnor.com"
+      "static.maixnor.com"
+      "cloud.maixnor.com"
+      "photos.maixnor.com"
+      "office.maixnor.com"
+      "ai.maixnor.com"
+      "research.maixnor.com"
+      "search.maixnor.com"
+      "adhoc.maixnor.com"
+      "fibs.maixnor.com"
+      "imognimma.maixnor.com"
+      "abo-exit.maixnor.com"
+      "media.maixnor.com"
+    ];
+  };
 
   services.openssh.enable = true;
   services.openssh.settings.PermitRootLogin = "yes";

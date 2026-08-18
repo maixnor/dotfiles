@@ -111,6 +111,7 @@
   # Battery saving
   services.thermald.enable = true;
 
+  services.teamviewer.enable = true;
   services.printing.enable = true;
   services.avahi = {
     enable = true;
