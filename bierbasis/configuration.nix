@@ -19,9 +19,17 @@
       ../modules/zerotier.nix
       # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
-      #../services/torrent-server.nix
+      ../services/tor-downloader.nix
       (import "${inputs.home-manager}/nixos")
     ];
+
+  services.tor-downloader = {
+    sink.enable = true;
+    agent = {
+      enable = true;
+      socksProxy = "127.0.0.1:9150"; # TOR Browser SOCKS proxy or local daemon
+    };
+  };
 
   age.secrets.slack_term = {
     file = ../secrets/slack_term.age;

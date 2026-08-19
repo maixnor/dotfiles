@@ -30,7 +30,13 @@ in
     ../services/error-pages.nix
     ../services/adhoc-tunnel.nix
     ../services/pixel-track.nix
+    ../services/tor-downloader.nix
   ];
+
+  services.tor-downloader = {
+    server.enable = true;
+    agent.enable = true;
+  };
 
   virtualisation.vmware.guest.enable = true;
 
@@ -77,6 +83,7 @@ in
       "imognimma.maixnor.com"
       "abo-exit.maixnor.com"
       "media.maixnor.com"
+      "tor-downloader.maixnor.com"
     ];
   };
 

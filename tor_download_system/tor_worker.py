@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+import os
+import sys
+import time
+import json
+import ssl
+import argparse
+import subprocess
+import hashlib
+import urllib.parse
+import urllib.request
+from html.parser import HTMLParser
+
+class DirectoryLinkParser(HTMLParser):
+    def __init__(self, base_url):
+        super().__init__()
+        self.base_url = base_url
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            for attr, val in attrs:
+                if attr == 'href' and val:
+                    val = val.strip()
+                    if val.startswith(('?', '#', '../', '/..')) or val in ('./', '../'):
+                        continue
+                    full_url = urllib.parse.urljoin(self.base_url, val)
+                    base_netloc = urllib.parse.urlparse(self.base_url).netloc
+                    link_netloc = urllib.parse.urlparse(full_url).netloc
+                    if base_netloc == link_netloc and full_url != self.base_url:
+                        self.links.append(full_url)
+
+def compute_sha256(filepath):
+    h = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(65536), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+def url_to_relative_path(url):
+    parsed = urllib.parse.urlparse(url)
+    path = urllib.parse.unquote(parsed.path.lstrip('/'))
+    if path.startswith('data/'):
+        path = path[5:]
+    return path
+
+class TorWorker:
+    def __init__(self, worker_id, server_url, socks_proxy, staging_dir, api_key=""):
+        self.worker_id = worker_id
+        self.server_url = server_url.rstrip('/')
+        self.socks_proxy = socks_proxy
+        self.staging_dir = staging_dir
+        self.api_key = api_key
+        os.makedirs(self.staging_dir, exist_ok=True)
+
+    def _post(self, endpoint, data):
+        headers = {'Content-Type': 'application/json'}
+        if self.api_key:
+            headers['X-API-Key'] = self.api_key
+
+        url = f"{self.server_url}{endpoint}"
+        parsed = urllib.parse.urlparse(url)
+        target_url = url
+        ctx = None
+
+        if parsed.scheme == 'https':
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
+        if parsed.hostname == "tor-downloader.maixnor.com":
+            headers['Host'] = "tor-downloader.maixnor.com"
+            # Fallback IP if DNS resolution fails
+            try:
+                import socket
+                socket.gethostbyname("tor-downloader.maixnor.com")
+            except Exception:
+                target_url = urllib.parse.urlunparse((
+                    parsed.scheme, "37.205.9.77", parsed.path, parsed.params, parsed.query, parsed.fragment
+                ))
+
+        req = urllib.request.Request(
+            target_url,
+            data=json.dumps(data).encode('utf-8'),
+            headers=headers
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=20, context=ctx) as resp:
+                return json.loads(resp.read().decode('utf-8'))
+        except Exception as e:
+            print(f"[{self.worker_id}] Error posting to {endpoint}: {e}")
+            return None
+
+    def fetch_url_content(self, url):
+        cmd = ["curl", "--socks5-hostname", self.socks_proxy, "-s", "-L", "--connect-timeout", "30", url]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if res.returncode != 0:
+            raise Exception(f"curl failed (code {res.returncode}): {res.stderr}")
+        return res.stdout
+
+    def download_file(self, url, dest_path):
+        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+        cmd = [
+            "curl", "--socks5-hostname", self.socks_proxy,
+            "-L", "-C", "-", "--connect-timeout", "30",
+            "--retry", "3", "--retry-delay", "5",
+            "-o", dest_path, url
+        ]
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        if res.returncode != 0:
+            raise Exception(f"curl download failed (code {res.returncode}): {res.stderr}")
+        if not os.path.exists(dest_path):
+            raise Exception(f"Downloaded file does not exist at {dest_path}")
+
+    def run_step(self):
+        resp = self._post("/api/claim", {"worker_id": self.worker_id})
+        if not resp or not resp.get("task"):
+            return False
+
+        task = resp["task"]
+        task_id = task["id"]
+        url = task["url"]
+        is_dir = task["is_dir"]
+
+        print(f"[{self.worker_id}] Claimed task {task_id}: {url} (is_dir={is_dir})")
+
+        try:
+            if is_dir or url.endswith('/'):
+                html = self.fetch_url_content(url)
+                parser = DirectoryLinkParser(url)
+                parser.feed(html)
+                discovered = list(set(parser.links))
+                print(f"[{self.worker_id}] Directory crawl discovered {len(discovered)} links.")
+                
+                self._post("/api/report_staging", {
+                    "task_id": task_id,
+                    "url": url,
+                    "worker_id": self.worker_id,
+                    "staging_path": "",
+                    "file_size": 0,
+                    "file_hash": "",
+                    "discovered_urls": discovered
+                })
+            else:
+                rel_path = url_to_relative_path(url)
+                staging_path = os.path.join(self.staging_dir, rel_path)
+                
+                self.download_file(url, staging_path)
+                file_size = os.path.getsize(staging_path)
+                file_hash = compute_sha256(staging_path)
+
+                print(f"[{self.worker_id}] Downloaded {url} to staging: {staging_path} ({file_size} bytes)")
+                
+                self._post("/api/report_staging", {
+                    "task_id": task_id,
+                    "url": url,
+                    "worker_id": self.worker_id,
+                    "staging_path": staging_path,
+                    "file_size": file_size,
+                    "file_hash": file_hash,
+                    "discovered_urls": []
+                })
+
+        except Exception as e:
+            print(f"[{self.worker_id}] Task {task_id} failed: {e}")
+            self._post("/api/report_failed", {"task_id": task_id, "error": str(e)})
+
+        return True
+
+    def loop(self):
+        print(f"[{self.worker_id}] Starting worker loop. Server: {self.server_url}, Proxy: {self.socks_proxy}, Staging: {self.staging_dir}")
+        while True:
+            had_task = self.run_step()
+            if not had_task:
+                time.sleep(3)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--worker-id', required=True)
+    parser.add_argument('--server-url', default='https://tor-downloader.maixnor.com')
+    parser.add_argument('--socks-proxy', default='127.0.0.1:9050')
+    parser.add_argument('--staging-dir', default='/var/lib/tor-downloader/staging')
+    parser.add_argument('--api-key-file', default='/run/secrets/tor-downloader-api-key')
+    parser.add_argument('--api-key', default='')
+    args = parser.parse_args()
+
+    api_key = args.api_key
+    if not api_key and os.path.exists(args.api_key_file):
+        try:
+            with open(args.api_key_file, 'r') as f:
+                api_key = f.read().strip()
+        except Exception:
+            pass
+
+    worker = TorWorker(args.worker_id, args.server_url, args.socks_proxy, args.staging_dir, api_key)
+    worker.loop()

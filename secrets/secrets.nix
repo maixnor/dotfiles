@@ -23,4 +23,5 @@ in
   "odoo_master_password.age".publicKeys = all;
   "rclone-gdrive.age".publicKeys = all;
   "cloudflare-token-maixnor-com.age".publicKeys = all;
+  "tor-downloader-api-key.age".publicKeys = all;
 }

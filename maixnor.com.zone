@@ -1,0 +1,36 @@
+;$ORIGIN maixnor.com.
+$TTL 300
+
+; Replace YOUR_SERVER_IP with the public IPv4 address of your Wieselburg server
+
+; Root Domain & Host Aliases
+@               IN A       YOUR_SERVER_IP
+wieselburg      IN A       YOUR_SERVER_IP
+wb              IN CNAME   wieselburg.maixnor.com.
+static          IN A       YOUR_SERVER_IP
+
+; Core Services
+cloud           IN A       YOUR_SERVER_IP
+photos          IN A       YOUR_SERVER_IP
+office          IN A       YOUR_SERVER_IP
+ai              IN A       YOUR_SERVER_IP
+research        IN A       YOUR_SERVER_IP
+search          IN A       YOUR_SERVER_IP
+
+; Custom Web Apps & Services
+adhoc           IN A       YOUR_SERVER_IP
+fibs            IN A       YOUR_SERVER_IP
+imognimma       IN A       YOUR_SERVER_IP
+abo-exit        IN A       YOUR_SERVER_IP
+media           IN A       YOUR_SERVER_IP
+
+; Monitoring & Language Services
+grafana         IN A       YOUR_SERVER_IP
+prometheus      IN A       YOUR_SERVER_IP
+loki            IN A       YOUR_SERVER_IP
+languagebuddy   IN A       YOUR_SERVER_IP
+api.languagebuddy IN A     YOUR_SERVER_IP
+test.languagebuddy IN A    YOUR_SERVER_IP
+
+; Catch-all Wildcard
+*               IN A       YOUR_SERVER_IP
