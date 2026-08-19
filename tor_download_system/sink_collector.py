@@ -97,7 +97,7 @@ class SinkCollector:
         print(f"[Sink] Pulling task {task_id} from {self.source_host}:{staging_path} -> {dest_file}")
 
         rsync_cmd = [
-            "rsync", "-avz", "-e", "ssh -o StrictHostKeyChecking=accept-new",
+            "rsync", "-avz",
             f"{self.source_host}:{staging_path}", dest_file
         ]
         res = subprocess.run(rsync_cmd, capture_output=True, text=True)
@@ -112,7 +112,7 @@ class SinkCollector:
                 "file_hash": file_hash
             })
 
-            cleanup_cmd = ["ssh", "-o", "StrictHostKeyChecking=accept-new", self.source_host, f"rm -f {subprocess.list2cmdline([staging_path])}"]
+            cleanup_cmd = ["ssh", self.source_host, f"rm -f {subprocess.list2cmdline([staging_path])}"]
             subprocess.run(cleanup_cmd, capture_output=True)
             print(f"[Sink] Completed task {task_id}: {rel_path} ({file_size} bytes). Remote staging cleaned up.")
         else:

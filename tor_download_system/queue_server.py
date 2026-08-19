@@ -54,6 +54,8 @@ def init_db():
             url TEXT UNIQUE NOT NULL,
             parent_url TEXT,
             is_dir INTEGER DEFAULT 0,
+            is_vip INTEGER DEFAULT 0,
+            vip_added_at TIMESTAMP,
             status TEXT DEFAULT 'pending',
             worker_id TEXT,
             local_rel_path TEXT,
@@ -66,6 +68,15 @@ def init_db():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    try:
+        c.execute('ALTER TABLE tasks ADD COLUMN is_vip INTEGER DEFAULT 0')
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute('ALTER TABLE tasks ADD COLUMN vip_added_at TIMESTAMP')
+    except sqlite3.OperationalError:
+        pass
+
     c.execute('''
         CREATE TABLE IF NOT EXISTS workers (
             worker_id TEXT PRIMARY KEY,
@@ -75,6 +86,7 @@ def init_db():
     ''')
     c.execute('CREATE INDEX IF NOT EXISTS idx_status ON tasks(status)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_url ON tasks(url)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_vip ON tasks(is_vip, vip_added_at)')
     conn.commit()
     conn.close()
 
@@ -96,12 +108,17 @@ def update_worker_heartbeat(conn, worker_id, increment_task=False):
                 last_seen = CURRENT_TIMESTAMP
         ''', (worker_id,))
 
+def extract_relative_path(url):
+    parsed = urllib.parse.urlparse(url)
+    path = urllib.parse.unquote(parsed.path)
+    return path if path else url
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tor Download Manager — Wieselburg</title>
+    <title>Tor Download Manager & Explorer — Wieselburg</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
         :root {
@@ -115,6 +132,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --vip-gold: #fbbf24;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -124,12 +142,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             padding: 24px;
             line-height: 1.5;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1280px; margin: 0 auto; }
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
         }
@@ -140,46 +158,51 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .btn:hover { background: var(--border-color); }
         .btn-pause { background: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: var(--warning); }
-        .btn-pause:hover { background: rgba(245, 158, 11, 0.3); }
         .btn-resume { background: rgba(16, 185, 129, 0.2); color: var(--success); border-color: var(--success); }
-        .btn-resume:hover { background: rgba(16, 185, 129, 0.3); }
-        .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); }
-        .btn-danger:hover { background: rgba(239, 68, 68, 0.3); }
+        .btn-vip { background: rgba(251, 191, 36, 0.2); color: var(--vip-gold); border-color: var(--vip-gold); font-size: 11px; padding: 4px 8px; }
+        .btn-vip-cancel { background: rgba(156, 163, 175, 0.2); color: var(--text-muted); border-color: var(--border-color); font-size: 11px; padding: 4px 8px; }
+        .btn-cancel { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); font-size: 11px; padding: 4px 8px; }
 
         .grid-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
         .stat-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 20px;
+            padding: 18px;
         }
-        .stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
-        .stat-value { font-size: 26px; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #fff; }
         .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         
-        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 14px; color: #fff; }
+        .nav-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .tab { padding: 8px 16px; font-weight: 600; font-size: 14px; border-radius: 6px; cursor: pointer; color: var(--text-muted); text-decoration: none; }
+        .tab.active { background: var(--primary); color: #fff; }
+
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
+        .section-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
         form.seed-form { display: flex; gap: 12px; }
         input[type="text"] {
             flex: 1;
@@ -204,8 +227,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         button.btn-submit:hover { background: var(--primary-hover); }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 13px; }
-        th { background: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        th { background: rgba(0,0,0,0.25); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
         tr:hover { background: rgba(255,255,255,0.02); }
         .badge {
             display: inline-block;
@@ -216,38 +239,43 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             text-transform: uppercase;
         }
         .badge-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .badge-vip { background: rgba(251, 191, 36, 0.25); color: var(--vip-gold); border: 1px solid var(--vip-gold); }
         .badge-assigned { background: rgba(59, 130, 246, 0.15); color: var(--primary); }
         .badge-staging { background: rgba(16, 185, 129, 0.15); color: #34d399; }
         .badge-completed { background: rgba(16, 185, 129, 0.25); color: var(--success); }
         .badge-failed { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
         
-        .url-cell { font-family: monospace; max-width: 450px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .path-cell { font-family: monospace; font-size: 12px; word-break: break-all; color: var(--text-main); }
+        .explorer-tree { font-family: monospace; font-size: 13px; }
+        .tree-item { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: space-between; }
+        .tree-item:hover { background: rgba(255,255,255,0.03); }
+        .tree-name { display: flex; align-items: center; gap: 8px; }
+        .search-box { margin-bottom: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div>
-                <h1>Tor Download Manager STATUS_BADGE</h1>
-                <div class="subtitle">Wieselburg Coordinator & Distribution Hub</div>
+                <h1>Tor Download Manager & Explorer STATUS_BADGE</h1>
+                <div class="subtitle">Wieselburg Coordinator & Priority Hub</div>
             </div>
             <div class="actions">
                 PAUSE_RESUME_BTN
-                <button class="btn btn-danger" onclick="if(confirm('Stop & clear all pending queued downloads?')) location.href='/ui/clear_pending'">Stop & Clear Queue</button>
                 <button class="btn" onclick="location.reload()">Refresh (F5)</button>
             </div>
         </header>
 
         <div class="grid-stats">
             <div class="stat-card">
-                <div class="stat-label">Total Catalog Items</div>
-                <div class="stat-value">TOTAL_TASKS</div>
-                <div class="stat-sub">Discovered URLs</div>
+                <div class="stat-label">VIP Queue (Priority)</div>
+                <div class="stat-value" style="color: var(--vip-gold)">VIP_TASKS</div>
+                <div class="stat-sub">High-priority items</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pending Downloads</div>
+                <div class="stat-label">Pending Queue</div>
                 <div class="stat-value" style="color: var(--warning)">PENDING_TASKS</div>
-                <div class="stat-sub">In queue</div>
+                <div class="stat-sub">Standard priority</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Completed Payload</div>
@@ -261,32 +289,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
         </div>
 
-        <div class="card">
-            <div class="section-title">Seed New Onion Target</div>
-            <form class="seed-form" method="POST" action="/ui/add_url">
-                <input type="text" name="url" placeholder="http://xxxxxxxx.onion/data/target/" required />
-                <button type="submit" class="btn-submit">Add Target URL</button>
-            </form>
+        <div class="nav-tabs">
+            <a href="/ui?view=queue" class="tab TAB_QUEUE_ACTIVE">Active Queue & VIP List</a>
+            <a href="/ui?view=explorer" class="tab TAB_EXPLORER_ACTIVE">File & Folder Explorer</a>
         </div>
 
-        <div class="card">
-            <div class="section-title">Recent Tasks & Discovered Items</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Target URL</th>
-                        <th>Status</th>
-                        <th>Worker</th>
-                        <th>Size</th>
-                        <th>Updated At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    TASKS_ROWS
-                </tbody>
-            </table>
-        </div>
+        VIEW_CONTENT
+
     </div>
 </body>
 </html>
@@ -336,41 +345,77 @@ class QueueHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
             parsed = urllib.parse.urlparse(self.path)
+            params = urllib.parse.parse_qs(parsed.query)
+            view = params.get("view", ["queue"])[0]
 
-            if parsed.path in ('/ui/toggle_pause', '/ui/clear_pending'):
-                if parsed.path == '/ui/toggle_pause':
-                    set_paused(not is_paused())
-                elif parsed.path == '/ui/clear_pending':
-                    conn = get_db()
-                    c = conn.cursor()
-                    c.execute("UPDATE tasks SET status='cancelled' WHERE status='pending'")
-                    conn.commit()
-                    conn.close()
+            if parsed.path == '/ui/toggle_pause':
+                set_paused(not is_paused())
                 self.send_response(303)
                 self.send_header('Location', '/ui')
+                self.end_headers()
+                return
+
+            if parsed.path in ('/ui/set_vip', '/ui/cancel_vip', '/ui/cancel_task'):
+                task_id = params.get("id", [""])[0]
+                target_url = params.get("url", [""])[0]
+                folder_path = params.get("folder", [""])[0]
+                conn = get_db()
+                c = conn.cursor()
+
+                if parsed.path == '/ui/set_vip':
+                    if task_id:
+                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE id = ?", (task_id,))
+                    elif target_url:
+                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                    elif folder_path:
+                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url LIKE ? AND status IN ('pending', 'assigned')", (f"%{folder_path}%",))
+                elif parsed.path == '/ui/cancel_vip':
+                    if task_id:
+                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE id = ?", (task_id,))
+                    elif target_url:
+                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                    elif folder_path:
+                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url LIKE ?", (f"%{folder_path}%",))
+                elif parsed.path == '/ui/cancel_task':
+                    if task_id:
+                        c.execute("SELECT url, is_dir FROM tasks WHERE id = ?", (task_id,))
+                        row = c.fetchone()
+                        if row:
+                            c.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+                            if row['is_dir']:
+                                dir_url = row['url']
+                                c.execute("DELETE FROM tasks WHERE url LIKE ? OR parent_url LIKE ?", (f"{dir_url}%", f"{dir_url}%"))
+                    elif target_url:
+                        c.execute("DELETE FROM tasks WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                    elif folder_path:
+                        c.execute("DELETE FROM tasks WHERE url LIKE ?", (f"%{folder_path}%",))
+
+                conn.commit()
+                conn.close()
+                redirect_url = '/ui?view=explorer' if 'view=explorer' in self.headers.get('Referer', '') else f'/ui?view={view}'
+                self.send_response(303)
+                self.send_header('Location', redirect_url)
                 self.end_headers()
                 return
 
             if parsed.path in ('/', '/ui'):
                 conn = get_db()
                 c = conn.cursor()
+
                 c.execute('SELECT status, count(*) as count FROM tasks GROUP BY status')
                 stats = {row['status']: row['count'] for row in c.fetchall()}
+
+                c.execute('SELECT count(*) as count FROM tasks WHERE is_vip = 1 AND status = "pending"')
+                vip_count = c.fetchone()['count']
                 
                 c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
                 completed_info = c.fetchone()
                 
-                # Active workers within last 5 minutes
-                c.execute("SELECT worker_id, datetime(last_seen, 'localtime') as ls FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
-                active_worker_rows = c.fetchall()
-                workers = [r['worker_id'] for r in active_worker_rows]
+                c.execute("SELECT worker_id FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
+                workers = [r['worker_id'] for r in c.fetchall() if r['worker_id']]
 
                 c.execute('SELECT count(*) as count FROM tasks')
                 total_tasks = c.fetchone()['count']
-
-                c.execute('SELECT * FROM tasks ORDER BY id DESC LIMIT 50')
-                recent_tasks = [dict(r) for r in c.fetchall()]
-                conn.close()
 
                 comp_bytes = completed_info['total_bytes'] or 0
                 if comp_bytes > 1073741824:
@@ -378,19 +423,117 @@ class QueueHandler(BaseHTTPRequestHandler):
                 else:
                     comp_size_str = f"{comp_bytes / 1048576:.1f} MB"
 
-                rows_html = ""
-                for t in recent_tasks:
-                    badge_cls = f"badge-{t['status']}"
-                    size_str = f"{t['file_size']} B" if t['file_size'] else "-"
-                    worker_str = t['worker_id'] or "-"
-                    rows_html += f"""<tr>
-                        <td>{t['id']}</td>
-                        <td class="url-cell" title="{t['url']}">{t['url']}</td>
-                        <td><span class="badge {badge_cls}">{t['status']}</span></td>
-                        <td>{worker_str}</td>
-                        <td>{size_str}</td>
-                        <td>{t['updated_at']}</td>
-                    </tr>"""
+                if view == 'explorer':
+                    search_q = params.get("q", [""])[0].strip()
+                    if search_q:
+                        c.execute("SELECT * FROM tasks WHERE url LIKE ? ORDER BY is_dir DESC, url ASC LIMIT 150", (f"%{search_q}%",))
+                    else:
+                        c.execute("SELECT * FROM tasks ORDER BY is_dir DESC, url ASC LIMIT 150")
+                    
+                    items = [dict(r) for r in c.fetchall()]
+                    conn.close()
+
+                    explorer_html = f"""
+                    <div class="card">
+                        <div class="section-title">
+                            File & Directory Explorer
+                            <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">Browse cataloged files & directories; promote or delete branches</span>
+                        </div>
+                        <form method="GET" action="/ui" class="search-box">
+                            <input type="hidden" name="view" value="explorer" />
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" name="q" value="{search_q}" placeholder="Filter by folder or file name (e.g. ALSGLOBAL/03 Metallurgy/)..." />
+                                <button type="submit" class="btn-submit">Search Explorer</button>
+                            </div>
+                        </form>
+                        <div class="explorer-tree">
+                    """
+                    for item in items:
+                        rel = extract_relative_path(item['url'])
+                        icon = "📁" if item['is_dir'] else "📄"
+                        badge = "VIP Pending" if (item['is_vip'] and item['status'] == 'pending') else item['status']
+                        badge_cls = "badge-vip" if (item['is_vip'] and item['status'] == 'pending') else f"badge-{item['status']}"
+                        
+                        enc_url = urllib.parse.quote(item['url'])
+                        vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP</a>' if not item['is_vip'] else f'<a href="/ui/cancel_vip?url={enc_url}" class="btn btn-vip-cancel">☆ Normal</a>'
+                        cancel_label = "✖ Remove Folder" if item['is_dir'] else "✖ Remove File"
+                        cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">{cancel_label}</a>'
+
+                        explorer_html += f"""
+                        <div class="tree-item">
+                            <div class="tree-name">
+                                <span>{icon}</span>
+                                <span class="path-cell" title="{item['url']}">{rel}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="badge {badge_cls}">{badge}</span>
+                                <span style="font-size: 12px; color: var(--text-muted); width: 80px; text-align: right;">{item['file_size']} B</span>
+                                {vip_btn}
+                                {cancel_btn}
+                            </div>
+                        </div>
+                        """
+                    explorer_html += "</div></div>"
+                    view_content = explorer_html
+
+                else:
+                    c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
+                    active_queue = [dict(r) for r in c.fetchall()]
+                    conn.close()
+
+                    queue_rows = ""
+                    for t in active_queue:
+                        rel = extract_relative_path(t['url'])
+                        badge = "VIP Pending" if (t['is_vip'] and t['status'] == 'pending') else t['status']
+                        badge_cls = "badge-vip" if (t['is_vip'] and t['status'] == 'pending') else f"badge-{t['status']}"
+                        worker_str = t['worker_id'] or "-"
+                        size_str = f"{t['file_size']} B" if t['file_size'] else "-"
+
+                        enc_url = urllib.parse.quote(t['url'])
+                        vip_action = f'<a href="/ui/cancel_vip?id={t["id"]}" class="btn btn-vip-cancel">☆ Normal</a>' if t['is_vip'] else f'<a href="/ui/set_vip?id={t["id"]}" class="btn btn-vip">★ VIP</a>'
+                        cancel_action = f'<a href="/ui/cancel_task?id={t["id"]}" class="btn btn-cancel">✖ Remove</a>'
+
+                        queue_rows += f"""<tr>
+                            <td>{t['id']}</td>
+                            <td class="path-cell" title="{t['url']}">{rel}</td>
+                            <td><span class="badge {badge_cls}">{badge}</span></td>
+                            <td>{worker_str}</td>
+                            <td>{size_str}</td>
+                            <td style="display: flex; gap: 6px;">{vip_action}{cancel_action}</td>
+                        </tr>"""
+
+                    queue_html = f"""
+                    <div class="card">
+                        <div class="section-title">Seed New Onion Target</div>
+                        <form class="seed-form" method="POST" action="/ui/add_url">
+                            <input type="text" name="url" placeholder="http://xxxxxxxx.onion/data/ALSGLOBAL/subfolder/" required />
+                            <button type="submit" class="btn-submit">Add Target URL</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title">
+                            Active Queue (VIP First)
+                            <span style="font-size: 12px; color: var(--text-muted);">VIP items are downloaded first in order of VIP declaration</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Path (After .onion)</th>
+                                    <th>Status</th>
+                                    <th>Worker</th>
+                                    <th>Size</th>
+                                    <th>Priority & Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {queue_rows if queue_rows else '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No active pending or VIP tasks in queue.</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                    """
+                    view_content = queue_html
 
                 paused = is_paused()
                 status_badge = '<span class="badge badge-failed" style="margin-left: 8px;">PAUSED</span>' if paused else '<span class="badge badge-completed" style="margin-left: 8px;">ACTIVE</span>'
@@ -399,13 +542,15 @@ class QueueHandler(BaseHTTPRequestHandler):
                 html = HTML_TEMPLATE
                 html = html.replace("STATUS_BADGE", status_badge)
                 html = html.replace("PAUSE_RESUME_BTN", pause_btn)
-                html = html.replace("TOTAL_TASKS", f"{total_tasks:,}")
+                html = html.replace("VIP_TASKS", f"{vip_count:,}")
                 html = html.replace("PENDING_TASKS", f"{stats.get('pending', 0):,}")
                 html = html.replace("COMPLETED_SIZE", comp_size_str)
                 html = html.replace("COMPLETED_COUNT", f"{completed_info['total'] or 0:,}")
                 html = html.replace("ACTIVE_WORKERS", str(len(workers)))
                 html = html.replace("WORKER_NAMES", ", ".join(workers) if workers else "None active in last 5m")
-                html = html.replace("TASKS_ROWS", rows_html)
+                html = html.replace("TAB_QUEUE_ACTIVE", "active" if view == "queue" else "")
+                html = html.replace("TAB_EXPLORER_ACTIVE", "active" if view == "explorer" else "")
+                html = html.replace("VIEW_CONTENT", view_content)
 
                 self._send_html(html)
 
@@ -513,7 +658,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                     return
 
                 c = conn.cursor()
-                c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_dir DESC, id ASC LIMIT 1')
+                c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_vip DESC, vip_added_at ASC, is_dir DESC, id ASC LIMIT 1')
                 row = c.fetchone()
                 if row:
                     task = dict(row)

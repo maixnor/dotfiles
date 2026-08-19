@@ -159,7 +159,7 @@ in {
         path = [ pythonEnv pkgs.rsync pkgs.openssh pkgs.curl ];
         serviceConfig = {
           Type = "simple";
-          User = "root";
+          User = "maixnor";
           ExecStartPre = pkgs.writeShellScript "init-tor-downloader-sink" ''
             mkdir -p ${cfg.sink.destinationDir}
           '';
