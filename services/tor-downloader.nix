@@ -64,6 +64,11 @@ in {
         default = "/data/download";
         description = "Local directory where downloaded files land (Bierbasis)";
       };
+      sshKey = mkOption {
+        type = types.str;
+        default = "/home/maixnor/.ssh/id_tor_downloader";
+        description = "Dedicated SSH private key file for rsync authentication";
+      };
       apiKeyFile = mkOption {
         type = types.str;
         default = "/run/secrets/tor-downloader-api-key";
@@ -78,10 +83,20 @@ in {
         default = "https://tor-downloader.maixnor.com";
         description = "URL of the Queue Coordinator Server";
       };
+      workerCount = mkOption {
+        type = types.int;
+        default = 20;
+        description = "Number of parallel Tor downloader worker processes and SOCKS proxy ports to spawn";
+      };
+      baseSocksPort = mkOption {
+        type = types.port;
+        default = 9050;
+        description = "Base SOCKS5 port for Tor client proxies";
+      };
       socksProxy = mkOption {
         type = types.str;
         default = "127.0.0.1:9050";
-        description = "TOR SOCKS5 proxy address (e.g., 127.0.0.1:9050 or 127.0.0.1:9150)";
+        description = "TOR SOCKS5 proxy address";
       };
       workerId = mkOption {
         type = types.str;
@@ -157,13 +172,16 @@ in {
         after = [ "network.target" ];
         wantedBy = [ "multi-user.target" ];
         path = [ pythonEnv pkgs.rsync pkgs.openssh pkgs.curl ];
+        environment = {
+          HOME = "/home/maixnor";
+        };
         serviceConfig = {
           Type = "simple";
           User = "maixnor";
           ExecStartPre = pkgs.writeShellScript "init-tor-downloader-sink" ''
             mkdir -p ${cfg.sink.destinationDir}
           '';
-          ExecStart = "${pythonEnv}/bin/python3 ${sinkCollectorPy} --server-url ${cfg.sink.serverUrl} --source-host ${cfg.sink.sourceHost} --destination-dir ${cfg.sink.destinationDir} --api-key-file ${cfg.sink.apiKeyFile}";
+          ExecStart = "${pythonEnv}/bin/python3 ${sinkCollectorPy} --server-url ${cfg.sink.serverUrl} --source-host ${cfg.sink.sourceHost} --ssh-key ${cfg.sink.sshKey} --destination-dir ${cfg.sink.destinationDir} --api-key-file ${cfg.sink.apiKeyFile}";
           Restart = "always";
           RestartSec = "10s";
         };
@@ -172,29 +190,35 @@ in {
 
     # AGENT WORKER SERVICE CONFIGURATION (wieselburg, bierbasis, bierzelt, etc.)
     (mkIf cfg.agent.enable {
-      # Automatically enable local TOR client daemon for agent
+      # Automatically enable local TOR client daemon with multi-SOCKS port bindings
       services.tor = {
         enable = true;
         client.enable = true;
-      };
-
-      systemd.services.tor-downloader-agent = {
-        description = "Tor Downloader Worker Agent (${cfg.agent.workerId})";
-        after = [ "network.target" "tor.service" ];
-        requires = [ "tor.service" ];
-        wantedBy = [ "multi-user.target" ];
-        path = [ pythonEnv pkgs.curl pkgs.openssh ];
-        serviceConfig = {
-          Type = "simple";
-          User = "root";
-          ExecStartPre = pkgs.writeShellScript "init-tor-downloader-agent" ''
-            mkdir -p ${cfg.agent.stagingDir}
-          '';
-          ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId} --server-url ${cfg.agent.serverUrl} --socks-proxy ${cfg.agent.socksProxy} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}";
-          Restart = "always";
-          RestartSec = "5s";
+        settings = {
+          SocksPort = map (i: "127.0.0.1:${toString (cfg.agent.baseSocksPort + i)}") (lib.range 0 (cfg.agent.workerCount - 1));
         };
       };
+
+      systemd.services = builtins.listToAttrs (map (i: {
+        name = "tor-downloader-agent-${toString (i + 1)}";
+        value = {
+          description = "Tor Downloader Worker Agent (${cfg.agent.workerId}-${toString (i + 1)})";
+          after = [ "network.target" "tor.service" ];
+          requires = [ "tor.service" ];
+          wantedBy = [ "multi-user.target" ];
+          path = [ pythonEnv pkgs.curl pkgs.openssh ];
+          serviceConfig = {
+            Type = "simple";
+            User = "root";
+            ExecStartPre = pkgs.writeShellScript "init-tor-downloader-agent-${toString (i + 1)}" ''
+              mkdir -p ${cfg.agent.stagingDir}
+            '';
+            ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}";
+            Restart = "always";
+            RestartSec = "5s";
+          };
+        };
+      }) (lib.range 0 (cfg.agent.workerCount - 1)));
     })
   ];
 }

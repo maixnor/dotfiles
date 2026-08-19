@@ -18,6 +18,8 @@ let
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICDxCQgXMMthOLAM2ewMIB2Xudns+bFjnFrGAyUOFjPa maixnor@wieselburg"
       # zwettl-ed
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICFsSPrGzAWViMwxyjP+6WmYeVidrV79BpwSBSoNE7Vr root@zwettl"
+      # tor-downloader-sink
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPVmAN+Zz7/4LknO5I6zwvAITkqaHzjJh9f/t7qRQgzi tor-downloader-sink@bierbasis"
     ];
   };
 

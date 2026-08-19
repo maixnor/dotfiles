@@ -113,6 +113,189 @@ def extract_relative_path(url):
     path = urllib.parse.unquote(parsed.path)
     return path if path else url
 
+def build_tree_structure(tasks):
+    root = {"name": "root", "is_dir": True, "children": {}, "task": None}
+    for t in tasks:
+        parsed = urllib.parse.urlparse(t['url'])
+        clean_path = urllib.parse.unquote(parsed.path).strip('/')
+        if not clean_path:
+            continue
+        parts = clean_path.split('/')
+        curr = root
+        for i, part in enumerate(parts):
+            if part not in curr["children"]:
+                curr["children"][part] = {
+                    "name": part,
+                    "is_dir": (i < len(parts) - 1) or bool(t['is_dir']),
+                    "children": {},
+                    "task": None
+                }
+            curr = curr["children"][part]
+            if i == len(parts) - 1:
+                curr["task"] = t
+                curr["is_dir"] = bool(t['is_dir'])
+    return root
+
+def compute_node_rollup_status(node):
+    if not node["is_dir"]:
+        t = node["task"]
+        if t:
+            return t["status"], bool(t.get("is_vip"))
+        return "completed", False
+
+    child_statuses = []
+    has_vip = False
+
+    for child_name, child_node in node["children"].items():
+        st, vip = compute_node_rollup_status(child_node)
+        child_statuses.append(st)
+        if vip:
+            has_vip = True
+
+    if not child_statuses:
+        return "completed", False
+
+    if "failed" in child_statuses:
+        return "failed", False
+    if "pending" in child_statuses or "VIP Pending" in child_statuses:
+        return ("VIP Pending" if has_vip else "pending"), has_vip
+    if "assigned" in child_statuses:
+        return "assigned", False
+    if "downloaded_staging" in child_statuses:
+        return "downloaded_staging", False
+    if all(s == "completed" for s in child_statuses):
+        return "completed", False
+
+    return "pending", False
+
+def render_tree_node(node, depth=0):
+    html = ""
+    sorted_keys = sorted(node["children"].keys(), key=lambda k: (not node["children"][k]["is_dir"], k.lower()))
+    for key in sorted_keys:
+        child = node["children"][key]
+        item_name = child["name"]
+        task = child["task"]
+
+        badge_html = ""
+        action_html = ""
+        size_str = ""
+
+        if child["is_dir"]:
+            rollup_st, is_vip_rollup = compute_node_rollup_status(child)
+            badge_cls = "badge-vip" if (rollup_st == "VIP Pending") else f"badge-{rollup_st}"
+            badge_html = f'<span class="badge {badge_cls}">{rollup_st}</span>'
+
+            dir_url = task['url'] if task else ""
+            if dir_url:
+                enc_url = urllib.parse.quote(dir_url)
+                vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP Folder</a>'
+                cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">✖ Remove Folder</a>'
+                action_html = f'{vip_btn} {cancel_btn}'
+
+            inner_content = render_tree_node(child, depth + 1)
+            html += f"""
+            <details class="tree-folder">
+                <summary class="tree-summary">
+                    <span class="folder-title">📁 {item_name}/</span>
+                    <div class="tree-actions">{badge_html} {action_html}</div>
+                </summary>
+                <div class="tree-children">
+                    {inner_content if inner_content else '<div class="empty-folder">(Empty folder)</div>'}
+                </div>
+            </details>
+            """
+        else:
+            if task:
+                badge = "VIP Pending" if (task['is_vip'] and task['status'] == 'pending') else task['status']
+                badge_cls = "badge-vip" if (task['is_vip'] and task['status'] == 'pending') else f"badge-{task['status']}"
+                badge_html = f'<span class="badge {badge_cls}">{badge}</span>'
+                size_str = f"{task['file_size']} B" if task['file_size'] else ""
+                enc_url = urllib.parse.quote(task['url'])
+
+                vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP</a>' if not task['is_vip'] else f'<a href="/ui/cancel_vip?url={enc_url}" class="btn btn-vip-cancel">☆ Normal</a>'
+                cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">✖ Remove File</a>'
+                action_html = f'{vip_btn} {cancel_btn}'
+
+            html += f"""
+            <div class="tree-file">
+                <span class="file-title">📄 {item_name}</span>
+                <div class="tree-actions">
+                    <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;">{size_str}</span>
+                    {badge_html}
+                    {action_html}
+                </div>
+            </div>
+            """
+    return html
+
+def calculate_speed_and_etc(conn):
+    c = conn.cursor()
+    c.execute("""
+        SELECT SUM(file_size) as recent_bytes 
+        FROM tasks 
+        WHERE status IN ('downloaded_staging', 'completed') 
+          AND is_dir = 0
+          AND datetime(updated_at) >= datetime('now', '-5 minutes')
+    """)
+    recent = c.fetchone()['recent_bytes'] or 0
+    speed_bps = recent / 300.0
+
+    c.execute("""
+        SELECT SUM(file_size) as known_bytes, COUNT(*) as total_pending
+        FROM tasks 
+        WHERE status IN ('pending', 'assigned') AND is_dir = 0
+    """)
+    p_info = c.fetchone()
+    known_remaining = p_info['known_bytes'] or 0
+    total_pending = p_info['total_pending'] or 0
+
+    c.execute("""
+        SELECT AVG(file_size) as avg_bytes
+        FROM tasks
+        WHERE status = 'completed' AND is_dir = 0 AND file_size > 0
+    """)
+    avg_row = c.fetchone()
+    avg_size = avg_row['avg_bytes'] if (avg_row and avg_row['avg_bytes']) else 500000
+
+    c.execute("""
+        SELECT COUNT(*) as unk_count
+        FROM tasks
+        WHERE status IN ('pending', 'assigned') AND is_dir = 0 AND (file_size IS NULL OR file_size = 0)
+    """)
+    unk_count = c.fetchone()['unk_count'] or 0
+
+    est_remaining_bytes = known_remaining + (unk_count * avg_size)
+
+    if speed_bps >= 1048576:
+        speed_str = f"{speed_bps / 1048576:.2f} MB/s"
+    elif speed_bps >= 1024:
+        speed_str = f"{speed_bps / 1024:.1f} KB/s"
+    elif speed_bps > 0:
+        speed_str = f"{speed_bps:.0f} B/s"
+    else:
+        speed_str = "~0 B/s"
+
+    if total_pending == 0:
+        etc_str = "Completed"
+    elif speed_bps <= 0:
+        etc_str = "Calculating..."
+    else:
+        seconds_left = int(est_remaining_bytes / speed_bps)
+        if seconds_left < 60:
+            etc_str = f"{seconds_left}s"
+        elif seconds_left < 3600:
+            etc_str = f"{seconds_left // 60}m {seconds_left % 60}s"
+        elif seconds_left < 86400:
+            hours = seconds_left // 3600
+            mins = (seconds_left % 3600) // 60
+            etc_str = f"{hours}h {mins}m"
+        else:
+            days = seconds_left // 86400
+            hours = (seconds_left % 86400) // 3600
+            etc_str = f"{days}d {hours}h"
+
+    return speed_str, etc_str, speed_bps, est_remaining_bytes
+
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,13 +354,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .btn:hover { background: var(--border-color); }
         .btn-pause { background: rgba(245, 158, 11, 0.2); color: var(--warning); border-color: var(--warning); }
         .btn-resume { background: rgba(16, 185, 129, 0.2); color: var(--success); border-color: var(--success); }
+        .btn-retry { background: rgba(59, 130, 246, 0.2); color: var(--primary); border-color: var(--primary); }
         .btn-vip { background: rgba(251, 191, 36, 0.2); color: var(--vip-gold); border-color: var(--vip-gold); font-size: 11px; padding: 4px 8px; }
         .btn-vip-cancel { background: rgba(156, 163, 175, 0.2); color: var(--text-muted); border-color: var(--border-color); font-size: 11px; padding: 4px 8px; }
         .btn-cancel { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); font-size: 11px; padding: 4px 8px; }
 
         .grid-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -187,8 +371,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             border-radius: 8px;
             padding: 18px;
         }
-        .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
-        .stat-value { font-size: 24px; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 22px; font-weight: 700; color: #fff; }
         .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         
         .nav-tabs { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
@@ -246,10 +430,36 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .badge-failed { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
         
         .path-cell { font-family: monospace; font-size: 12px; word-break: break-all; color: var(--text-main); }
-        .explorer-tree { font-family: monospace; font-size: 13px; }
-        .tree-item { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: space-between; }
-        .tree-item:hover { background: rgba(255,255,255,0.03); }
-        .tree-name { display: flex; align-items: center; gap: 8px; }
+        
+        /* Foldable Tree Explorer Styles */
+        .tree-container { font-family: monospace; font-size: 13px; }
+        .tree-folder { margin-bottom: 4px; border-left: 2px solid var(--border-color); padding-left: 10px; margin-left: 6px; }
+        .tree-summary {
+            cursor: pointer;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+        .tree-summary:hover { background: rgba(255,255,255,0.05); }
+        .folder-title { font-weight: 600; color: #facc15; }
+        .tree-children { padding-left: 12px; margin-top: 4px; }
+        .tree-file {
+            padding: 6px 12px;
+            margin: 2px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.15);
+        }
+        .tree-file:hover { background: rgba(255,255,255,0.03); }
+        .file-title { color: #e2e8f0; word-break: break-all; }
+        .tree-actions { display: flex; gap: 8px; align-items: center; }
+        .empty-folder { font-size: 12px; color: var(--text-muted); padding: 4px 12px; font-style: italic; }
         .search-box { margin-bottom: 16px; }
     </style>
 </head>
@@ -261,12 +471,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="subtitle">Wieselburg Coordinator & Priority Hub</div>
             </div>
             <div class="actions">
+                RETRY_FAILED_BTN
                 PAUSE_RESUME_BTN
                 <button class="btn" onclick="location.reload()">Refresh (F5)</button>
             </div>
         </header>
 
         <div class="grid-stats">
+            <div class="stat-card">
+                <div class="stat-label">Download Speed</div>
+                <div class="stat-value" style="color: #38bdf8">DOWNLOAD_SPEED</div>
+                <div class="stat-sub">Aggregate streams</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Estimated Time (ETC)</div>
+                <div class="stat-value" style="color: #a78bfa">ETC_TIME</div>
+                <div class="stat-sub">Remaining queue</div>
+            </div>
             <div class="stat-card">
                 <div class="stat-label">VIP Queue (Priority)</div>
                 <div class="stat-value" style="color: var(--vip-gold)">VIP_TASKS</div>
@@ -291,7 +512,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         <div class="nav-tabs">
             <a href="/ui?view=queue" class="tab TAB_QUEUE_ACTIVE">Active Queue & VIP List</a>
-            <a href="/ui?view=explorer" class="tab TAB_EXPLORER_ACTIVE">File & Folder Explorer</a>
+            <a href="/ui?view=explorer" class="tab TAB_EXPLORER_ACTIVE">Collapsible File Explorer</a>
         </div>
 
         VIEW_CONTENT
@@ -355,6 +576,18 @@ class QueueHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
+            if parsed.path == '/ui/retry_failed':
+                conn = get_db()
+                c = conn.cursor()
+                c.execute("UPDATE tasks SET status = 'pending', attempts = 0, error_message = NULL WHERE status = 'failed'")
+                conn.commit()
+                conn.close()
+                redirect_url = self.headers.get('Referer', '/ui')
+                self.send_response(303)
+                self.send_header('Location', redirect_url)
+                self.end_headers()
+                return
+
             if parsed.path in ('/ui/set_vip', '/ui/cancel_vip', '/ui/cancel_task'):
                 task_id = params.get("id", [""])[0]
                 target_url = params.get("url", [""])[0]
@@ -414,8 +647,13 @@ class QueueHandler(BaseHTTPRequestHandler):
                 c.execute("SELECT worker_id FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
                 workers = [r['worker_id'] for r in c.fetchall() if r['worker_id']]
 
+                speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
+
                 c.execute('SELECT count(*) as count FROM tasks')
                 total_tasks = c.fetchone()['count']
+
+                failed_count = stats.get('failed', 0)
+                retry_failed_btn = f'<a href="/ui/retry_failed" class="btn btn-retry">🔄 Retry Failed ({failed_count})</a>' if failed_count > 0 else ''
 
                 comp_bytes = completed_info['total_bytes'] or 0
                 if comp_bytes > 1073741824:
@@ -426,54 +664,34 @@ class QueueHandler(BaseHTTPRequestHandler):
                 if view == 'explorer':
                     search_q = params.get("q", [""])[0].strip()
                     if search_q:
-                        c.execute("SELECT * FROM tasks WHERE url LIKE ? ORDER BY is_dir DESC, url ASC LIMIT 150", (f"%{search_q}%",))
+                        c.execute("SELECT * FROM tasks WHERE url LIKE ? ORDER BY is_dir DESC, url ASC LIMIT 500", (f"%{search_q}%",))
                     else:
-                        c.execute("SELECT * FROM tasks ORDER BY is_dir DESC, url ASC LIMIT 150")
+                        c.execute("SELECT * FROM tasks ORDER BY is_dir DESC, url ASC LIMIT 2000")
                     
-                    items = [dict(r) for r in c.fetchall()]
+                    tasks = [dict(r) for r in c.fetchall()]
                     conn.close()
+
+                    tree_root = build_tree_structure(tasks)
+                    tree_html = render_tree_node(tree_root)
 
                     explorer_html = f"""
                     <div class="card">
                         <div class="section-title">
-                            File & Directory Explorer
-                            <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">Browse cataloged files & directories; promote or delete branches</span>
+                            Collapsible Directory Explorer
+                            <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Folder badges rollup to the lowest status of all sub-files. Unfold folders to view relative sub-files.</span>
                         </div>
                         <form method="GET" action="/ui" class="search-box">
                             <input type="hidden" name="view" value="explorer" />
                             <div style="display: flex; gap: 10px;">
-                                <input type="text" name="q" value="{search_q}" placeholder="Filter by folder or file name (e.g. ALSGLOBAL/03 Metallurgy/)..." />
-                                <button type="submit" class="btn-submit">Search Explorer</button>
+                                <input type="text" name="q" value="{search_q}" placeholder="Search cataloged files or folders..." />
+                                <button type="submit" class="btn-submit">Search</button>
                             </div>
                         </form>
-                        <div class="explorer-tree">
-                    """
-                    for item in items:
-                        rel = extract_relative_path(item['url'])
-                        icon = "📁" if item['is_dir'] else "📄"
-                        badge = "VIP Pending" if (item['is_vip'] and item['status'] == 'pending') else item['status']
-                        badge_cls = "badge-vip" if (item['is_vip'] and item['status'] == 'pending') else f"badge-{item['status']}"
-                        
-                        enc_url = urllib.parse.quote(item['url'])
-                        vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP</a>' if not item['is_vip'] else f'<a href="/ui/cancel_vip?url={enc_url}" class="btn btn-vip-cancel">☆ Normal</a>'
-                        cancel_label = "✖ Remove Folder" if item['is_dir'] else "✖ Remove File"
-                        cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">{cancel_label}</a>'
-
-                        explorer_html += f"""
-                        <div class="tree-item">
-                            <div class="tree-name">
-                                <span>{icon}</span>
-                                <span class="path-cell" title="{item['url']}">{rel}</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <span class="badge {badge_cls}">{badge}</span>
-                                <span style="font-size: 12px; color: var(--text-muted); width: 80px; text-align: right;">{item['file_size']} B</span>
-                                {vip_btn}
-                                {cancel_btn}
-                            </div>
+                        <div class="tree-container">
+                            {tree_html if tree_html else '<div class="empty-folder">No cataloged items found in queue.</div>'}
                         </div>
-                        """
-                    explorer_html += "</div></div>"
+                    </div>
+                    """
                     view_content = explorer_html
 
                 else:
@@ -541,7 +759,10 @@ class QueueHandler(BaseHTTPRequestHandler):
 
                 html = HTML_TEMPLATE
                 html = html.replace("STATUS_BADGE", status_badge)
+                html = html.replace("RETRY_FAILED_BTN", retry_failed_btn)
                 html = html.replace("PAUSE_RESUME_BTN", pause_btn)
+                html = html.replace("DOWNLOAD_SPEED", speed_str)
+                html = html.replace("ETC_TIME", etc_str)
                 html = html.replace("VIP_TASKS", f"{vip_count:,}")
                 html = html.replace("PENDING_TASKS", f"{stats.get('pending', 0):,}")
                 html = html.replace("COMPLETED_SIZE", comp_size_str)
@@ -563,11 +784,16 @@ class QueueHandler(BaseHTTPRequestHandler):
                 completed_info = c.fetchone()
                 c.execute("SELECT worker_id FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
                 workers = [r['worker_id'] for r in c.fetchall() if r['worker_id']]
+                speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
                 conn.close()
                 
                 self._send_json({
                     "paused": is_paused(),
                     "stats": stats,
+                    "download_speed": speed_str,
+                    "speed_bps": speed_bps,
+                    "etc": etc_str,
+                    "est_remaining_bytes": est_rem_bytes,
                     "completed_count": completed_info['total'] or 0,
                     "completed_bytes": completed_info['total_bytes'] or 0,
                     "active_workers": workers

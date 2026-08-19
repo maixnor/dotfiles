@@ -13,6 +13,8 @@ import urllib.request
 DATA_SINK_DIR = os.environ.get("DATA_SINK_DIR", "/data/download")
 SERVER_URL = os.environ.get("SERVER_URL", "https://tor-downloader.maixnor.com")
 SOURCE_HOST = os.environ.get("SOURCE_HOST", "maixnor.com")
+SSH_USER = os.environ.get("SSH_USER", "maixnor")
+SSH_IDENTITY_FILE = os.environ.get("SSH_IDENTITY_FILE", "/home/maixnor/.ssh/id_ed25519")
 API_KEY_FILE = os.environ.get("API_KEY_FILE", "/run/secrets/tor-downloader-api-key")
 
 def url_to_relative_path(url):
@@ -30,10 +32,12 @@ def compute_sha256(filepath):
     return h.hexdigest()
 
 class SinkCollector:
-    def __init__(self, server_url, source_host, dest_dir, api_key=""):
+    def __init__(self, server_url, source_host, dest_dir, ssh_user="maixnor", ssh_key="/home/maixnor/.ssh/id_ed25519", api_key=""):
         self.server_url = server_url.rstrip('/')
         self.source_host = source_host
         self.dest_dir = dest_dir
+        self.ssh_user = ssh_user
+        self.ssh_key = ssh_key
         self.api_key = api_key
         os.makedirs(self.dest_dir, exist_ok=True)
 
@@ -94,11 +98,13 @@ class SinkCollector:
         dest_file = os.path.join(self.dest_dir, rel_path)
         os.makedirs(os.path.dirname(dest_file), exist_ok=True)
 
-        print(f"[Sink] Pulling task {task_id} from {self.source_host}:{staging_path} -> {dest_file}")
+        print(f"[Sink] Pulling task {task_id} from {self.ssh_user}@{self.source_host}:{staging_path} -> {dest_file}")
+
+        ssh_opts = f"ssh -i {self.ssh_key} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
 
         rsync_cmd = [
-            "rsync", "-avz",
-            f"{self.source_host}:{staging_path}", dest_file
+            "rsync", "-avz", "-e", ssh_opts,
+            f"{self.ssh_user}@{self.source_host}:{staging_path}", dest_file
         ]
         res = subprocess.run(rsync_cmd, capture_output=True, text=True)
         if res.returncode == 0 and os.path.exists(dest_file):
@@ -112,7 +118,10 @@ class SinkCollector:
                 "file_hash": file_hash
             })
 
-            cleanup_cmd = ["ssh", self.source_host, f"rm -f {subprocess.list2cmdline([staging_path])}"]
+            cleanup_cmd = [
+                "ssh", "-i", self.ssh_key, "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new",
+                f"{self.ssh_user}@{self.source_host}", f"rm -f {subprocess.list2cmdline([staging_path])}"
+            ]
             subprocess.run(cleanup_cmd, capture_output=True)
             print(f"[Sink] Completed task {task_id}: {rel_path} ({file_size} bytes). Remote staging cleaned up.")
         else:
@@ -120,7 +129,7 @@ class SinkCollector:
             self._request("/api/report_failed", "POST", {"task_id": task_id, "error": f"rsync failed: {res.stderr}"})
 
     def run_loop(self):
-        print(f"[Sink] Sink Collector starting. Server: {self.server_url}, Source: {self.source_host}, Dest: {self.dest_dir}")
+        print(f"[Sink] Sink Collector starting. Server: {self.server_url}, Source: {self.ssh_user}@{self.source_host}, Dest: {self.dest_dir}")
         while True:
             resp = self._request("/api/staging_tasks", "GET")
             if resp and resp.get("tasks"):
@@ -133,6 +142,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--server-url', default=SERVER_URL)
     parser.add_argument('--source-host', default=SOURCE_HOST)
+    parser.add_argument('--ssh-user', default=SSH_USER)
+    parser.add_argument('--ssh-key', default=SSH_IDENTITY_FILE)
     parser.add_argument('--destination-dir', default=DATA_SINK_DIR)
     parser.add_argument('--api-key-file', default=API_KEY_FILE)
     parser.add_argument('--api-key', default='')
@@ -146,5 +157,5 @@ if __name__ == '__main__':
         except Exception:
             pass
 
-    sink = SinkCollector(args.server_url, args.source_host, args.destination_dir, api_key)
+    sink = SinkCollector(args.server_url, args.source_host, args.destination_dir, args.ssh_user, args.ssh_key, api_key)
     sink.run_loop()
