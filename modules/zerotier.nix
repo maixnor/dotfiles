@@ -14,6 +14,7 @@
         "8056c2e21c546100"
         "93afae5963f55ee3" # zert exchange
         "f3797ba7a8ae752f" #ir-aug 
+        "83048a0632d320da" # zert exchange 1120
       ]; 
     };
   };
