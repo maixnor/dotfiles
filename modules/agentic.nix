@@ -25,7 +25,7 @@ in
   programs.pi-coding-agent = {
     enable = true;
     package = inputs.pi-flake.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    models = {
+    agentFiles.models.value = {
       providers = {
         ollama = {
           baseUrl = "http://172.16.32.133:11434/v1";
