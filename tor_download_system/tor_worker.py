@@ -125,12 +125,16 @@ class TorWorker:
         for attempt in range(15):
             cmd = [
                 "curl", "--socks5-hostname", self.socks_proxy,
-                "-L", "-C", "-",
+                "-L",
                 "--tcp-nodelay",
                 "--connect-timeout", "20",
                 "--speed-time", "30", "--speed-limit", "1024",
                 "-o", dest_path, url
             ]
+            if os.path.exists(dest_path) and os.path.getsize(dest_path) > 0 and attempt == 0:
+                cmd.insert(4, "-C")
+                cmd.insert(5, "-")
+
             res = subprocess.run(cmd, capture_output=True, text=True)
             if res.returncode == 0:
                 if os.path.exists(dest_path):
@@ -147,7 +151,16 @@ class TorWorker:
                                 raise
                     return
                 break
+
             last_error = f"curl download failed (code {res.returncode}): {res.stderr}"
+            if res.returncode == 33:
+                # Byte ranges not supported, wipe partial file and retry clean
+                if os.path.exists(dest_path):
+                    try:
+                        os.remove(dest_path)
+                    except Exception:
+                        pass
+                continue
             if res.returncode in (18, 28, 52, 56):
                 time.sleep(2)
                 continue
