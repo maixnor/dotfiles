@@ -629,23 +629,27 @@ class QueueHandler(BaseHTTPRequestHandler):
                 return
 
             if parsed.path == '/ui/retry_failed':
-                conn = get_db()
-                c = conn.cursor()
-                c.execute("UPDATE tasks SET status = 'pending', attempts = 0, error_message = NULL WHERE status = 'failed'")
-                conn.commit()
-                conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    c.execute("UPDATE tasks SET status = 'pending', attempts = 0, error_message = NULL WHERE status = 'failed'")
+                    conn.commit()
+                    conn.close()
                 redirect_url = self.headers.get('Referer', '/ui')
                 self.send_response(303)
                 self.send_header('Location', redirect_url)
                 self.end_headers()
+                return
+
             if parsed.path == '/ui/clear_all':
-                conn = get_db()
-                c = conn.cursor()
-                c.execute("DELETE FROM tasks")
-                c.execute("DELETE FROM workers")
-                c.execute("VACUUM")
-                conn.commit()
-                conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    c.execute("DELETE FROM tasks")
+                    c.execute("DELETE FROM workers")
+                    c.execute("VACUUM")
+                    conn.commit()
+                    conn.close()
                 self.send_response(303)
                 self.send_header('Location', '/ui')
                 self.end_headers()
@@ -654,22 +658,23 @@ class QueueHandler(BaseHTTPRequestHandler):
             if parsed.path in ('/ui/rescan_dir', '/ui/rescan_empty_dirs'):
                 target_url = params.get("url", [""])[0]
                 task_id = params.get("id", [""])[0]
-                conn = get_db()
-                c = conn.cursor()
-                if parsed.path == '/ui/rescan_empty_dirs':
-                    c.execute("""
-                        UPDATE tasks
-                        SET status = 'pending', attempts = 0, is_dir = 1, is_vip = 1, error_message = NULL
-                        WHERE is_dir = 1 AND url NOT IN (
-                            SELECT DISTINCT parent_url FROM tasks WHERE parent_url IS NOT NULL
-                        )
-                    """)
-                elif task_id:
-                    c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE id = ?", (task_id,))
-                elif target_url:
-                    c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE url = ? OR url = ?", (target_url, target_url.rstrip('/') + '/'))
-                conn.commit()
-                conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    if parsed.path == '/ui/rescan_empty_dirs':
+                        c.execute("""
+                            UPDATE tasks
+                            SET status = 'pending', attempts = 0, is_dir = 1, is_vip = 1, error_message = NULL
+                            WHERE is_dir = 1 AND url NOT IN (
+                                SELECT DISTINCT parent_url FROM tasks WHERE parent_url IS NOT NULL
+                            )
+                        """)
+                    elif task_id:
+                        c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE id = ?", (task_id,))
+                    elif target_url:
+                        c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE url = ? OR url = ?", (target_url, target_url.rstrip('/') + '/'))
+                    conn.commit()
+                    conn.close()
                 redirect_url = '/ui?view=explorer' if 'view=explorer' in self.headers.get('Referer', '') else f'/ui?view={view}'
                 self.send_response(303)
                 self.send_header('Location', redirect_url)
@@ -680,39 +685,40 @@ class QueueHandler(BaseHTTPRequestHandler):
                 task_id = params.get("id", [""])[0]
                 target_url = params.get("url", [""])[0]
                 folder_path = params.get("folder", [""])[0]
-                conn = get_db()
-                c = conn.cursor()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
 
-                if parsed.path == '/ui/set_vip':
-                    if task_id:
-                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE id = ?", (task_id,))
-                    elif target_url:
-                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
-                    elif folder_path:
-                        c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url LIKE ? AND status IN ('pending', 'assigned')", (f"%{folder_path}%",))
-                elif parsed.path == '/ui/cancel_vip':
-                    if task_id:
-                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE id = ?", (task_id,))
-                    elif target_url:
-                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
-                    elif folder_path:
-                        c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url LIKE ?", (f"%{folder_path}%",))
-                elif parsed.path == '/ui/cancel_task':
-                    if task_id:
-                        c.execute("SELECT url, is_dir FROM tasks WHERE id = ?", (task_id,))
-                        row = c.fetchone()
-                        if row:
-                            c.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
-                            if row['is_dir']:
-                                dir_url = row['url']
-                                c.execute("DELETE FROM tasks WHERE url LIKE ? OR parent_url LIKE ?", (f"{dir_url}%", f"{dir_url}%"))
-                    elif target_url:
-                        c.execute("DELETE FROM tasks WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
-                    elif folder_path:
-                        c.execute("DELETE FROM tasks WHERE url LIKE ?", (f"%{folder_path}%",))
+                    if parsed.path == '/ui/set_vip':
+                        if task_id:
+                            c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE id = ?", (task_id,))
+                        elif target_url:
+                            c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                        elif folder_path:
+                            c.execute("UPDATE tasks SET is_vip = 1, vip_added_at = CURRENT_TIMESTAMP WHERE url LIKE ? AND status IN ('pending', 'assigned')", (f"%{folder_path}%",))
+                    elif parsed.path == '/ui/cancel_vip':
+                        if task_id:
+                            c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE id = ?", (task_id,))
+                        elif target_url:
+                            c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                        elif folder_path:
+                            c.execute("UPDATE tasks SET is_vip = 0, vip_added_at = NULL WHERE url LIKE ?", (f"%{folder_path}%",))
+                    elif parsed.path == '/ui/cancel_task':
+                        if task_id:
+                            c.execute("SELECT url, is_dir FROM tasks WHERE id = ?", (task_id,))
+                            row = c.fetchone()
+                            if row:
+                                c.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+                                if row['is_dir']:
+                                    dir_url = row['url']
+                                    c.execute("DELETE FROM tasks WHERE url LIKE ? OR parent_url LIKE ?", (f"{dir_url}%", f"{dir_url}%"))
+                        elif target_url:
+                            c.execute("DELETE FROM tasks WHERE url = ? OR url LIKE ? OR parent_url LIKE ?", (target_url, f"{target_url}%", f"{target_url}%"))
+                        elif folder_path:
+                            c.execute("DELETE FROM tasks WHERE url LIKE ?", (f"%{folder_path}%",))
 
-                conn.commit()
-                conn.close()
+                    conn.commit()
+                    conn.close()
                 redirect_url = '/ui?view=explorer' if 'view=explorer' in self.headers.get('Referer', '') else f'/ui?view={view}'
                 self.send_response(303)
                 self.send_header('Location', redirect_url)
@@ -912,14 +918,15 @@ class QueueHandler(BaseHTTPRequestHandler):
                 url = body.get("url", "").strip()
                 if url:
                     is_dir = 1 if url.endswith('/') else 0
-                    conn = get_db()
-                    c = conn.cursor()
-                    try:
-                        c.execute('INSERT INTO tasks (url, is_dir, status) VALUES (?, ?, "pending")', (url, is_dir))
-                        conn.commit()
-                    except sqlite3.IntegrityError:
-                        pass
-                    conn.close()
+                    with DB_WRITE_LOCK:
+                        conn = get_db()
+                        c = conn.cursor()
+                        try:
+                            c.execute('INSERT INTO tasks (url, is_dir, status) VALUES (?, ?, "pending")', (url, is_dir))
+                            conn.commit()
+                        except sqlite3.IntegrityError:
+                            pass
+                        conn.close()
                 self.send_response(303)
                 self.send_header('Location', '/ui')
                 self.end_headers()
@@ -937,33 +944,35 @@ class QueueHandler(BaseHTTPRequestHandler):
                     urls = [urls]
                 parent_url = body.get("parent_url", None)
                 added = 0
-                conn = get_db()
-                c = conn.cursor()
-                for u in urls:
-                    u = u.strip()
-                    if not u:
-                        continue
-                    is_dir = 1 if u.endswith('/') else 0
-                    try:
-                        c.execute('''
-                            INSERT INTO tasks (url, parent_url, is_dir, status)
-                            VALUES (?, ?, ?, 'pending')
-                        ''', (u, parent_url, is_dir))
-                        added += 1
-                    except sqlite3.IntegrityError:
-                        pass
-                conn.commit()
-                conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    for u in urls:
+                        u = u.strip()
+                        if not u:
+                            continue
+                        is_dir = 1 if u.endswith('/') else 0
+                        try:
+                            c.execute('''
+                                INSERT INTO tasks (url, parent_url, is_dir, status)
+                                VALUES (?, ?, ?, 'pending')
+                            ''', (u, parent_url, is_dir))
+                            added += 1
+                        except sqlite3.IntegrityError:
+                            pass
+                    conn.commit()
+                    conn.close()
                 self._send_json({"status": "ok", "added": added})
 
             elif parsed.path == '/api/reset_queue':
-                conn = get_db()
-                c = conn.cursor()
-                c.execute("DELETE FROM tasks")
-                c.execute("DELETE FROM workers")
-                c.execute("VACUUM")
-                conn.commit()
-                conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    c.execute("DELETE FROM tasks")
+                    c.execute("DELETE FROM workers")
+                    c.execute("VACUUM")
+                    conn.commit()
+                    conn.close()
                 self._send_json({"status": "ok", "message": "Queue database completely reset"})
 
             elif parsed.path == '/api/claim':
