@@ -203,7 +203,7 @@ in {
           MaxCircuitDirtiness = 30;
           CircuitBuildTimeout = 15;
           KeepalivePeriod = 20;
-          EnforceDistinctSubnets = 1;
+          EnforceDistinctSubnets = true;
         };
       };
 
