@@ -223,7 +223,8 @@ in {
               mkdir -p ${cfg.agent.stagingDir}
               find ${cfg.agent.stagingDir} -maxdepth 2 -type f ! -name "*.*" -delete 2>/dev/null || true
             '';
-            ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}";
+            Environment = [ "PYTHONUNBUFFERED=1" ];
+            ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}${lib.optionalString cfg.sink.enable " --destination-dir ${cfg.sink.destinationDir}"}";
             Restart = "always";
             RestartSec = "5s";
           };
