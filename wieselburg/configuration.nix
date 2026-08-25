@@ -35,7 +35,7 @@ in
 
   services.tor-downloader = {
     server.enable = true;
-    agent.enable = true;
+    agent.enable = false;
   };
 
   virtualisation.vmware.guest.enable = true;

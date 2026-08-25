@@ -31,6 +31,21 @@ def compute_sha256(filepath):
             h.update(chunk)
     return h.hexdigest()
 
+def ensure_parent_dirs(path):
+    parent = os.path.dirname(path)
+    if not parent:
+        return
+    parts = parent.strip('/').split('/')
+    curr = "/" if parent.startswith('/') else ""
+    for p in parts:
+        curr = os.path.join(curr, p)
+        if os.path.isfile(curr):
+            try:
+                os.remove(curr)
+            except Exception:
+                pass
+        os.makedirs(curr, exist_ok=True)
+
 class SinkCollector:
     def __init__(self, server_url, source_host, dest_dir, ssh_user="maixnor", ssh_key="/home/maixnor/.ssh/id_ed25519", api_key=""):
         self.server_url = server_url.rstrip('/')
@@ -96,7 +111,41 @@ class SinkCollector:
 
         rel_path = url_to_relative_path(url)
         dest_file = os.path.join(self.dest_dir, rel_path)
-        os.makedirs(os.path.dirname(dest_file), exist_ok=True)
+        ensure_parent_dirs(dest_file)
+
+        if os.path.isdir(dest_file):
+            self._request("/api/report_completed", "POST", {
+                "task_id": task_id,
+                "local_rel_path": rel_path,
+                "file_size": 0,
+                "file_hash": ""
+            })
+            return
+
+        # Local Staging Fast-Path (for local worker agents on Bierbasis)
+        if os.path.exists(staging_path) and os.path.isfile(staging_path):
+            import shutil
+            try:
+                shutil.move(staging_path, dest_file)
+            except Exception:
+                # If cross-device move
+                shutil.copy2(staging_path, dest_file)
+                try:
+                    os.remove(staging_path)
+                except Exception:
+                    pass
+
+            file_size = os.path.getsize(dest_file) if os.path.exists(dest_file) else 0
+            file_hash = compute_sha256(dest_file) if os.path.exists(dest_file) else ""
+
+            self._request("/api/report_completed", "POST", {
+                "task_id": task_id,
+                "local_rel_path": rel_path,
+                "file_size": file_size,
+                "file_hash": file_hash
+            })
+            print(f"[Sink] Local fast-path completed task {task_id}: {rel_path} ({file_size} bytes)")
+            return
 
         print(f"[Sink] Pulling task {task_id} from {self.ssh_user}@{self.source_host}:{staging_path} -> {dest_file}")
 
@@ -129,14 +178,23 @@ class SinkCollector:
             self._request("/api/report_failed", "POST", {"task_id": task_id, "error": f"rsync failed: {res.stderr}"})
 
     def run_loop(self):
+        import concurrent.futures
         print(f"[Sink] Sink Collector starting. Server: {self.server_url}, Source: {self.ssh_user}@{self.source_host}, Dest: {self.dest_dir}")
         while True:
-            resp = self._request("/api/staging_tasks", "GET")
-            if resp and resp.get("tasks"):
-                tasks = resp["tasks"]
-                for t in tasks:
-                    self.process_task(t)
-            time.sleep(10)
+            try:
+                resp = self._request("/api/staging_tasks", "GET")
+                if resp and resp.get("tasks"):
+                    tasks = resp["tasks"]
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                        futures = [executor.submit(self.process_task, t) for t in tasks]
+                        for f in concurrent.futures.as_completed(futures):
+                            try:
+                                f.result()
+                            except Exception as e:
+                                print(f"[Sink] Task processing error: {e}")
+            except Exception as e:
+                print(f"[Sink] Loop error: {e}")
+            time.sleep(3)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -157,5 +215,12 @@ if __name__ == '__main__':
         except Exception:
             pass
 
-    sink = SinkCollector(args.server_url, args.source_host, args.destination_dir, args.ssh_user, args.ssh_key, api_key)
+    sink = SinkCollector(
+        server_url=args.server_url,
+        source_host=args.source_host,
+        dest_dir=args.destination_dir,
+        ssh_user=args.ssh_user,
+        ssh_key=args.ssh_key,
+        api_key=api_key
+    )
     sink.run_loop()

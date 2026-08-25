@@ -4,6 +4,7 @@ import json
 import time
 import os
 import sys
+import threading
 import traceback
 import urllib.parse
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
@@ -40,13 +41,30 @@ SECRET_KEY = load_api_key()
 
 def get_db():
     conn = sqlite3.connect(DB_PATH, timeout=60.0)
-    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA busy_timeout = 60000;")
+    conn.execute("PRAGMA synchronous = FULL;")
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = get_db()
+    conn = sqlite3.connect(DB_PATH, timeout=60.0)
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA synchronous = FULL;")
+    conn.execute("PRAGMA wal_autocheckpoint = 1000;")
+    conn.row_factory = sqlite3.Row
+
+    # Startup integrity and crash-recovery verification
+    try:
+        cur = conn.cursor()
+        cur.execute("PRAGMA quick_check;")
+        check_res = cur.fetchone()[0]
+        if check_res != "ok":
+            print(f"[DB] Integrity check returned: {check_res}. Running checkpoint recovery...")
+            cur.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+    except Exception as e:
+        print(f"[DB] Startup recovery exception: {e}")
+
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS tasks (
@@ -84,29 +102,30 @@ def init_db():
             tasks_completed INTEGER DEFAULT 0
         )
     ''')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_claim ON tasks(status, is_vip DESC, id ASC)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_status ON tasks(status)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_parent ON tasks(parent_url)')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_assigned ON tasks(status, updated_at)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_url ON tasks(url)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_vip ON tasks(is_vip, vip_added_at)')
-    conn.commit()
-    conn.close()
+WORKERS_LOCK = threading.Lock()
+WORKERS_MAP = {}
 
-def update_worker_heartbeat(conn, worker_id, increment_task=False):
-    c = conn.cursor()
-    if increment_task:
-        c.execute('''
-            INSERT INTO workers (worker_id, last_seen, tasks_completed)
-            VALUES (?, CURRENT_TIMESTAMP, 1)
-            ON CONFLICT(worker_id) DO UPDATE SET
-                last_seen = CURRENT_TIMESTAMP,
-                tasks_completed = tasks_completed + 1
-        ''', (worker_id,))
-    else:
-        c.execute('''
-            INSERT INTO workers (worker_id, last_seen, tasks_completed)
-            VALUES (?, CURRENT_TIMESTAMP, 0)
-            ON CONFLICT(worker_id) DO UPDATE SET
-                last_seen = CURRENT_TIMESTAMP
-        ''', (worker_id,))
+def update_worker_heartbeat(worker_id, increment_task=False):
+    if not worker_id:
+        return
+    now = time.time()
+    with WORKERS_LOCK:
+        if worker_id not in WORKERS_MAP:
+            WORKERS_MAP[worker_id] = {"last_seen": now, "tasks_completed": 0}
+        w = WORKERS_MAP[worker_id]
+        w["last_seen"] = now
+        if increment_task:
+            w["tasks_completed"] += 1
+
+def get_active_workers(within_seconds=300):
+    cutoff = time.time() - within_seconds
+    with WORKERS_LOCK:
+        return [wid for wid, info in WORKERS_MAP.items() if info["last_seen"] >= cutoff]
 
 def extract_relative_path(url):
     parsed = urllib.parse.urlparse(url)
@@ -188,9 +207,10 @@ def render_tree_node(node, depth=0):
             dir_url = task['url'] if task else ""
             if dir_url:
                 enc_url = urllib.parse.quote(dir_url)
+                rescan_btn = f'<a href="/ui/rescan_dir?url={enc_url}" class="btn" style="background:rgba(14,165,233,0.2);color:#38bdf8;border-color:#38bdf8;font-size:11px;padding:4px 8px;">🔄 Rescan Folder</a>'
                 vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP Folder</a>'
                 cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">✖ Remove Folder</a>'
-                action_html = f'{vip_btn} {cancel_btn}'
+                action_html = f'{rescan_btn} {vip_btn} {cancel_btn}'
 
             inner_content = render_tree_node(child, depth + 1)
             html += f"""
@@ -231,19 +251,22 @@ def render_tree_node(node, depth=0):
 def calculate_speed_and_etc(conn):
     c = conn.cursor()
     c.execute("""
-        SELECT SUM(file_size) as recent_bytes 
+        SELECT SUM(file_size) as recent_bytes, COUNT(*) as recent_tasks
         FROM tasks 
         WHERE status IN ('downloaded_staging', 'completed') 
-          AND is_dir = 0
           AND datetime(updated_at) >= datetime('now', '-5 minutes')
     """)
-    recent = c.fetchone()['recent_bytes'] or 0
-    speed_bps = recent / 300.0
+    rec_row = c.fetchone()
+    recent_bytes = rec_row['recent_bytes'] or 0
+    recent_tasks = rec_row['recent_tasks'] or 0
+
+    speed_bps = recent_bytes / 300.0
+    tasks_per_sec = recent_tasks / 300.0
 
     c.execute("""
         SELECT SUM(file_size) as known_bytes, COUNT(*) as total_pending
         FROM tasks 
-        WHERE status IN ('pending', 'assigned') AND is_dir = 0
+        WHERE status IN ('pending', 'assigned')
     """)
     p_info = c.fetchone()
     known_remaining = p_info['known_bytes'] or 0
@@ -270,16 +293,16 @@ def calculate_speed_and_etc(conn):
         speed_str = f"{speed_bps / 1048576:.2f} MB/s"
     elif speed_bps >= 1024:
         speed_str = f"{speed_bps / 1024:.1f} KB/s"
+    elif tasks_per_sec > 0:
+        speed_str = f"{tasks_per_sec:.1f} items/s"
     elif speed_bps > 0:
         speed_str = f"{speed_bps:.0f} B/s"
     else:
-        speed_str = "~0 B/s"
+        speed_str = "Idle"
 
     if total_pending == 0:
         etc_str = "Completed"
-    elif speed_bps <= 0:
-        etc_str = "Calculating..."
-    else:
+    elif speed_bps >= 1024:
         seconds_left = int(est_remaining_bytes / speed_bps)
         if seconds_left < 60:
             etc_str = f"{seconds_left}s"
@@ -293,6 +316,22 @@ def calculate_speed_and_etc(conn):
             days = seconds_left // 86400
             hours = (seconds_left % 86400) // 3600
             etc_str = f"{days}d {hours}h"
+    elif tasks_per_sec > 0:
+        seconds_left = int(total_pending / tasks_per_sec)
+        if seconds_left < 60:
+            etc_str = f"{seconds_left}s"
+        elif seconds_left < 3600:
+            etc_str = f"{seconds_left // 60}m {seconds_left % 60}s"
+        elif seconds_left < 86400:
+            hours = seconds_left // 3600
+            mins = (seconds_left % 3600) // 60
+            etc_str = f"{hours}h {mins}m"
+        else:
+            days = seconds_left // 86400
+            hours = (seconds_left % 86400) // 3600
+            etc_str = f"{days}d {hours}h"
+    else:
+        etc_str = "Calculating..."
 
     return speed_str, etc_str, speed_bps, est_remaining_bytes
 
@@ -472,7 +511,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
             <div class="actions">
                 RETRY_FAILED_BTN
+                <a href="/ui/rescan_empty_dirs" class="btn" style="background:rgba(14,165,233,0.2);color:#38bdf8;border-color:#38bdf8;">🔄 Rescan Empty Folders</a>
                 PAUSE_RESUME_BTN
+                <a href="/ui/clear_all" class="btn btn-cancel" onclick="return confirm('Are you sure you want to completely clear the entire queue and reset the database?')">🗑️ Clear Database</a>
                 <button class="btn" onclick="location.reload()">Refresh (F5)</button>
             </div>
         </header>
@@ -504,9 +545,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="stat-sub">COMPLETED_COUNT files ingested</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Active Worker Agents</div>
+                <div class="stat-label">Active Worker Streams</div>
                 <div class="stat-value" style="color: var(--primary)">ACTIVE_WORKERS</div>
-                <div class="stat-sub">WORKER_NAMES</div>
+                <div class="stat-sub">Active streams (last 5m)</div>
             </div>
         </div>
 
@@ -524,20 +565,30 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 class QueueHandler(BaseHTTPRequestHandler):
     def _send_json(self, data, code=200):
-        body = json.dumps(data).encode('utf-8')
-        self.send_response(code)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            body = json.dumps(data).encode('utf-8')
+            self.send_response(code)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Connection', 'close')
+            self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
+        except Exception:
+            pass
 
     def _send_html(self, html_content, code=200):
-        body = html_content.encode('utf-8')
-        self.send_response(code)
-        self.send_header('Content-Type', 'text/html; charset=utf-8')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
+        try:
+            body = html_content.encode('utf-8')
+            self.send_response(code)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', str(len(body)))
+            self.send_header('Connection', 'close')
+            self.end_headers()
+            self.wfile.write(body)
+            self.wfile.flush()
+        except Exception:
+            pass
 
     def _check_auth(self):
         if not SECRET_KEY:
@@ -583,6 +634,42 @@ class QueueHandler(BaseHTTPRequestHandler):
                 conn.commit()
                 conn.close()
                 redirect_url = self.headers.get('Referer', '/ui')
+                self.send_response(303)
+                self.send_header('Location', redirect_url)
+                self.end_headers()
+            if parsed.path == '/ui/clear_all':
+                conn = get_db()
+                c = conn.cursor()
+                c.execute("DELETE FROM tasks")
+                c.execute("DELETE FROM workers")
+                c.execute("VACUUM")
+                conn.commit()
+                conn.close()
+                self.send_response(303)
+                self.send_header('Location', '/ui')
+                self.end_headers()
+                return
+
+            if parsed.path in ('/ui/rescan_dir', '/ui/rescan_empty_dirs'):
+                target_url = params.get("url", [""])[0]
+                task_id = params.get("id", [""])[0]
+                conn = get_db()
+                c = conn.cursor()
+                if parsed.path == '/ui/rescan_empty_dirs':
+                    c.execute("""
+                        UPDATE tasks
+                        SET status = 'pending', attempts = 0, is_dir = 1, is_vip = 1, error_message = NULL
+                        WHERE is_dir = 1 AND url NOT IN (
+                            SELECT DISTINCT parent_url FROM tasks WHERE parent_url IS NOT NULL
+                        )
+                    """)
+                elif task_id:
+                    c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE id = ?", (task_id,))
+                elif target_url:
+                    c.execute("UPDATE tasks SET status = 'pending', is_dir = 1, attempts = 0, is_vip = 1, error_message = NULL WHERE url = ? OR url = ?", (target_url, target_url.rstrip('/') + '/'))
+                conn.commit()
+                conn.close()
+                redirect_url = '/ui?view=explorer' if 'view=explorer' in self.headers.get('Referer', '') else f'/ui?view={view}'
                 self.send_response(303)
                 self.send_header('Location', redirect_url)
                 self.end_headers()
@@ -644,8 +731,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                 c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
                 completed_info = c.fetchone()
                 
-                c.execute("SELECT worker_id FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
-                workers = [r['worker_id'] for r in c.fetchall() if r['worker_id']]
+                workers = get_active_workers(300)
 
                 speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
 
@@ -664,9 +750,9 @@ class QueueHandler(BaseHTTPRequestHandler):
                 if view == 'explorer':
                     search_q = params.get("q", [""])[0].strip()
                     if search_q:
-                        c.execute("SELECT * FROM tasks WHERE url LIKE ? ORDER BY is_dir DESC, url ASC LIMIT 500", (f"%{search_q}%",))
+                        c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks WHERE url LIKE ? ORDER BY url ASC LIMIT 5000", (f"%{search_q}%",))
                     else:
-                        c.execute("SELECT * FROM tasks ORDER BY is_dir DESC, url ASC LIMIT 2000")
+                        c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks ORDER BY url ASC LIMIT 10000")
                     
                     tasks = [dict(r) for r in c.fetchall()]
                     conn.close()
@@ -768,7 +854,6 @@ class QueueHandler(BaseHTTPRequestHandler):
                 html = html.replace("COMPLETED_SIZE", comp_size_str)
                 html = html.replace("COMPLETED_COUNT", f"{completed_info['total'] or 0:,}")
                 html = html.replace("ACTIVE_WORKERS", str(len(workers)))
-                html = html.replace("WORKER_NAMES", ", ".join(workers) if workers else "None active in last 5m")
                 html = html.replace("TAB_QUEUE_ACTIVE", "active" if view == "queue" else "")
                 html = html.replace("TAB_EXPLORER_ACTIVE", "active" if view == "explorer" else "")
                 html = html.replace("VIEW_CONTENT", view_content)
@@ -782,8 +867,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                 stats = {row['status']: row['count'] for row in c.fetchall()}
                 c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
                 completed_info = c.fetchone()
-                c.execute("SELECT worker_id FROM workers WHERE datetime(last_seen) >= datetime('now', '-5 minutes')")
-                workers = [r['worker_id'] for r in c.fetchall() if r['worker_id']]
+                workers = get_active_workers(300)
                 speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
                 conn.close()
                 
@@ -871,35 +955,42 @@ class QueueHandler(BaseHTTPRequestHandler):
                 conn.close()
                 self._send_json({"status": "ok", "added": added})
 
+            elif parsed.path == '/api/reset_queue':
+                conn = get_db()
+                c = conn.cursor()
+                c.execute("DELETE FROM tasks")
+                c.execute("DELETE FROM workers")
+                c.execute("VACUUM")
+                conn.commit()
+                conn.close()
+                self._send_json({"status": "ok", "message": "Queue database completely reset"})
+
             elif parsed.path == '/api/claim':
                 worker_id = body.get("worker_id", "unknown")
-                conn = get_db()
-
-                update_worker_heartbeat(conn, worker_id)
+                update_worker_heartbeat(worker_id)
 
                 if is_paused():
-                    conn.commit()
-                    conn.close()
                     self._send_json({"task": None, "paused": True})
                     return
 
-                c = conn.cursor()
-                c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_vip DESC, vip_added_at ASC, is_dir DESC, id ASC LIMIT 1')
-                row = c.fetchone()
-                if row:
-                    task = dict(row)
-                    c.execute('''
-                        UPDATE tasks
-                        SET status = "assigned", worker_id = ?, attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP
-                        WHERE id = ?
-                    ''', (worker_id, task['id']))
-                    conn.commit()
+                conn = get_db()
+                try:
+                    c = conn.cursor()
+                    c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_vip DESC, id ASC LIMIT 1')
+                    row = c.fetchone()
+                    if row:
+                        task = dict(row)
+                        c.execute('''
+                            UPDATE tasks
+                            SET status = "assigned", worker_id = ?, attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        ''', (worker_id, task['id']))
+                        conn.commit()
+                        self._send_json({"task": task})
+                    else:
+                        self._send_json({"task": None})
+                finally:
                     conn.close()
-                    self._send_json({"task": task})
-                else:
-                    conn.commit()
-                    conn.close()
-                    self._send_json({"task": None})
 
             elif parsed.path == '/api/report_staging':
                 task_id = body.get("task_id")
@@ -909,62 +1000,104 @@ class QueueHandler(BaseHTTPRequestHandler):
                 file_hash = body.get("file_hash", "")
                 discovered_urls = body.get("discovered_urls", [])
 
+                update_worker_heartbeat(worker_id, increment_task=True)
+
                 conn = get_db()
-                update_worker_heartbeat(conn, worker_id, increment_task=True)
+                try:
+                    c = conn.cursor()
+                    if discovered_urls:
+                        valid_items = [
+                            (u.strip(), body.get("url"), 1 if u.strip().endswith('/') else 0)
+                            for u in discovered_urls if u.strip()
+                        ]
+                        if valid_items:
+                            c.executemany('INSERT OR IGNORE INTO tasks (url, parent_url, is_dir, status) VALUES (?, ?, ?, "pending")', valid_items)
 
-                c = conn.cursor()
-                for u in discovered_urls:
-                    u = u.strip()
-                    if u:
-                        is_dir = 1 if u.endswith('/') else 0
-                        try:
-                            c.execute('INSERT INTO tasks (url, parent_url, is_dir, status) VALUES (?, ?, ?, "pending")',
-                                      (u, body.get("url"), is_dir))
-                        except sqlite3.IntegrityError:
-                            pass
-
-                c.execute('''
-                    UPDATE tasks
-                    SET status = "downloaded_staging", staging_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                ''', (staging_path, file_size, file_hash, task_id))
-                conn.commit()
-                conn.close()
-                self._send_json({"status": "ok"})
+                    # If directory crawl or no staging path, complete task directly
+                    if discovered_urls or not staging_path:
+                        c.execute('''
+                            UPDATE tasks
+                            SET status = "completed", staging_path = "", file_size = 0, file_hash = "", updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        ''', (task_id,))
+                    else:
+                        c.execute('''
+                            UPDATE tasks
+                            SET status = "downloaded_staging", staging_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        ''', (staging_path, file_size, file_hash, task_id))
+                    conn.commit()
+                    self._send_json({"status": "ok"})
+                finally:
+                    conn.close()
 
             elif parsed.path == '/api/report_completed':
                 task_id = body.get("task_id")
                 local_rel_path = body.get("local_rel_path")
                 file_size = body.get("file_size", 0)
                 file_hash = body.get("file_hash", "")
+                worker_id = body.get("worker_id", "unknown")
+                update_worker_heartbeat(worker_id, increment_task=True)
+
                 conn = get_db()
-                c = conn.cursor()
-                c.execute('''
-                    UPDATE tasks
-                    SET status = "completed", local_rel_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                ''', (local_rel_path, file_size, file_hash, task_id))
-                conn.commit()
-                conn.close()
-                self._send_json({"status": "ok"})
+                try:
+                    c = conn.cursor()
+                    c.execute('''
+                        UPDATE tasks
+                        SET status = "completed", local_rel_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
+                        WHERE id = ?
+                    ''', (local_rel_path, file_size, file_hash, task_id))
+                    conn.commit()
+                    self._send_json({"status": "ok"})
+                finally:
+                    conn.close()
+
+            elif parsed.path == '/api/requeue':
+                task_id = body.get("task_id")
+                conn = get_db()
+                try:
+                    c = conn.cursor()
+                    if task_id:
+                        c.execute("""
+                            UPDATE tasks
+                            SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        """, (task_id,))
+                    conn.commit()
+                    self._send_json({"status": "ok", "message": "Task requeued"})
+                finally:
+                    conn.close()
 
             elif parsed.path == '/api/report_failed':
                 task_id = body.get("task_id")
-                error = body.get("error", "Unknown error")
+                error = str(body.get("error", "Unknown error"))
                 conn = get_db()
-                c = conn.cursor()
-                c.execute('SELECT attempts FROM tasks WHERE id = ?', (task_id,))
-                row = c.fetchone()
-                attempts = row['attempts'] if row else 1
-                new_status = 'failed' if attempts >= 5 else 'pending'
-                c.execute('''
-                    UPDATE tasks
-                    SET status = ?, error_message = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?
-                ''', (new_status, error, task_id))
-                conn.commit()
-                conn.close()
-                self._send_json({"status": "ok", "new_status": new_status})
+                try:
+                    c = conn.cursor()
+
+                    # If 429 or rate limit, do NOT count as a failure or increment attempt penalty; requeue as pending
+                    if "429" in error or "Too Many Requests" in error or "rate limit" in error.lower():
+                        c.execute("""
+                            UPDATE tasks
+                            SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        """, (task_id,))
+                        new_status = 'pending'
+                    else:
+                        c.execute('SELECT attempts FROM tasks WHERE id = ?', (task_id,))
+                        row = c.fetchone()
+                        attempts = row['attempts'] if row else 1
+                        new_status = 'failed' if attempts >= 10 else 'pending'
+                        c.execute('''
+                            UPDATE tasks
+                            SET status = ?, error_message = ?, worker_id = NULL, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        ''', (new_status, error, task_id))
+
+                    conn.commit()
+                    self._send_json({"status": "ok", "new_status": new_status})
+                finally:
+                    conn.close()
 
             else:
                 self._send_json({"error": "Not found"}, 404)
@@ -972,8 +1105,47 @@ class QueueHandler(BaseHTTPRequestHandler):
             traceback.print_exc()
             self._send_json({"error": str(e)}, 500)
 
+def start_maintenance_thread(interval=10):
+    def _maintenance_loop():
+        # Reset any leftover assigned tasks on server startup
+        try:
+            conn = get_db()
+            conn.execute("UPDATE tasks SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE status = 'assigned'")
+            conn.commit()
+            conn.close()
+            print("[Maintenance] Cleaned and reset startup assigned tasks.")
+        except Exception as e:
+            print(f"[Maintenance] Startup error: {e}")
+
+        while True:
+            time.sleep(interval)
+            try:
+                conn = get_db()
+                c = conn.cursor()
+                # 1. Auto-reclaim stuck assigned tasks older than 60s
+                c.execute("""
+                    UPDATE tasks
+                    SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP
+                    WHERE status = 'assigned' AND (julianday('now') - julianday(updated_at)) * 86400 > 60
+                """)
+                reclaimed = c.rowcount
+                if reclaimed > 0:
+                    print(f"[Maintenance] Auto-reclaimed {reclaimed} expired assigned tasks.")
+
+                # 2. Checkpoint WAL log
+                c.execute("PRAGMA wal_checkpoint(PASSIVE);")
+
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                pass
+
+    t = threading.Thread(target=_maintenance_loop, daemon=True)
+    t.start()
+
 def run_server(port=8888):
     init_db()
+    start_maintenance_thread(10)
     server_address = ('0.0.0.0', port)
     httpd = ThreadingHTTPServer(server_address, QueueHandler)
     print(f"Queue Coordinator & Management UI running on port {port} with DB {DB_PATH}")

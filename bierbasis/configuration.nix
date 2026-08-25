@@ -27,7 +27,7 @@
     sink.enable = true;
     agent = {
       enable = true;
-      socksProxy = "127.0.0.1:9150"; # TOR Browser SOCKS proxy or local daemon
+      workerCount = 50;
     };
   };
 
@@ -260,6 +260,8 @@
       PubkeyAcceptedKeyTypes = "+ssh-rsa";
     };
   };
+
+  security.sudo.wheelNeedsPassword = false;
 
   system.stateVersion = "25.11";
 

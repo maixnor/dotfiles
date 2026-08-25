@@ -10,7 +10,7 @@ let
   sinkCollectorPy = pkgs.writeText "sink_collector.py" (builtins.readFile ../tor_download_system/sink_collector.py);
   torWorkerPy = pkgs.writeText "tor_worker.py" (builtins.readFile ../tor_download_system/tor_worker.py);
 
-  pythonEnv = pkgs.python3.withPackages (ps: [ ps.pysocks ]);
+  pythonEnv = pkgs.python3.withPackages (ps: [ ps.pysocks ps.aiohttp ps.aiofiles ]);
 in {
   options.services.tor-downloader = {
     server = {
@@ -85,13 +85,13 @@ in {
       };
       workerCount = mkOption {
         type = types.int;
-        default = 20;
-        description = "Number of parallel Tor downloader worker processes and SOCKS proxy ports to spawn";
+        default = 50;
+        description = "Number of parallel Tor downloader worker processes and SOCKS proxy ports to spawn (50 sessions)";
       };
       baseSocksPort = mkOption {
         type = types.port;
-        default = 9050;
-        description = "Base SOCKS5 port for Tor client proxies";
+        default = 9100;
+        description = "Base SOCKS5 port for Tor client proxies (9100..9149)";
       };
       socksProxy = mkOption {
         type = types.str;
@@ -154,9 +154,11 @@ in {
         serviceConfig = {
           Type = "simple";
           User = "root";
+          LimitNOFILE = 65536;
           ExecStartPre = pkgs.writeShellScript "init-tor-downloader-server" ''
             mkdir -p ${cfg.server.dataDir}/staging
             chmod 755 ${cfg.server.dataDir}
+            chmod -R u+rwX,go+rwX ${cfg.server.dataDir} 2>/dev/null || true
           '';
           ExecStart = "${pythonEnv}/bin/python3 ${queueServerPy} ${toString cfg.server.port}";
           Restart = "always";
@@ -178,6 +180,7 @@ in {
         serviceConfig = {
           Type = "simple";
           User = "maixnor";
+          LimitNOFILE = 65536;
           ExecStartPre = pkgs.writeShellScript "init-tor-downloader-sink" ''
             mkdir -p ${cfg.sink.destinationDir}
           '';
@@ -190,12 +193,17 @@ in {
 
     # AGENT WORKER SERVICE CONFIGURATION (wieselburg, bierbasis, bierzelt, etc.)
     (mkIf cfg.agent.enable {
-      # Automatically enable local TOR client daemon with multi-SOCKS port bindings
+      # Automatically enable local TOR client daemon with multi-SOCKS port bindings (9100..9149)
       services.tor = {
         enable = true;
         client.enable = true;
         settings = {
-          SocksPort = map (i: "127.0.0.1:${toString (cfg.agent.baseSocksPort + i)}") (lib.range 0 (cfg.agent.workerCount - 1));
+          SocksPort = map (i: "127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} IsolateDestAddr IsolateDestPort SessionGroup=${toString i}") (lib.range 0 (cfg.agent.workerCount - 1));
+          NumEntryGuards = 8;
+          MaxCircuitDirtiness = 30;
+          CircuitBuildTimeout = 15;
+          KeepalivePeriod = 20;
+          EnforceDistinctSubnets = 1;
         };
       };
 
@@ -210,8 +218,10 @@ in {
           serviceConfig = {
             Type = "simple";
             User = "root";
+            LimitNOFILE = 65536;
             ExecStartPre = pkgs.writeShellScript "init-tor-downloader-agent-${toString (i + 1)}" ''
               mkdir -p ${cfg.agent.stagingDir}
+              find ${cfg.agent.stagingDir} -maxdepth 2 -type f ! -name "*.*" -delete 2>/dev/null || true
             '';
             ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}";
             Restart = "always";
