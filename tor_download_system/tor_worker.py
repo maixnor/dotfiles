@@ -9,7 +9,10 @@ import subprocess
 import hashlib
 import urllib.parse
 import urllib.request
+import functools
 from html.parser import HTMLParser
+
+print = functools.partial(print, flush=True)
 
 class DirectoryLinkParser(HTMLParser):
     def __init__(self, base_url):
@@ -75,44 +78,27 @@ class TorWorker:
                 pass
 
     def _post(self, endpoint, data):
-        headers = {'Content-Type': 'application/json'}
-        if self.api_key:
-            headers['X-API-Key'] = self.api_key
-
         url = f"{self.server_url}{endpoint}"
-        parsed = urllib.parse.urlparse(url)
-        target_url = url
-        ctx = None
+        cmd = [
+            "curl", "-s", "-k",
+            "-H", "Content-Type: application/json",
+            "-d", json.dumps(data),
+            "--connect-timeout", "10",
+            "--max-time", "20",
+            url
+        ]
+        if self.api_key:
+            cmd.extend(["-H", f"X-API-Key: {self.api_key}"])
 
-        if parsed.scheme == 'https':
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
-        if parsed.hostname == "tor-downloader.maixnor.com":
-            headers['Host'] = "tor-downloader.maixnor.com"
-            try:
-                import socket
-                socket.gethostbyname("tor-downloader.maixnor.com")
-            except Exception:
-                target_url = urllib.parse.urlunparse((
-                    parsed.scheme, "37.205.9.77", parsed.path, parsed.params, parsed.query, parsed.fragment
-                ))
-
-        req = urllib.request.Request(
-            target_url,
-            data=json.dumps(data).encode('utf-8'),
-            headers=headers
-        )
         for attempt in range(3):
             try:
-                with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
-                    return json.loads(resp.read().decode('utf-8'))
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                if res.returncode == 0 and res.stdout.strip():
+                    return json.loads(res.stdout)
             except Exception as e:
                 if attempt == 2:
                     print(f"[{self.worker_id}] Error posting to {endpoint}: {e}")
-                    return None
-                time.sleep(1)
+            time.sleep(1)
         return None
 
     def fetch_url_content(self, url):
@@ -141,7 +127,6 @@ class TorWorker:
                 "curl", "--socks5-hostname", self.socks_proxy,
                 "-L", "-C", "-",
                 "--tcp-nodelay",
-                "--buffer-size", "65536",
                 "--connect-timeout", "20",
                 "--speed-time", "30", "--speed-limit", "1024",
                 "-o", dest_path, url

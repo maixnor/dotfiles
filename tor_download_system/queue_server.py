@@ -107,6 +107,7 @@ def init_db():
     c.execute('CREATE INDEX IF NOT EXISTS idx_parent ON tasks(parent_url)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_assigned ON tasks(status, updated_at)')
     c.execute('CREATE INDEX IF NOT EXISTS idx_url ON tasks(url)')
+DB_WRITE_LOCK = threading.Lock()
 WORKERS_LOCK = threading.Lock()
 WORKERS_MAP = {}
 
@@ -973,24 +974,25 @@ class QueueHandler(BaseHTTPRequestHandler):
                     self._send_json({"task": None, "paused": True})
                     return
 
-                conn = get_db()
-                try:
-                    c = conn.cursor()
-                    c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_vip DESC, id ASC LIMIT 1')
-                    row = c.fetchone()
-                    if row:
-                        task = dict(row)
-                        c.execute('''
-                            UPDATE tasks
-                            SET status = "assigned", worker_id = ?, attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        ''', (worker_id, task['id']))
-                        conn.commit()
-                        self._send_json({"task": task})
-                    else:
-                        self._send_json({"task": None})
-                finally:
-                    conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    try:
+                        c = conn.cursor()
+                        c.execute('SELECT * FROM tasks WHERE status = "pending" ORDER BY is_vip DESC, id ASC LIMIT 1')
+                        row = c.fetchone()
+                        if row:
+                            task = dict(row)
+                            c.execute('''
+                                UPDATE tasks
+                                SET status = "assigned", worker_id = ?, attempts = attempts + 1, updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            ''', (worker_id, task['id']))
+                            conn.commit()
+                            self._send_json({"task": task})
+                        else:
+                            self._send_json({"task": None})
+                    finally:
+                        conn.close()
 
             elif parsed.path == '/api/report_staging':
                 task_id = body.get("task_id")
@@ -1002,34 +1004,35 @@ class QueueHandler(BaseHTTPRequestHandler):
 
                 update_worker_heartbeat(worker_id, increment_task=True)
 
-                conn = get_db()
-                try:
-                    c = conn.cursor()
-                    if discovered_urls:
-                        valid_items = [
-                            (u.strip(), body.get("url"), 1 if u.strip().endswith('/') else 0)
-                            for u in discovered_urls if u.strip()
-                        ]
-                        if valid_items:
-                            c.executemany('INSERT OR IGNORE INTO tasks (url, parent_url, is_dir, status) VALUES (?, ?, ?, "pending")', valid_items)
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    try:
+                        c = conn.cursor()
+                        if discovered_urls:
+                            valid_items = [
+                                (u.strip(), body.get("url"), 1 if u.strip().endswith('/') else 0)
+                                for u in discovered_urls if u.strip()
+                            ]
+                            if valid_items:
+                                c.executemany('INSERT OR IGNORE INTO tasks (url, parent_url, is_dir, status) VALUES (?, ?, ?, "pending")', valid_items)
 
-                    # If directory crawl or no staging path, complete task directly
-                    if discovered_urls or not staging_path:
-                        c.execute('''
-                            UPDATE tasks
-                            SET status = "completed", staging_path = "", file_size = 0, file_hash = "", updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        ''', (task_id,))
-                    else:
-                        c.execute('''
-                            UPDATE tasks
-                            SET status = "downloaded_staging", staging_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        ''', (staging_path, file_size, file_hash, task_id))
-                    conn.commit()
-                    self._send_json({"status": "ok"})
-                finally:
-                    conn.close()
+                        # If directory crawl or no staging path, complete task directly
+                        if discovered_urls or not staging_path:
+                            c.execute('''
+                                UPDATE tasks
+                                SET status = "completed", staging_path = "", file_size = 0, file_hash = "", updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            ''', (task_id,))
+                        else:
+                            c.execute('''
+                                UPDATE tasks
+                                SET status = "downloaded_staging", staging_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            ''', (staging_path, file_size, file_hash, task_id))
+                        conn.commit()
+                        self._send_json({"status": "ok"})
+                    finally:
+                        conn.close()
 
             elif parsed.path == '/api/report_completed':
                 task_id = body.get("task_id")
@@ -1039,65 +1042,68 @@ class QueueHandler(BaseHTTPRequestHandler):
                 worker_id = body.get("worker_id", "unknown")
                 update_worker_heartbeat(worker_id, increment_task=True)
 
-                conn = get_db()
-                try:
-                    c = conn.cursor()
-                    c.execute('''
-                        UPDATE tasks
-                        SET status = "completed", local_rel_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
-                        WHERE id = ?
-                    ''', (local_rel_path, file_size, file_hash, task_id))
-                    conn.commit()
-                    self._send_json({"status": "ok"})
-                finally:
-                    conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    try:
+                        c = conn.cursor()
+                        c.execute('''
+                            UPDATE tasks
+                            SET status = "completed", local_rel_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
+                            WHERE id = ?
+                        ''', (local_rel_path, file_size, file_hash, task_id))
+                        conn.commit()
+                        self._send_json({"status": "ok"})
+                    finally:
+                        conn.close()
 
             elif parsed.path == '/api/requeue':
                 task_id = body.get("task_id")
-                conn = get_db()
-                try:
-                    c = conn.cursor()
-                    if task_id:
-                        c.execute("""
-                            UPDATE tasks
-                            SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        """, (task_id,))
-                    conn.commit()
-                    self._send_json({"status": "ok", "message": "Task requeued"})
-                finally:
-                    conn.close()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    try:
+                        c = conn.cursor()
+                        if task_id:
+                            c.execute("""
+                                UPDATE tasks
+                                SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            """, (task_id,))
+                        conn.commit()
+                        self._send_json({"status": "ok", "message": "Task requeued"})
+                    finally:
+                        conn.close()
 
             elif parsed.path == '/api/report_failed':
                 task_id = body.get("task_id")
                 error = str(body.get("error", "Unknown error"))
-                conn = get_db()
-                try:
-                    c = conn.cursor()
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    try:
+                        c = conn.cursor()
 
-                    # If 429 or rate limit, do NOT count as a failure or increment attempt penalty; requeue as pending
-                    if "429" in error or "Too Many Requests" in error or "rate limit" in error.lower():
-                        c.execute("""
-                            UPDATE tasks
-                            SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        """, (task_id,))
-                        new_status = 'pending'
-                    else:
-                        c.execute('SELECT attempts FROM tasks WHERE id = ?', (task_id,))
-                        row = c.fetchone()
-                        attempts = row['attempts'] if row else 1
-                        new_status = 'failed' if attempts >= 10 else 'pending'
-                        c.execute('''
-                            UPDATE tasks
-                            SET status = ?, error_message = ?, worker_id = NULL, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        ''', (new_status, error, task_id))
+                        # If 429 or rate limit, do NOT count as a failure or increment attempt penalty; requeue as pending
+                        if "429" in error or "Too Many Requests" in error or "rate limit" in error.lower():
+                            c.execute("""
+                                UPDATE tasks
+                                SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            """, (task_id,))
+                            new_status = 'pending'
+                        else:
+                            c.execute('SELECT attempts FROM tasks WHERE id = ?', (task_id,))
+                            row = c.fetchone()
+                            attempts = row['attempts'] if row else 1
+                            new_status = 'failed' if attempts >= 10 else 'pending'
+                            c.execute('''
+                                UPDATE tasks
+                                SET status = ?, error_message = ?, worker_id = NULL, updated_at = CURRENT_TIMESTAMP
+                                WHERE id = ?
+                            ''', (new_status, error, task_id))
 
-                    conn.commit()
-                    self._send_json({"status": "ok", "new_status": new_status})
-                finally:
-                    conn.close()
+                        conn.commit()
+                        self._send_json({"status": "ok", "new_status": new_status})
+                    finally:
+                        conn.close()
 
             else:
                 self._send_json({"error": "Not found"}, 404)
@@ -1109,10 +1115,11 @@ def start_maintenance_thread(interval=10):
     def _maintenance_loop():
         # Reset any leftover assigned tasks on server startup
         try:
-            conn = get_db()
-            conn.execute("UPDATE tasks SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE status = 'assigned'")
-            conn.commit()
-            conn.close()
+            with DB_WRITE_LOCK:
+                conn = get_db()
+                conn.execute("UPDATE tasks SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP WHERE status = 'assigned'")
+                conn.commit()
+                conn.close()
             print("[Maintenance] Cleaned and reset startup assigned tasks.")
         except Exception as e:
             print(f"[Maintenance] Startup error: {e}")
@@ -1120,23 +1127,24 @@ def start_maintenance_thread(interval=10):
         while True:
             time.sleep(interval)
             try:
-                conn = get_db()
-                c = conn.cursor()
-                # 1. Auto-reclaim stuck assigned tasks older than 60s
-                c.execute("""
-                    UPDATE tasks
-                    SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP
-                    WHERE status = 'assigned' AND (julianday('now') - julianday(updated_at)) * 86400 > 60
-                """)
-                reclaimed = c.rowcount
-                if reclaimed > 0:
-                    print(f"[Maintenance] Auto-reclaimed {reclaimed} expired assigned tasks.")
+                with DB_WRITE_LOCK:
+                    conn = get_db()
+                    c = conn.cursor()
+                    # 1. Auto-reclaim stuck assigned tasks older than 60s
+                    c.execute("""
+                        UPDATE tasks
+                        SET status = 'pending', worker_id = NULL, updated_at = CURRENT_TIMESTAMP
+                        WHERE status = 'assigned' AND (julianday('now') - julianday(updated_at)) * 86400 > 60
+                    """)
+                    reclaimed = c.rowcount
+                    if reclaimed > 0:
+                        print(f"[Maintenance] Auto-reclaimed {reclaimed} expired assigned tasks.")
 
-                # 2. Checkpoint WAL log
-                c.execute("PRAGMA wal_checkpoint(PASSIVE);")
+                    # 2. Checkpoint WAL log
+                    c.execute("PRAGMA wal_checkpoint(PASSIVE);")
 
-                conn.commit()
-                conn.close()
+                    conn.commit()
+                    conn.close()
             except Exception as e:
                 pass
 
