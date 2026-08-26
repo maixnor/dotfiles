@@ -161,7 +161,7 @@ class TorWorker:
                     except Exception:
                         pass
                 continue
-            if res.returncode in (18, 28, 52, 56):
+            if res.returncode in (7, 18, 28, 52, 56, 97):
                 time.sleep(2)
                 continue
             else:

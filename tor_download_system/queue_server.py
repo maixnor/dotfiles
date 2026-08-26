@@ -40,17 +40,17 @@ def load_api_key():
 SECRET_KEY = load_api_key()
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH, timeout=60.0)
+    conn = sqlite3.connect(DB_PATH, timeout=60.0, isolation_level=None)
     conn.execute("PRAGMA busy_timeout = 60000;")
-    conn.execute("PRAGMA synchronous = FULL;")
+    conn.execute("PRAGMA synchronous = NORMAL;")
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, timeout=60.0)
+    conn = sqlite3.connect(DB_PATH, timeout=60.0, isolation_level=None)
     conn.execute("PRAGMA journal_mode = WAL;")
-    conn.execute("PRAGMA synchronous = FULL;")
+    conn.execute("PRAGMA synchronous = NORMAL;")
     conn.execute("PRAGMA wal_autocheckpoint = 1000;")
     conn.row_factory = sqlite3.Row
 
@@ -249,7 +249,15 @@ def render_tree_node(node, depth=0):
             """
     return html
 
+METRICS_CACHE = {"timestamp": 0, "result": ("Idle", "Calculating...", 0.0, 0.0)}
+METRICS_LOCK = threading.Lock()
+
 def calculate_speed_and_etc(conn):
+    now = time.time()
+    with METRICS_LOCK:
+        if now - METRICS_CACHE["timestamp"] < 5.0:
+            return METRICS_CACHE["result"]
+
     c = conn.cursor()
     c.execute("""
         SELECT SUM(file_size) as recent_bytes, COUNT(*) as recent_tasks
@@ -334,7 +342,11 @@ def calculate_speed_and_etc(conn):
     else:
         etc_str = "Calculating..."
 
-    return speed_str, etc_str, speed_bps, est_remaining_bytes
+    result = (speed_str, etc_str, speed_bps, est_remaining_bytes)
+    with METRICS_LOCK:
+        METRICS_CACHE["timestamp"] = now
+        METRICS_CACHE["result"] = result
+    return result
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -727,72 +739,75 @@ class QueueHandler(BaseHTTPRequestHandler):
 
             if parsed.path in ('/', '/ui'):
                 conn = get_db()
-                c = conn.cursor()
+                try:
+                    c = conn.cursor()
 
-                c.execute('SELECT status, count(*) as count FROM tasks GROUP BY status')
-                stats = {row['status']: row['count'] for row in c.fetchall()}
+                    c.execute('SELECT status, count(*) as count FROM tasks GROUP BY status')
+                    stats = {row['status']: row['count'] for row in c.fetchall()}
 
-                c.execute('SELECT count(*) as count FROM tasks WHERE is_vip = 1 AND status = "pending"')
-                vip_count = c.fetchone()['count']
-                
-                c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
-                completed_info = c.fetchone()
-                
-                workers = get_active_workers(300)
-
-                speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
-
-                c.execute('SELECT count(*) as count FROM tasks')
-                total_tasks = c.fetchone()['count']
-
-                failed_count = stats.get('failed', 0)
-                retry_failed_btn = f'<a href="/ui/retry_failed" class="btn btn-retry">🔄 Retry Failed ({failed_count})</a>' if failed_count > 0 else ''
-
-                comp_bytes = completed_info['total_bytes'] or 0
-                if comp_bytes > 1073741824:
-                    comp_size_str = f"{comp_bytes / 1073741824:.2f} GB"
-                else:
-                    comp_size_str = f"{comp_bytes / 1048576:.1f} MB"
-
-                if view == 'explorer':
-                    search_q = params.get("q", [""])[0].strip()
-                    if search_q:
-                        c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks WHERE url LIKE ? ORDER BY url ASC LIMIT 5000", (f"%{search_q}%",))
-                    else:
-                        c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks ORDER BY url ASC LIMIT 10000")
+                    c.execute('SELECT count(*) as count FROM tasks WHERE is_vip = 1 AND status = "pending"')
+                    vip_count = c.fetchone()['count']
                     
-                    tasks = [dict(r) for r in c.fetchall()]
-                    conn.close()
+                    c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
+                    completed_info = c.fetchone()
+                    
+                    workers = get_active_workers(300)
 
-                    tree_root = build_tree_structure(tasks)
-                    tree_html = render_tree_node(tree_root)
+                    speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
 
-                    explorer_html = f"""
-                    <div class="card">
-                        <div class="section-title">
-                            Collapsible Directory Explorer
-                            <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Folder badges rollup to the lowest status of all sub-files. Unfold folders to view relative sub-files.</span>
-                        </div>
-                        <form method="GET" action="/ui" class="search-box">
-                            <input type="hidden" name="view" value="explorer" />
-                            <div style="display: flex; gap: 10px;">
-                                <input type="text" name="q" value="{search_q}" placeholder="Search cataloged files or folders..." />
-                                <button type="submit" class="btn-submit">Search</button>
+                    c.execute('SELECT count(*) as count FROM tasks')
+                    total_tasks = c.fetchone()['count']
+
+                    failed_count = stats.get('failed', 0)
+                    retry_failed_btn = f'<a href="/ui/retry_failed" class="btn btn-retry">🔄 Retry Failed ({failed_count})</a>' if failed_count > 0 else ''
+
+                    comp_bytes = completed_info['total_bytes'] or 0
+                    if comp_bytes > 1073741824:
+                        comp_size_str = f"{comp_bytes / 1073741824:.2f} GB"
+                    else:
+                        comp_size_str = f"{comp_bytes / 1048576:.1f} MB"
+
+                    if view == 'explorer':
+                        search_q = params.get("q", [""])[0].strip()
+                        if search_q:
+                            c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks WHERE url LIKE ? ORDER BY url ASC LIMIT 5000", (f"%{search_q}%",))
+                        else:
+                            c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks ORDER BY url ASC LIMIT 10000")
+                        
+                        tasks = [dict(r) for r in c.fetchall()]
+
+                        tree_root = build_tree_structure(tasks)
+                        tree_html = render_tree_node(tree_root)
+
+                        explorer_html = f"""
+                        <div class="card">
+                            <div class="section-title">
+                                Collapsible Directory Explorer
+                                <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Folder badges rollup to the lowest status of all sub-files. Unfold folders to view relative sub-files.</span>
                             </div>
-                        </form>
-                        <div class="tree-container">
-                            {tree_html if tree_html else '<div class="empty-folder">No cataloged items found in queue.</div>'}
+                            <form method="GET" action="/ui" class="search-box">
+                                <input type="hidden" name="view" value="explorer" />
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="q" value="{search_q}" placeholder="Search cataloged files or folders..." />
+                                    <button type="submit" class="btn-submit">Search</button>
+                                </div>
+                            </form>
+                            <div class="tree-container">
+                                {tree_html if tree_html else '<div class="empty-folder">No cataloged items found in queue.</div>'}
+                            </div>
                         </div>
-                    </div>
-                    """
-                    view_content = explorer_html
+                        """
+                        view_content = explorer_html
 
-                else:
-                    c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
-                    active_queue = [dict(r) for r in c.fetchall()]
+                    else:
+                        c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
+                        active_queue = [dict(r) for r in c.fetchall()]
+
+                        queue_rows = ""
+                finally:
                     conn.close()
 
-                    queue_rows = ""
+                if view != 'explorer':
                     for t in active_queue:
                         rel = extract_relative_path(t['url'])
                         badge = "VIP Pending" if (t['is_vip'] and t['status'] == 'pending') else t['status']
@@ -869,14 +884,16 @@ class QueueHandler(BaseHTTPRequestHandler):
 
             elif parsed.path == '/api/status':
                 conn = get_db()
-                c = conn.cursor()
-                c.execute('SELECT status, count(*) as count FROM tasks GROUP BY status')
-                stats = {row['status']: row['count'] for row in c.fetchall()}
-                c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
-                completed_info = c.fetchone()
-                workers = get_active_workers(300)
-                speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
-                conn.close()
+                try:
+                    c = conn.cursor()
+                    c.execute('SELECT status, count(*) as count FROM tasks GROUP BY status')
+                    stats = {row['status']: row['count'] for row in c.fetchall()}
+                    c.execute('SELECT count(*) as total, sum(file_size) as total_bytes FROM tasks WHERE status="completed"')
+                    completed_info = c.fetchone()
+                    workers = get_active_workers(300)
+                    speed_str, etc_str, speed_bps, est_rem_bytes = calculate_speed_and_etc(conn)
+                finally:
+                    conn.close()
                 
                 self._send_json({
                     "paused": is_paused(),
@@ -891,17 +908,21 @@ class QueueHandler(BaseHTTPRequestHandler):
                 })
             elif parsed.path == '/api/staging_tasks':
                 conn = get_db()
-                c = conn.cursor()
-                c.execute('SELECT * FROM tasks WHERE status = "downloaded_staging" LIMIT 200')
-                tasks = [dict(r) for r in c.fetchall()]
-                conn.close()
+                try:
+                    c = conn.cursor()
+                    c.execute('SELECT * FROM tasks WHERE status = "downloaded_staging" LIMIT 200')
+                    tasks = [dict(r) for r in c.fetchall()]
+                finally:
+                    conn.close()
                 self._send_json({"tasks": tasks})
             elif parsed.path == '/api/tasks':
                 conn = get_db()
-                c = conn.cursor()
-                c.execute('SELECT * FROM tasks ORDER BY id DESC LIMIT 100')
-                tasks = [dict(r) for r in c.fetchall()]
-                conn.close()
+                try:
+                    c = conn.cursor()
+                    c.execute('SELECT * FROM tasks ORDER BY id DESC LIMIT 100')
+                    tasks = [dict(r) for r in c.fetchall()]
+                finally:
+                    conn.close()
                 self._send_json({"tasks": tasks})
             else:
                 self._send_json({"error": "Not found"}, 404)
