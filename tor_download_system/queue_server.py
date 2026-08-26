@@ -188,7 +188,17 @@ def compute_node_rollup_status(node):
 
     return "pending", False
 
-def render_tree_node(node, depth=0):
+def human_size(num):
+    if not num: return ""
+    num = float(num)
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            if unit == 'B': return f"{int(num)} B"
+            return f"{num:.1f} {unit}"
+        num /= 1024.0
+    return f"{num:.1f} PB"
+
+def render_tree_node(node, depth=0, path=""):
     html = ""
     sorted_keys = sorted(node["children"].keys(), key=lambda k: (not node["children"][k]["is_dir"], k.lower()))
     for key in sorted_keys:
@@ -213,9 +223,10 @@ def render_tree_node(node, depth=0):
                 cancel_btn = f'<a href="/ui/cancel_task?url={enc_url}" class="btn btn-cancel">✖ Remove Folder</a>'
                 action_html = f'{rescan_btn} {vip_btn} {cancel_btn}'
 
-            inner_content = render_tree_node(child, depth + 1)
+            child_path = path + "/" + item_name
+            inner_content = render_tree_node(child, depth + 1, child_path)
             html += f"""
-            <details class="tree-folder">
+            <details class="tree-folder" data-path="{urllib.parse.quote(child_path)}">
                 <summary class="tree-summary">
                     <span class="folder-title">📁 {item_name}/</span>
                     <div class="tree-actions">{badge_html} {action_html}</div>
@@ -230,7 +241,7 @@ def render_tree_node(node, depth=0):
                 badge = "VIP Pending" if (task['is_vip'] and task['status'] == 'pending') else task['status']
                 badge_cls = "badge-vip" if (task['is_vip'] and task['status'] == 'pending') else f"badge-{task['status']}"
                 badge_html = f'<span class="badge {badge_cls}">{badge}</span>'
-                size_str = f"{task['file_size']} B" if task['file_size'] else ""
+                size_str = human_size(task['file_size']) if task['file_size'] else ""
                 enc_url = urllib.parse.quote(task['url'])
 
                 vip_btn = f'<a href="/ui/set_vip?url={enc_url}" class="btn btn-vip">★ VIP</a>' if not task['is_vip'] else f'<a href="/ui/cancel_vip?url={enc_url}" class="btn btn-vip-cancel">☆ Normal</a>'
@@ -558,6 +569,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <div class="stat-sub">COMPLETED_COUNT files ingested</div>
             </div>
             <div class="stat-card">
+                <div class="stat-label">Remaining Payload</div>
+                <div class="stat-value" style="color: #f472b6">REMAINING_SIZE</div>
+                <div class="stat-sub">Estimated pending bytes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completion %</div>
+                <div class="stat-value" style="color: #4ade80">COMPLETION_PERCENT%</div>
+                <div class="stat-sub">By data size</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-label">Active Worker Streams</div>
                 <div class="stat-value" style="color: var(--primary)">ACTIVE_WORKERS</div>
                 <div class="stat-sub">Active streams (last 5m)</div>
@@ -571,6 +592,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
         VIEW_CONTENT
 
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const details = document.querySelectorAll("details.tree-folder");
+                details.forEach(el => {
+                    const id = "tree-node-" + el.getAttribute("data-path");
+                    if (localStorage.getItem(id) === "true") {
+                        el.setAttribute("open", "");
+                    }
+                    el.addEventListener("toggle", () => {
+                        localStorage.setItem(id, el.hasAttribute("open"));
+                    });
+                });
+            });
+        </script>
     </div>
 </body>
 </html>
@@ -813,7 +848,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                         badge = "VIP Pending" if (t['is_vip'] and t['status'] == 'pending') else t['status']
                         badge_cls = "badge-vip" if (t['is_vip'] and t['status'] == 'pending') else f"badge-{t['status']}"
                         worker_str = t['worker_id'] or "-"
-                        size_str = f"{t['file_size']} B" if t['file_size'] else "-"
+                        size_str = human_size(t['file_size']) if t['file_size'] else "-"
 
                         enc_url = urllib.parse.quote(t['url'])
                         vip_action = f'<a href="/ui/cancel_vip?id={t["id"]}" class="btn btn-vip-cancel">☆ Normal</a>' if t['is_vip'] else f'<a href="/ui/set_vip?id={t["id"]}" class="btn btn-vip">★ VIP</a>'
@@ -865,6 +900,10 @@ class QueueHandler(BaseHTTPRequestHandler):
                 status_badge = '<span class="badge badge-failed" style="margin-left: 8px;">PAUSED</span>' if paused else '<span class="badge badge-completed" style="margin-left: 8px;">ACTIVE</span>'
                 pause_btn = '<a href="/ui/toggle_pause" class="btn btn-resume">Resume Queue</a>' if paused else '<a href="/ui/toggle_pause" class="btn btn-pause">Pause Queue</a>'
 
+                total_est_bytes = comp_bytes + est_rem_bytes
+                completion_pct = (comp_bytes / total_est_bytes * 100) if total_est_bytes > 0 else 0
+                rem_size_str = human_size(est_rem_bytes)
+
                 html = HTML_TEMPLATE
                 html = html.replace("STATUS_BADGE", status_badge)
                 html = html.replace("RETRY_FAILED_BTN", retry_failed_btn)
@@ -875,6 +914,8 @@ class QueueHandler(BaseHTTPRequestHandler):
                 html = html.replace("PENDING_TASKS", f"{stats.get('pending', 0):,}")
                 html = html.replace("COMPLETED_SIZE", comp_size_str)
                 html = html.replace("COMPLETED_COUNT", f"{completed_info['total'] or 0:,}")
+                html = html.replace("REMAINING_SIZE", rem_size_str)
+                html = html.replace("COMPLETION_PERCENT", f"{completion_pct:.2f}")
                 html = html.replace("ACTIVE_WORKERS", str(len(workers)))
                 html = html.replace("TAB_QUEUE_ACTIVE", "active" if view == "queue" else "")
                 html = html.replace("TAB_EXPLORER_ACTIVE", "active" if view == "explorer" else "")
