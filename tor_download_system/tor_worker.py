@@ -206,7 +206,9 @@ class TorWorker:
                 use_direct = bool(self.dest_dir and os.path.isdir(self.dest_dir))
                 target_file = os.path.join(self.dest_dir, rel_path) if use_direct else os.path.join(self.staging_dir, rel_path)
 
+                start_t = time.time()
                 self.download_file(url, target_file)
+                duration = time.time() - start_t
 
                 if os.path.isdir(target_file):
                     if use_direct:
@@ -214,7 +216,9 @@ class TorWorker:
                             "task_id": task_id,
                             "local_rel_path": rel_path,
                             "file_size": 0,
-                            "file_hash": ""
+                            "file_hash": "",
+                            "worker_id": self.worker_id,
+                            "speed_bps": 0
                         })
                     else:
                         self._post("/api/report_staging", {
@@ -229,6 +233,7 @@ class TorWorker:
                     return True
 
                 file_size = os.path.getsize(target_file)
+                speed_bps = file_size / duration if duration > 0 else 0
 
                 # Check if downloaded file is actually an HTML directory index page
                 if file_size < 1000000:
@@ -264,7 +269,9 @@ class TorWorker:
                         "task_id": task_id,
                         "local_rel_path": rel_path,
                         "file_size": file_size,
-                        "file_hash": file_hash
+                        "file_hash": file_hash,
+                        "worker_id": self.worker_id,
+                        "speed_bps": speed_bps
                     })
                 else:
                     print(f"[{self.worker_id}] Downloaded {url} to staging: {target_file} ({file_size} bytes)")
@@ -275,13 +282,14 @@ class TorWorker:
                         "staging_path": target_file,
                         "file_size": file_size,
                         "file_hash": file_hash,
-                        "discovered_urls": []
+                        "discovered_urls": [],
+                        "speed_bps": speed_bps
                     })
 
         except Exception as e:
             if "429" in str(e) or "Too Many Requests" in str(e) or "rate limit" in str(e).lower():
                 print(f"[{self.worker_id}] Rate limited (429) on task {task_id}: {e}. Requeuing without failure penalty.")
-                self._post("/api/requeue", {"task_id": task_id})
+                self._post("/api/requeue", {"task_id": task_id, "worker_id": self.worker_id})
                 time.sleep(5)
             else:
                 print(f"[{self.worker_id}] Task {task_id} failed: {e}")

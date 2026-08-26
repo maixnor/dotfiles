@@ -96,6 +96,18 @@ def init_db():
         pass
 
     c.execute('''
+        CREATE TABLE IF NOT EXISTS stats_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            return_code INTEGER,
+            speed_bps REAL,
+            file_size INTEGER,
+            worker_id TEXT
+        )
+    ''')
+    c.execute('CREATE INDEX IF NOT EXISTS idx_stats_time ON stats_log(timestamp)')
+
+    c.execute('''
         CREATE TABLE IF NOT EXISTS workers (
             worker_id TEXT PRIMARY KEY,
             last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -274,14 +286,14 @@ def calculate_speed_and_etc(conn):
         SELECT SUM(file_size) as recent_bytes, COUNT(*) as recent_tasks
         FROM tasks 
         WHERE status IN ('downloaded_staging', 'completed') 
-          AND datetime(updated_at) >= datetime('now', '-5 minutes')
+          AND datetime(updated_at) >= datetime('now', '-10 minutes')
     """)
     rec_row = c.fetchone()
     recent_bytes = rec_row['recent_bytes'] or 0
     recent_tasks = rec_row['recent_tasks'] or 0
 
-    speed_bps = recent_bytes / 300.0
-    tasks_per_sec = recent_tasks / 300.0
+    speed_bps = recent_bytes / 600.0
+    tasks_per_sec = recent_tasks / 600.0
 
     c.execute("""
         SELECT SUM(file_size) as known_bytes, COUNT(*) as total_pending
@@ -525,6 +537,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .empty-folder { font-size: 12px; color: var(--text-muted); padding: 4px 12px; font-style: italic; }
         .search-box { margin-bottom: 16px; }
     </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -537,7 +550,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 RETRY_FAILED_BTN
                 <a href="/ui/rescan_empty_dirs" class="btn" style="background:rgba(14,165,233,0.2);color:#38bdf8;border-color:#38bdf8;">🔄 Rescan Empty Folders</a>
                 PAUSE_RESUME_BTN
-                <a href="/ui/clear_all" class="btn btn-cancel" onclick="return confirm('Are you sure you want to completely clear the entire queue and reset the database?')">🗑️ Clear Database</a>
                 <button class="btn" onclick="location.reload()">Refresh (F5)</button>
             </div>
         </header>
@@ -585,9 +597,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
         </div>
 
+        THROTTLING_WARNING
         <div class="nav-tabs">
             <a href="/ui?view=queue" class="tab TAB_QUEUE_ACTIVE">Active Queue & VIP List</a>
             <a href="/ui?view=explorer" class="tab TAB_EXPLORER_ACTIVE">Collapsible File Explorer</a>
+            <a href="/ui?view=advanced" class="tab TAB_ADVANCED_ACTIVE">Advanced Statistics</a>
         </div>
 
         VIEW_CONTENT
@@ -667,6 +681,8 @@ class QueueHandler(BaseHTTPRequestHandler):
             parsed = urllib.parse.urlparse(self.path)
             params = urllib.parse.parse_qs(parsed.query)
             view = params.get("view", ["queue"])[0]
+            if parsed.path == '/ui/mobile':
+                view = 'mobile'
 
             if parsed.path == '/ui/toggle_pause':
                 set_paused(not is_paused())
@@ -802,7 +818,139 @@ class QueueHandler(BaseHTTPRequestHandler):
                     else:
                         comp_size_str = f"{comp_bytes / 1048576:.1f} MB"
 
-                    if view == 'explorer':
+                    
+                    if view == 'advanced':
+                        c.execute('''
+                            SELECT 
+                                strftime('%Y-%m-%d %H:%M:00', timestamp) as minute,
+                                COUNT(*) as requests,
+                                SUM(CASE WHEN return_code = 200 THEN 1 ELSE 0 END) as rc_200,
+                                SUM(CASE WHEN return_code = 429 THEN 1 ELSE 0 END) as rc_429,
+                                SUM(CASE WHEN return_code = 500 THEN 1 ELSE 0 END) as rc_500,
+                                SUM(CASE WHEN return_code NOT IN (200, 429, 500) THEN 1 ELSE 0 END) as rc_other,
+                                SUM(speed_bps) as sum_speed_bps
+                            FROM stats_log
+                            WHERE datetime(timestamp) >= datetime('now', '-1 hour')
+                              AND datetime(timestamp) <= datetime('now', '-1 minute')
+                            GROUP BY minute
+                            ORDER BY minute ASC
+                        ''')
+                        timeline_data = [dict(r) for r in c.fetchall()]
+
+                        c.execute('''
+                            SELECT speed_bps FROM stats_log 
+                            WHERE speed_bps > 0 AND datetime(timestamp) >= datetime('now', '-1 hour')
+                            ORDER BY speed_bps ASC
+                        ''')
+                        speeds = [r['speed_bps'] for r in c.fetchall()]
+                        speed_min = speeds[0] if speeds else 0
+                        speed_max = speeds[-1] if speeds else 0
+                        speed_avg = sum(speeds)/len(speeds) if speeds else 0
+                        speed_median = speeds[len(speeds)//2] if speeds else 0
+
+                        c.execute('''
+                            SELECT file_size FROM stats_log 
+                            WHERE file_size > 0 AND datetime(timestamp) >= datetime('now', '-1 hour')
+                            ORDER BY file_size ASC
+                        ''')
+                        sizes = [r['file_size'] for r in c.fetchall()]
+                        size_min = sizes[0] if sizes else 0
+                        size_max = sizes[-1] if sizes else 0
+                        size_avg = sum(sizes)/len(sizes) if sizes else 0
+                        size_median = sizes[len(sizes)//2] if sizes else 0
+
+                        advanced_html = '''
+                        <div class="card">
+                            <div class="section-title">Advanced Statistics (Last 1 Hour)</div>
+                            
+                            <div class="grid-stats">
+                                <div class="stat-card">
+                                    <div class="stat-label">Speed Stats (bps)</div>
+                                    <div class="stat-sub">Min: SPEED_MIN</div>
+                                    <div class="stat-sub">Max: SPEED_MAX</div>
+                                    <div class="stat-sub">Avg: SPEED_AVG</div>
+                                    <div class="stat-sub">Median: SPEED_MEDIAN</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">File Size Stats (bytes)</div>
+                                    <div class="stat-sub">Min: SIZE_MIN</div>
+                                    <div class="stat-sub">Max: SIZE_MAX</div>
+                                    <div class="stat-sub">Avg: SIZE_AVG</div>
+                                    <div class="stat-sub">Median: SIZE_MEDIAN</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartRequests"></canvas>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartCodes"></canvas>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartSpeed"></canvas>
+                            </div>
+
+                            <script>
+                                const tData = TIMELINE_DATA;
+                                const labels = tData.map(d => d.minute.split(" ")[1]);
+                                
+                                new Chart(document.getElementById('chartRequests'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            label: 'Requests/min',
+                                            data: tData.map(d => d.requests),
+                                            borderColor: '#3b82f6',
+                                            tension: 0.1
+                                        }]
+                                    },
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Requests per Minute', color: '#fff' } } }
+                                });
+
+                                new Chart(document.getElementById('chartCodes'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [
+                                            { label: '200 OK', data: tData.map(d => d.rc_200), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true },
+                                            { label: '429 Throttled', data: tData.map(d => d.rc_429), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true },
+                                            { label: '500 Error', data: tData.map(d => d.rc_500), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true },
+                                            { label: 'Other', data: tData.map(d => d.rc_other), borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.2)', fill: true }
+                                        ]
+                                    },
+                                    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { title: { display: true, text: 'Return Codes (Stacked)', color: '#fff' } } }
+                                });
+
+                                new Chart(document.getElementById('chartSpeed'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            label: 'Sum Speed (bps)',
+                                            data: tData.map(d => d.sum_speed_bps),
+                                            borderColor: '#a78bfa',
+                                            tension: 0.1
+                                        }]
+                                    },
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Download Speed over last 1h (lagged 1m)', color: '#fff' } } }
+                                });
+                            </script>
+                        </div>
+                        ''' \
+                        .replace('SPEED_MIN', f'{speed_min:.0f}') \
+                        .replace('SPEED_MAX', f'{speed_max:.0f}') \
+                        .replace('SPEED_AVG', f'{speed_avg:.0f}') \
+                        .replace('SPEED_MEDIAN', f'{speed_median:.0f}') \
+                        .replace('SIZE_MIN', f'{size_min}') \
+                        .replace('SIZE_MAX', f'{size_max}') \
+                        .replace('SIZE_AVG', f'{size_avg:.0f}') \
+                        .replace('SIZE_MEDIAN', f'{size_median}') \
+                        .replace('TIMELINE_DATA', json.dumps(timeline_data))
+                        view_content = advanced_html
+
+                    elif view == 'explorer':
+
                         search_q = params.get("q", [""])[0].strip()
                         if search_q:
                             c.execute("SELECT id, url, is_dir, is_vip, status, file_size FROM tasks WHERE url LIKE ? ORDER BY url ASC LIMIT 5000", (f"%{search_q}%",))
@@ -834,6 +982,73 @@ class QueueHandler(BaseHTTPRequestHandler):
                         """
                         view_content = explorer_html
 
+                    elif view == 'mobile':
+                        import datetime
+                        c.execute("SELECT count(*) as count FROM stats_log WHERE return_code = 429 AND datetime(timestamp) >= datetime('now', '-5 minutes')")
+                        recent_429_count = c.fetchone()['count']
+                        c.execute("SELECT count(*) as count FROM stats_log WHERE datetime(timestamp) >= datetime('now', '-5 minutes')")
+                        total_5m_count = c.fetchone()['count']
+                        perc_429 = (recent_429_count / total_5m_count * 100) if total_5m_count > 0 else 0
+
+                        c.execute("SELECT sum(speed_bps) as sum_speed, count(*) as cnt FROM stats_log WHERE return_code = 200 AND datetime(timestamp) >= datetime('now', '-5 minutes')")
+                        speed_5m_row = c.fetchone()
+                        speed_5m_avg = (speed_5m_row['sum_speed'] / speed_5m_row['cnt']) if (speed_5m_row and speed_5m_row['cnt'] > 0) else 0
+                        speed_5m_str = human_size(speed_5m_avg) + "/s" if speed_5m_avg > 0 else "0 B/s"
+
+                        total_est_bytes = comp_bytes + est_rem_bytes
+                        completion_pct = (comp_bytes / total_est_bytes * 100) if total_est_bytes > 0 else 0
+
+                        paused = is_paused()
+                        pause_btn = '<a href="/ui/toggle_pause" class="btn btn-resume" style="flex:1;text-align:center;justify-content:center;padding:12px;">Resume</a>' if paused else '<a href="/ui/toggle_pause" class="btn btn-pause" style="flex:1;text-align:center;justify-content:center;padding:12px;">Pause</a>'
+                        retry_btn = '<a href="/ui/retry_failed" class="btn btn-retry" style="flex:1;text-align:center;justify-content:center;padding:12px;">Retry Failed</a>'
+
+                        warning_html = ""
+                        if perc_429 > 10:
+                            warning_html = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger); font-weight: bold; text-align: center;">⚠️ Server Throttling! High 429s ({perc_429:.1f}%)</div>'
+
+                        eta_html = "N/A"
+                        if speed_bps > 0 and est_rem_bytes > 0:
+                            seconds_left = int(est_rem_bytes / speed_bps)
+                            eta_dt = datetime.datetime.now() + datetime.timedelta(seconds=seconds_left)
+                            eta_html = eta_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+                        mobile_html = f"""
+                        <style>.grid-stats {{ display: none !important; }} header .actions {{ display: none !important; }}</style>
+                        <div style="max-width: 600px; margin: 0 auto; margin-top: 20px;">
+                            {warning_html}
+                            <div class="card" style="padding: 24px; text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 14px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 8px;">Completion</div>
+                                <div style="font-size: 42px; font-weight: bold; color: #4ade80; margin-bottom: 8px;">{completion_pct:.1f}%</div>
+                                <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">ETC: <strong style="color: #a78bfa;">{etc_str}</strong> (ETA: {eta_html})</div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; text-align: left; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Downloaded</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #fff;">{comp_size_str}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Remaining</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #f472b6;">{human_size(est_rem_bytes)}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Speed (5m)</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: #38bdf8;">{speed_5m_str}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">429 Errors</div>
+                                        <div style="font-size: 16px; font-weight: 600; color: {'var(--danger)' if perc_429 > 10 else 'var(--warning)'};">{perc_429:.1f}%</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                                    {pause_btn}
+                                    {retry_btn}
+                                </div>
+                            </div>
+                        </div>
+                        """
+                        view_content = mobile_html
+
                     else:
                         c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
                         active_queue = [dict(r) for r in c.fetchall()]
@@ -842,59 +1057,66 @@ class QueueHandler(BaseHTTPRequestHandler):
                 finally:
                     conn.close()
 
-                if view != 'explorer':
-                    for t in active_queue:
-                        rel = extract_relative_path(t['url'])
-                        badge = "VIP Pending" if (t['is_vip'] and t['status'] == 'pending') else t['status']
-                        badge_cls = "badge-vip" if (t['is_vip'] and t['status'] == 'pending') else f"badge-{t['status']}"
-                        worker_str = t['worker_id'] or "-"
-                        size_str = human_size(t['file_size']) if t['file_size'] else "-"
+                
+                    c.execute("SELECT count(*) as count FROM stats_log WHERE return_code = 429 AND datetime(timestamp) >= datetime('now', '-5 minutes')")
+                    recent_429s = c.fetchone()['count']
+                    throttling_warning = ""
+                    if recent_429s > 20:
+                        throttling_warning = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger);"><strong>Warning:</strong> High number of 429 Too Many Requests errors detected ({recent_429s} in last 5m). Throttling may be occurring.</div>'
 
-                        enc_url = urllib.parse.quote(t['url'])
-                        vip_action = f'<a href="/ui/cancel_vip?id={t["id"]}" class="btn btn-vip-cancel">☆ Normal</a>' if t['is_vip'] else f'<a href="/ui/set_vip?id={t["id"]}" class="btn btn-vip">★ VIP</a>'
-                        cancel_action = f'<a href="/ui/cancel_task?id={t["id"]}" class="btn btn-cancel">✖ Remove</a>'
+                    if view not in ('explorer', 'advanced', 'mobile'):
+                        for t in active_queue:
+                            rel = extract_relative_path(t['url'])
+                            badge = "VIP Pending" if (t['is_vip'] and t['status'] == 'pending') else t['status']
+                            badge_cls = "badge-vip" if (t['is_vip'] and t['status'] == 'pending') else f"badge-{t['status']}"
+                            worker_str = t['worker_id'] or "-"
+                            size_str = human_size(t['file_size']) if t['file_size'] else "-"
 
-                        queue_rows += f"""<tr>
-                            <td>{t['id']}</td>
-                            <td class="path-cell" title="{t['url']}">{rel}</td>
-                            <td><span class="badge {badge_cls}">{badge}</span></td>
-                            <td>{worker_str}</td>
-                            <td>{size_str}</td>
-                            <td style="display: flex; gap: 6px;">{vip_action}{cancel_action}</td>
-                        </tr>"""
+                            enc_url = urllib.parse.quote(t['url'])
+                            vip_action = f'<a href="/ui/cancel_vip?id={t["id"]}" class="btn btn-vip-cancel">☆ Normal</a>' if t['is_vip'] else f'<a href="/ui/set_vip?id={t["id"]}" class="btn btn-vip">★ VIP</a>'
+                            cancel_action = f'<a href="/ui/cancel_task?id={t["id"]}" class="btn btn-cancel">✖ Remove</a>'
 
-                    queue_html = f"""
-                    <div class="card">
-                        <div class="section-title">Seed New Onion Target</div>
-                        <form class="seed-form" method="POST" action="/ui/add_url">
-                            <input type="text" name="url" placeholder="http://xxxxxxxx.onion/data/ALSGLOBAL/subfolder/" required />
-                            <button type="submit" class="btn-submit">Add Target URL</button>
-                        </form>
-                    </div>
+                            queue_rows += f"""<tr>
+                                <td>{t['id']}</td>
+                                <td class="path-cell" title="{t['url']}">{rel}</td>
+                                <td><span class="badge {badge_cls}">{badge}</span></td>
+                                <td>{worker_str}</td>
+                                <td>{size_str}</td>
+                                <td style="display: flex; gap: 6px;">{vip_action}{cancel_action}</td>
+                            </tr>"""
 
-                    <div class="card">
-                        <div class="section-title">
-                            Active Queue (VIP First)
-                            <span style="font-size: 12px; color: var(--text-muted);">VIP items are downloaded first in order of VIP declaration</span>
+                        queue_html = f"""
+                        <div class="card">
+                            <div class="section-title">Seed New Onion Target</div>
+                            <form class="seed-form" method="POST" action="/ui/add_url">
+                                <input type="text" name="url" placeholder="http://xxxxxxxx.onion/data/ALSGLOBAL/subfolder/" required />
+                                <button type="submit" class="btn-submit">Add Target URL</button>
+                            </form>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Path (After .onion)</th>
-                                    <th>Status</th>
-                                    <th>Worker</th>
-                                    <th>Size</th>
-                                    <th>Priority & Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {queue_rows if queue_rows else '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No active pending or VIP tasks in queue.</td></tr>'}
-                            </tbody>
-                        </table>
-                    </div>
-                    """
-                    view_content = queue_html
+
+                        <div class="card">
+                            <div class="section-title">
+                                Active Queue (VIP First)
+                                <span style="font-size: 12px; color: var(--text-muted);">VIP items are downloaded first in order of VIP declaration</span>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Path (After .onion)</th>
+                                        <th>Status</th>
+                                        <th>Worker</th>
+                                        <th>Size</th>
+                                        <th>Priority & Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {queue_rows if queue_rows else '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No active pending or VIP tasks in queue.</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                        """
+                        view_content = queue_html
 
                 paused = is_paused()
                 status_badge = '<span class="badge badge-failed" style="margin-left: 8px;">PAUSED</span>' if paused else '<span class="badge badge-completed" style="margin-left: 8px;">ACTIVE</span>'
@@ -919,6 +1141,8 @@ class QueueHandler(BaseHTTPRequestHandler):
                 html = html.replace("ACTIVE_WORKERS", str(len(workers)))
                 html = html.replace("TAB_QUEUE_ACTIVE", "active" if view == "queue" else "")
                 html = html.replace("TAB_EXPLORER_ACTIVE", "active" if view == "explorer" else "")
+                html = html.replace("TAB_ADVANCED_ACTIVE", "active" if view == "advanced" else "")
+                html = html.replace("THROTTLING_WARNING", throttling_warning)
                 html = html.replace("VIEW_CONTENT", view_content)
 
                 self._send_html(html)
@@ -1111,12 +1335,17 @@ class QueueHandler(BaseHTTPRequestHandler):
                 file_size = body.get("file_size", 0)
                 file_hash = body.get("file_hash", "")
                 worker_id = body.get("worker_id", "unknown")
+                speed_bps = float(body.get("speed_bps", 0))
                 update_worker_heartbeat(worker_id, increment_task=True)
 
                 with DB_WRITE_LOCK:
                     conn = get_db()
                     try:
                         c = conn.cursor()
+                        c.execute('''
+                            INSERT INTO stats_log (return_code, speed_bps, file_size, worker_id)
+                            VALUES (?, ?, ?, ?)
+                        ''', (200, speed_bps, file_size, worker_id))
                         c.execute('''
                             UPDATE tasks
                             SET status = "completed", local_rel_path = ?, file_size = ?, file_hash = ?, updated_at = CURRENT_TIMESTAMP
@@ -1129,6 +1358,7 @@ class QueueHandler(BaseHTTPRequestHandler):
 
             elif parsed.path == '/api/requeue':
                 task_id = body.get("task_id")
+                worker_id = body.get("worker_id", "unknown")
                 with DB_WRITE_LOCK:
                     conn = get_db()
                     try:
@@ -1139,6 +1369,10 @@ class QueueHandler(BaseHTTPRequestHandler):
                                 SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
                                 WHERE id = ?
                             """, (task_id,))
+                            c.execute('''
+                                INSERT INTO stats_log (return_code, speed_bps, file_size, worker_id)
+                                VALUES (?, ?, ?, ?)
+                            ''', (429, 0, 0, worker_id))
                         conn.commit()
                         self._send_json({"status": "ok", "message": "Task requeued"})
                     finally:
@@ -1153,7 +1387,9 @@ class QueueHandler(BaseHTTPRequestHandler):
                         c = conn.cursor()
 
                         # If 429 or rate limit, do NOT count as a failure or increment attempt penalty; requeue as pending
+                        return_code = 500
                         if "429" in error or "Too Many Requests" in error or "rate limit" in error.lower():
+                            return_code = 429
                             c.execute("""
                                 UPDATE tasks
                                 SET status = 'pending', worker_id = NULL, error_message = NULL, updated_at = CURRENT_TIMESTAMP
@@ -1170,6 +1406,11 @@ class QueueHandler(BaseHTTPRequestHandler):
                                 SET status = ?, error_message = ?, worker_id = NULL, updated_at = CURRENT_TIMESTAMP
                                 WHERE id = ?
                             ''', (new_status, error, task_id))
+
+                        c.execute('''
+                            INSERT INTO stats_log (return_code, speed_bps, file_size, worker_id)
+                            VALUES (?, ?, ?, ?)
+                        ''', (return_code, 0, 0, "unknown"))
 
                         conn.commit()
                         self._send_json({"status": "ok", "new_status": new_status})
