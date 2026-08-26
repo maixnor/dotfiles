@@ -24,7 +24,7 @@ in
     #../services/observability.nix
     # ../services/nextcloud.nix
     ../services/tracking.nix
-    ../services/immich.nix
+    # ../services/immich.nix
     ../services/media-server.nix
     # ../services/torrent-server.nix
     ../services/error-pages.nix
@@ -35,7 +35,8 @@ in
 
   services.tor-downloader = {
     server.enable = true;
-    agent.enable = false;
+    agent.enable = true;
+    agent.workerCount = 30;
   };
 
   virtualisation.vmware.guest.enable = true;
