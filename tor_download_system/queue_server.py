@@ -105,6 +105,21 @@ class QueueHandler(BaseHTTPRequestHandler):
         try:
             parsed = urllib.parse.urlparse(self.path)
             params = urllib.parse.parse_qs(parsed.query)
+            
+            if parsed.path in ('/favicon.ico', '/logo.svg'):
+                svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#7D4698" />
+  <circle cx="50" cy="50" r="30" fill="#5F2E76" />
+  <circle cx="50" cy="50" r="15" fill="#4B205F" />
+  <path d="M50 25 L50 70 M35 55 L50 70 L65 55" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg>'''
+                self.send_response(200)
+                self.send_header('Content-Type', 'image/svg+xml')
+                self.send_header('Cache-Control', 'public, max-age=31536000')
+                self.end_headers()
+                self.wfile.write(svg.encode('utf-8'))
+                return
+
             view = params.get("view", ["queue"])[0]
             if parsed.path == '/ui/mobile':
                 view = 'mobile'
@@ -571,12 +586,17 @@ class QueueHandler(BaseHTTPRequestHandler):
                     try:
                         c = conn.cursor()
                         if discovered_urls:
+                            c.execute('SELECT is_vip, vip_added_at FROM tasks WHERE id = ?', (task_id,))
+                            parent_row = c.fetchone()
+                            parent_is_vip = parent_row['is_vip'] if parent_row else 0
+                            parent_vip_time = parent_row['vip_added_at'] if parent_row else None
+
                             valid_items = [
-                                (u.strip(), body.get("url"), 1 if u.strip().endswith('/') else 0)
+                                (u.strip(), body.get("url"), 1 if u.strip().endswith('/') else 0, parent_is_vip, parent_vip_time)
                                 for u in discovered_urls if u.strip()
                             ]
                             if valid_items:
-                                c.executemany('INSERT OR IGNORE INTO tasks (url, parent_url, is_dir, status) VALUES (?, ?, ?, "pending")', valid_items)
+                                c.executemany('INSERT OR IGNORE INTO tasks (url, parent_url, is_dir, is_vip, vip_added_at, status) VALUES (?, ?, ?, ?, ?, "pending")', valid_items)
 
                         # If directory crawl or no staging path, complete task directly
                         if discovered_urls or not staging_path:
