@@ -1054,16 +1054,17 @@ class QueueHandler(BaseHTTPRequestHandler):
                         active_queue = [dict(r) for r in c.fetchall()]
 
                         queue_rows = ""
-                finally:
-                    conn.close()
-
-                
+                    
                     c.execute("SELECT count(*) as count FROM stats_log WHERE return_code = 429 AND datetime(timestamp) >= datetime('now', '-5 minutes')")
                     recent_429s = c.fetchone()['count']
                     throttling_warning = ""
                     if recent_429s > 20:
                         throttling_warning = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger);"><strong>Warning:</strong> High number of 429 Too Many Requests errors detected ({recent_429s} in last 5m). Throttling may be occurring.</div>'
+                        
+                finally:
+                    conn.close()
 
+                
                     if view not in ('explorer', 'advanced', 'mobile'):
                         for t in active_queue:
                             rel = extract_relative_path(t['url'])
