@@ -47,18 +47,24 @@
                                     options: { responsive: true, plugins: { title: { display: true, text: 'Requests per 5 Minutes', color: '#fff' } } }
                                 });
 
+                                const totals = tData.map(d => d.requests > 0 ? d.requests : 1);
+                                const pct200 = tData.map((d, i) => (d.rc_200 / totals[i]) * 100);
+                                const pct429 = tData.map((d, i) => (d.rc_429 / totals[i]) * 100);
+                                const pct500 = tData.map((d, i) => (d.rc_500 / totals[i]) * 100);
+                                const pctOther = tData.map((d, i) => (d.rc_other / totals[i]) * 100);
+
                                 new Chart(document.getElementById('chartCodes'), {
                                     type: 'line',
                                     data: {
                                         labels: labels,
                                         datasets: [
-                                            { label: '200 OK', data: tData.map(d => d.rc_200), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true },
-                                            { label: '429 Throttled', data: tData.map(d => d.rc_429), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true },
-                                            { label: '500 Error', data: tData.map(d => d.rc_500), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true },
-                                            { label: 'Other', data: tData.map(d => d.rc_other), borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.2)', fill: true }
+                                            { label: '200 OK', data: pct200, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true },
+                                            { label: '429 Throttled', data: pct429, borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true },
+                                            { label: '500 Error', data: pct500, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true },
+                                            { label: 'Other', data: pctOther, borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.2)', fill: true }
                                         ]
                                     },
-                                    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { title: { display: true, text: 'Return Codes (Stacked)', color: '#fff' } } }
+                                    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, max: 100, ticks: { callback: function(val) { return val + '%'; } } } }, plugins: { title: { display: true, text: 'Return Codes % (100% Stacked)', color: '#fff' } } }
                                 });
 
                                 const avgSpeed = tData.reduce((acc, d) => acc + (d.sum_speed_bps || 0), 0) / (tData.length || 1);
