@@ -194,27 +194,37 @@
             </div>
         </header>
 
+        
+        <table style="margin-bottom: 24px;">
+            <thead>
+                <tr>
+                    <th>Queue Type</th>
+                    <th>Pending Tasks</th>
+                    <th>Active Streams</th>
+                    <th>Completion %</th>
+                    <th>ETC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Standard</td>
+                    <td>STD_PENDING</td>
+                    <td>STD_ACTIVE</td>
+                    <td>STD_COMPLETION%</td>
+                    <td>STD_ETC</td>
+                </tr>
+                VIP_ROW
+            </tbody>
+        </table>
         <div class="grid-stats">
             <div class="stat-card">
                 <div class="stat-label">Download Speed</div>
                 <div class="stat-value" style="color: #38bdf8">DOWNLOAD_SPEED</div>
                 <div class="stat-sub">Aggregate streams</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Estimated Time (ETC)</div>
-                <div class="stat-value" style="color: #a78bfa">ETC_TIME</div>
-                <div class="stat-sub">Remaining queue</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">VIP Queue (Priority)</div>
-                <div class="stat-value" style="color: var(--vip-gold)">VIP_TASKS</div>
-                <div class="stat-sub">High-priority items</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Pending Queue</div>
-                <div class="stat-value" style="color: var(--warning)">PENDING_TASKS</div>
-                <div class="stat-sub">Standard priority</div>
-            </div>
+            
+            
+            
             <div class="stat-card">
                 <div class="stat-label">Completed Payload</div>
                 <div class="stat-value" style="color: var(--success)">COMPLETED_SIZE</div>
@@ -225,16 +235,8 @@
                 <div class="stat-value" style="color: #f472b6">REMAINING_SIZE</div>
                 <div class="stat-sub">Estimated pending bytes</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Completion %</div>
-                <div class="stat-value" style="color: #4ade80">COMPLETION_PERCENT%</div>
-                <div class="stat-sub">By data size</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Active Worker Streams</div>
-                <div class="stat-value" style="color: var(--primary)">ACTIVE_WORKERS</div>
-                <div class="stat-sub">Active streams (last 5m)</div>
-            </div>
+            
+            
         </div>
 
         THROTTLING_WARNING

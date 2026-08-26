@@ -43,6 +43,89 @@ def load_api_key():
 
 SECRET_KEY = load_api_key()
 
+
+def get_queue_metrics(conn, is_vip):
+    c = conn.cursor()
+    vip_val = 1 if is_vip else 0
+    c.execute("SELECT COUNT(*) as cnt FROM tasks WHERE is_vip = ? AND status = 'assigned'", (vip_val,))
+    active_streams = c.fetchone()['cnt']
+    
+    c.execute("SELECT COUNT(*) as cnt FROM tasks WHERE is_vip = ? AND status = 'pending'", (vip_val,))
+    pending_tasks = c.fetchone()['cnt']
+
+    c.execute("SELECT COUNT(*) as cnt FROM tasks WHERE is_vip = ? AND status = 'completed'", (vip_val,))
+    completed_tasks = c.fetchone()['cnt']
+    
+    total = completed_tasks + pending_tasks + active_streams
+    if total > 0:
+        completion_pct = (completed_tasks / total) * 100.0
+    else:
+        completion_pct = 0.0
+
+    c.execute("""
+        SELECT SUM(file_size) as recent_bytes, COUNT(*) as recent_tasks
+        FROM tasks 
+        WHERE status IN ('downloaded_staging', 'completed') 
+          AND is_vip = ?
+          AND datetime(updated_at) >= datetime('now', '-10 minutes')
+    """, (vip_val,))
+    rec_row = c.fetchone()
+    recent_bytes = rec_row['recent_bytes'] or 0
+    recent_tasks = rec_row['recent_tasks'] or 0
+
+    speed_bps = recent_bytes / 600.0
+    tasks_per_sec = recent_tasks / 600.0
+
+    c.execute("""
+        SELECT SUM(file_size) as known_bytes, COUNT(*) as total_pending
+        FROM tasks 
+        WHERE status IN ('pending', 'assigned') AND is_dir = 0 AND is_vip = ?
+    """, (vip_val,))
+    p_info = c.fetchone()
+    known_remaining = p_info['known_bytes'] or 0
+    total_pending = p_info['total_pending'] or 0
+
+    c.execute("""
+        SELECT AVG(file_size) as avg_bytes
+        FROM tasks
+        WHERE status = 'completed' AND is_dir = 0 AND file_size > 0 AND is_vip = ?
+    """, (vip_val,))
+    avg_row = c.fetchone()
+    avg_size = avg_row['avg_bytes'] if (avg_row and avg_row['avg_bytes']) else 500000
+
+    c.execute("""
+        SELECT COUNT(*) as unk_count
+        FROM tasks
+        WHERE status IN ('pending', 'assigned') AND is_dir = 0 AND (file_size IS NULL OR file_size = 0) AND is_vip = ?
+    """, (vip_val,))
+    unk_count = c.fetchone()['unk_count'] or 0
+
+    est_remaining_bytes = known_remaining + (unk_count * avg_size)
+    
+    if total_pending == 0:
+        etc_str = "Completed"
+    elif speed_bps >= 1024:
+        seconds_left = int(est_remaining_bytes / speed_bps)
+        if seconds_left < 60: etc_str = f"{seconds_left}s"
+        elif seconds_left < 3600: etc_str = f"{seconds_left // 60}m {seconds_left % 60}s"
+        elif seconds_left < 86400: etc_str = f"{seconds_left // 3600}h {(seconds_left % 3600) // 60}m"
+        else: etc_str = f"{seconds_left // 86400}d {(seconds_left % 86400) // 3600}h"
+    elif tasks_per_sec > 0:
+        seconds_left = int(total_pending / tasks_per_sec)
+        if seconds_left < 60: etc_str = f"{seconds_left}s"
+        elif seconds_left < 3600: etc_str = f"{seconds_left // 60}m {seconds_left % 60}s"
+        elif seconds_left < 86400: etc_str = f"{seconds_left // 3600}h {(seconds_left % 3600) // 60}m"
+        else: etc_str = f"{seconds_left // 86400}d {(seconds_left % 86400) // 3600}h"
+    else:
+        etc_str = "Calculating..."
+
+    return {
+        "pending": pending_tasks,
+        "active": active_streams,
+        "completion_pct": completion_pct,
+        "etc": etc_str
+    }
+
 def load_template(name):
     path = os.path.join(os.path.dirname(__file__), 'templates', name)
     with open(path, 'r') as f:
@@ -361,7 +444,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                         view_content = mobile_html
 
                     else:
-                        c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
+                        c.execute('SELECT * FROM tasks WHERE status IN ("pending", "assigned") AND is_dir = 1 ORDER BY is_vip DESC, vip_added_at ASC, id ASC LIMIT 100')
                         active_queue = [dict(r) for r in c.fetchall()]
 
                         queue_rows = ""
@@ -372,6 +455,9 @@ class QueueHandler(BaseHTTPRequestHandler):
                     if recent_429s > 20:
                         throttling_warning = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger);"><strong>Warning:</strong> High number of 429 Too Many Requests errors detected ({recent_429s} in last 5m). Throttling may be occurring.</div>'
                         
+                    std_m = get_queue_metrics(conn, False)
+                    vip_m = get_queue_metrics(conn, True)
+
                 finally:
                     conn.close()
 
@@ -408,7 +494,19 @@ class QueueHandler(BaseHTTPRequestHandler):
                 completion_pct = (comp_bytes / total_est_bytes * 100) if total_est_bytes > 0 else 0
                 rem_size_str = human_size(est_rem_bytes)
 
+
                 html = HTML_TEMPLATE
+                html = html.replace("STD_PENDING", str(std_m['pending']))
+                html = html.replace("STD_ACTIVE", str(std_m['active']))
+                html = html.replace("STD_COMPLETION%", f"{std_m['completion_pct']:.2f}%")
+                html = html.replace("STD_ETC", std_m['etc'])
+                
+                if vip_m['pending'] > 0 or vip_m['active'] > 0:
+                    vip_row = f"<tr><td><span style='color: var(--vip-gold);'>VIP</span></td><td>{vip_m['pending']}</td><td>{vip_m['active']}</td><td>{vip_m['completion_pct']:.2f}%</td><td>{vip_m['etc']}</td></tr>"
+                    html = html.replace("VIP_ROW", vip_row)
+                else:
+                    html = html.replace("VIP_ROW", "")
+
                 html = html.replace("STATUS_BADGE", status_badge)
                 html = html.replace("RETRY_FAILED_BTN", retry_failed_btn)
                 html = html.replace("PAUSE_RESUME_BTN", pause_btn)
