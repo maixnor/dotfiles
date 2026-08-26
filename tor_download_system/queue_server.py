@@ -451,9 +451,12 @@ class QueueHandler(BaseHTTPRequestHandler):
                     
                     c.execute("SELECT count(*) as count FROM stats_log WHERE return_code = 429 AND datetime(timestamp) >= datetime('now', '-5 minutes')")
                     recent_429s = c.fetchone()['count']
+                    c.execute("SELECT count(*) as count FROM stats_log WHERE datetime(timestamp) >= datetime('now', '-5 minutes')")
+                    total_5m = c.fetchone()['count']
+                    perc_429 = (recent_429s / total_5m * 100) if total_5m > 0 else 0
                     throttling_warning = ""
-                    if recent_429s > 20:
-                        throttling_warning = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger);"><strong>Warning:</strong> High number of 429 Too Many Requests errors detected ({recent_429s} in last 5m). Throttling may be occurring.</div>'
+                    if perc_429 > 95:
+                        throttling_warning = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 10px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger);"><strong>Warning:</strong> High number of 429 Too Many Requests errors detected ({perc_429:.1f}% in last 5m). Throttling may be occurring.</div>'
                         
                     std_m = get_queue_metrics(conn, False)
                     vip_m = get_queue_metrics(conn, True)
