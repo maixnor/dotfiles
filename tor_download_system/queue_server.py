@@ -345,7 +345,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                     if view == 'advanced':
                         c.execute('''
                             SELECT 
-                                strftime('%Y-%m-%d %H:%M:00', timestamp) as minute,
+                                datetime((strftime('%s', timestamp) / 300) * 300, 'unixepoch') as minute,
                                 COUNT(*) as requests,
                                 SUM(CASE WHEN return_code = 200 THEN 1 ELSE 0 END) as rc_200,
                                 SUM(CASE WHEN return_code = 429 THEN 1 ELSE 0 END) as rc_429,
@@ -353,8 +353,8 @@ class QueueHandler(BaseHTTPRequestHandler):
                                 SUM(CASE WHEN return_code NOT IN (200, 429, 500) THEN 1 ELSE 0 END) as rc_other,
                                 SUM(speed_bps) as sum_speed_bps
                             FROM stats_log
-                            WHERE datetime(timestamp) >= datetime('now', '-1 hour')
-                              AND datetime(timestamp) <= datetime('now', '-1 minute')
+                            WHERE datetime(timestamp) >= datetime('now', '-6 hours')
+                              AND datetime(timestamp) < datetime((strftime('%s', 'now') / 300) * 300, 'unixepoch')
                             GROUP BY minute
                             ORDER BY minute ASC
                         ''')
@@ -362,7 +362,7 @@ class QueueHandler(BaseHTTPRequestHandler):
 
                         c.execute('''
                             SELECT speed_bps FROM stats_log 
-                            WHERE speed_bps > 0 AND datetime(timestamp) >= datetime('now', '-1 hour')
+                            WHERE speed_bps > 0 AND datetime(timestamp) >= datetime('now', '-6 hours')
                             ORDER BY speed_bps ASC
                         ''')
                         speeds = [r['speed_bps'] for r in c.fetchall()]
@@ -373,7 +373,7 @@ class QueueHandler(BaseHTTPRequestHandler):
 
                         c.execute('''
                             SELECT file_size FROM stats_log 
-                            WHERE file_size > 0 AND datetime(timestamp) >= datetime('now', '-1 hour')
+                            WHERE file_size > 0 AND datetime(timestamp) >= datetime('now', '-6 hours')
                             ORDER BY file_size ASC
                         ''')
                         sizes = [r['file_size'] for r in c.fetchall()]

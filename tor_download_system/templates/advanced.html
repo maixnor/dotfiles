@@ -1,6 +1,6 @@
 
                         <div class="card">
-                            <div class="section-title">Advanced Statistics (Last 1 Hour)</div>
+                            <div class="section-title">Advanced Statistics (Last 6 Hours)</div>
                             
                             <div class="grid-stats">
                                 <div class="stat-card">
@@ -38,13 +38,13 @@
                                     data: {
                                         labels: labels,
                                         datasets: [{
-                                            label: 'Requests/min',
+                                            label: 'Requests / 5min',
                                             data: tData.map(d => d.requests),
                                             borderColor: '#3b82f6',
                                             tension: 0.1
                                         }]
                                     },
-                                    options: { responsive: true, plugins: { title: { display: true, text: 'Requests per Minute', color: '#fff' } } }
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Requests per 5 Minutes', color: '#fff' } } }
                                 });
 
                                 new Chart(document.getElementById('chartCodes'), {
@@ -61,18 +61,31 @@
                                     options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { title: { display: true, text: 'Return Codes (Stacked)', color: '#fff' } } }
                                 });
 
+                                const avgSpeed = tData.reduce((acc, d) => acc + (d.sum_speed_bps || 0), 0) / (tData.length || 1);
+
                                 new Chart(document.getElementById('chartSpeed'), {
                                     type: 'line',
                                     data: {
                                         labels: labels,
-                                        datasets: [{
-                                            label: 'Sum Speed (bps)',
-                                            data: tData.map(d => d.sum_speed_bps),
-                                            borderColor: '#a78bfa',
-                                            tension: 0.1
-                                        }]
+                                        datasets: [
+                                            {
+                                                label: 'Speed (bps)',
+                                                data: tData.map(d => d.sum_speed_bps),
+                                                borderColor: '#a78bfa',
+                                                tension: 0.1
+                                            },
+                                            {
+                                                label: 'Average',
+                                                data: Array(tData.length).fill(avgSpeed),
+                                                borderColor: 'rgba(255, 255, 255, 0.5)',
+                                                borderDash: [5, 5],
+                                                borderWidth: 1,
+                                                pointRadius: 0,
+                                                tension: 0
+                                            }
+                                        ]
                                     },
-                                    options: { responsive: true, plugins: { title: { display: true, text: 'Download Speed over last 1h (lagged 1m)', color: '#fff' } } }
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Download Speed over last 6h (5m intervals)', color: '#fff' } } }
                                 });
                             </script>
                         </div>
