@@ -290,7 +290,7 @@ class TorWorker:
             if "429" in str(e) or "Too Many Requests" in str(e) or "rate limit" in str(e).lower():
                 print(f"[{self.worker_id}] Rate limited (429) on task {task_id}: {e}. Requeuing without failure penalty.")
                 self._post("/api/requeue", {"task_id": task_id, "worker_id": self.worker_id})
-                time.sleep(5)
+                # Removed 5s backoff to play the numbers game
             else:
                 print(f"[{self.worker_id}] Task {task_id} failed: {e}")
                 self._post("/api/report_failed", {"task_id": task_id, "error": str(e)})

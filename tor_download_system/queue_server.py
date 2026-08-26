@@ -431,7 +431,7 @@ class QueueHandler(BaseHTTPRequestHandler):
                         retry_btn = '<a href="/ui/retry_failed" class="btn btn-retry" style="flex:1;text-align:center;justify-content:center;padding:12px;">Retry Failed</a>'
 
                         warning_html = ""
-                        if perc_429 > 10:
+                        if perc_429 > 95:
                             warning_html = f'<div style="background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 12px; margin-bottom: 20px; border-radius: 6px; border: 1px solid var(--danger); font-weight: bold; text-align: center;">⚠️ Server Throttling! High 429s ({perc_429:.1f}%)</div>'
 
                         eta_html = "N/A"
