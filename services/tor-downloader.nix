@@ -5,11 +5,6 @@ with lib;
 let
   cfg = config.services.tor-downloader;
 
-  # Embedded Python Scripts
-  queueServerPy = pkgs.writeText "queue_server.py" (builtins.readFile ../tor_download_system/queue_server.py);
-  sinkCollectorPy = pkgs.writeText "sink_collector.py" (builtins.readFile ../tor_download_system/sink_collector.py);
-  torWorkerPy = pkgs.writeText "tor_worker.py" (builtins.readFile ../tor_download_system/tor_worker.py);
-
   pythonEnv = pkgs.python3.withPackages (ps: [ ps.pysocks ps.aiohttp ps.aiofiles ]);
 in {
   options.services.tor-downloader = {
@@ -160,7 +155,7 @@ in {
             chmod 755 ${cfg.server.dataDir}
             chmod -R u+rwX,go+rwX ${cfg.server.dataDir} 2>/dev/null || true
           '';
-          ExecStart = "${pythonEnv}/bin/python3 ${queueServerPy} ${toString cfg.server.port}";
+          ExecStart = "${pythonEnv}/bin/python3 ${../tor_download_system}/queue_server.py ${toString cfg.server.port}";
           Restart = "always";
           RestartSec = "5s";
         };
@@ -184,7 +179,7 @@ in {
           ExecStartPre = pkgs.writeShellScript "init-tor-downloader-sink" ''
             mkdir -p ${cfg.sink.destinationDir}
           '';
-          ExecStart = "${pythonEnv}/bin/python3 ${sinkCollectorPy} --server-url ${cfg.sink.serverUrl} --source-host ${cfg.sink.sourceHost} --ssh-key ${cfg.sink.sshKey} --destination-dir ${cfg.sink.destinationDir} --api-key-file ${cfg.sink.apiKeyFile}";
+          ExecStart = "${pythonEnv}/bin/python3 ${../tor_download_system}/sink_collector.py --server-url ${cfg.sink.serverUrl} --source-host ${cfg.sink.sourceHost} --ssh-key ${cfg.sink.sshKey} --destination-dir ${cfg.sink.destinationDir} --api-key-file ${cfg.sink.apiKeyFile}";
           Restart = "always";
           RestartSec = "10s";
         };
@@ -224,7 +219,7 @@ in {
               find ${cfg.agent.stagingDir} -maxdepth 2 -type f ! -name "*.*" -delete 2>/dev/null || true
             '';
             Environment = [ "PYTHONUNBUFFERED=1" ];
-            ExecStart = "${pythonEnv}/bin/python3 ${torWorkerPy} --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}${lib.optionalString cfg.sink.enable " --destination-dir ${cfg.sink.destinationDir}"}";
+            ExecStart = "${pythonEnv}/bin/python3 ${../tor_download_system}/tor_worker.py --worker-id ${cfg.agent.workerId}-${toString (i + 1)} --server-url ${cfg.agent.serverUrl} --socks-proxy 127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} --staging-dir ${cfg.agent.stagingDir} --api-key-file ${cfg.agent.apiKeyFile}${lib.optionalString cfg.sink.enable " --destination-dir ${cfg.sink.destinationDir}"}";
             Restart = "always";
             RestartSec = "5s";
           };

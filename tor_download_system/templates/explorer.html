@@ -1,0 +1,18 @@
+
+                        <div class="card">
+                            <div class="section-title">
+                                Collapsible Directory Explorer
+                                <span style="font-size: 12px; font-weight: normal; color: var(--text-muted);">Folder badges rollup to the lowest status of all sub-files. Unfold folders to view relative sub-files.</span>
+                            </div>
+                            <form method="GET" action="/ui" class="search-box">
+                                <input type="hidden" name="view" value="explorer" />
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" name="q" value="{search_q}" placeholder="Search cataloged files or folders..." />
+                                    <button type="submit" class="btn-submit">Search</button>
+                                </div>
+                            </form>
+                            <div class="tree-container">
+                                {tree_html if tree_html else '<div class="empty-folder">No cataloged items found in queue.</div>'}
+                            </div>
+                        </div>
+                        

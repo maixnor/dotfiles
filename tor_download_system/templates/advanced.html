@@ -1,0 +1,79 @@
+
+                        <div class="card">
+                            <div class="section-title">Advanced Statistics (Last 1 Hour)</div>
+                            
+                            <div class="grid-stats">
+                                <div class="stat-card">
+                                    <div class="stat-label">Speed Stats (bps)</div>
+                                    <div class="stat-sub">Min: SPEED_MIN</div>
+                                    <div class="stat-sub">Max: SPEED_MAX</div>
+                                    <div class="stat-sub">Avg: SPEED_AVG</div>
+                                    <div class="stat-sub">Median: SPEED_MEDIAN</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">File Size Stats (bytes)</div>
+                                    <div class="stat-sub">Min: SIZE_MIN</div>
+                                    <div class="stat-sub">Max: SIZE_MAX</div>
+                                    <div class="stat-sub">Avg: SIZE_AVG</div>
+                                    <div class="stat-sub">Median: SIZE_MEDIAN</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartRequests"></canvas>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartCodes"></canvas>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <canvas id="chartSpeed"></canvas>
+                            </div>
+
+                            <script>
+                                const tData = TIMELINE_DATA;
+                                const labels = tData.map(d => d.minute.split(" ")[1]);
+                                
+                                new Chart(document.getElementById('chartRequests'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            label: 'Requests/min',
+                                            data: tData.map(d => d.requests),
+                                            borderColor: '#3b82f6',
+                                            tension: 0.1
+                                        }]
+                                    },
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Requests per Minute', color: '#fff' } } }
+                                });
+
+                                new Chart(document.getElementById('chartCodes'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [
+                                            { label: '200 OK', data: tData.map(d => d.rc_200), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.2)', fill: true },
+                                            { label: '429 Throttled', data: tData.map(d => d.rc_429), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.2)', fill: true },
+                                            { label: '500 Error', data: tData.map(d => d.rc_500), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.2)', fill: true },
+                                            { label: 'Other', data: tData.map(d => d.rc_other), borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.2)', fill: true }
+                                        ]
+                                    },
+                                    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true } }, plugins: { title: { display: true, text: 'Return Codes (Stacked)', color: '#fff' } } }
+                                });
+
+                                new Chart(document.getElementById('chartSpeed'), {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            label: 'Sum Speed (bps)',
+                                            data: tData.map(d => d.sum_speed_bps),
+                                            borderColor: '#a78bfa',
+                                            tension: 0.1
+                                        }]
+                                    },
+                                    options: { responsive: true, plugins: { title: { display: true, text: 'Download Speed over last 1h (lagged 1m)', color: '#fff' } } }
+                                });
+                            </script>
+                        </div>
+                        

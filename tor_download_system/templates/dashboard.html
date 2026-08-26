@@ -1,0 +1,31 @@
+
+                        <div class="card">
+                            <div class="section-title">Seed New Onion Target</div>
+                            <form class="seed-form" method="POST" action="/ui/add_url">
+                                <input type="text" name="url" placeholder="http://xxxxxxxx.onion/data/ALSGLOBAL/subfolder/" required />
+                                <button type="submit" class="btn-submit">Add Target URL</button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="section-title">
+                                Active Queue (VIP First)
+                                <span style="font-size: 12px; color: var(--text-muted);">VIP items are downloaded first in order of VIP declaration</span>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Path (After .onion)</th>
+                                        <th>Status</th>
+                                        <th>Worker</th>
+                                        <th>Size</th>
+                                        <th>Priority & Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {queue_rows if queue_rows else '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No active pending or VIP tasks in queue.</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                        
