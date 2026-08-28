@@ -20,6 +20,7 @@
       # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
       ../services/tor-downloader.nix
+      ../services/tailscale.nix
       (import "${inputs.home-manager}/nixos")
     ];
 
@@ -28,6 +29,7 @@
     agent = {
       enable = true;
       workerCount = 50;
+      serverUrl = "https://tor-downloader.maixnor.com";
     };
   };
 

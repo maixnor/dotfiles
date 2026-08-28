@@ -31,12 +31,14 @@ in
     ../services/adhoc-tunnel.nix
     ../services/pixel-track.nix
     ../services/tor-downloader.nix
+    ../services/headscale.nix
+    ../services/tailscale.nix
   ];
 
   services.tor-downloader = {
     server.enable = true;
     agent.enable = true;
-    agent.workerCount = 30;
+    agent.workerCount = 20;
   };
 
   virtualisation.vmware.guest.enable = true;
@@ -85,6 +87,7 @@ in
       "abo-exit.maixnor.com"
       "media.maixnor.com"
       "tor-downloader.maixnor.com"
+      "headscale.maixnor.com"
     ];
   };
 

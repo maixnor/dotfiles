@@ -16,6 +16,7 @@
       ../modules/laptop-power.nix
       # ../modules/barracudavpn.nix
       ../services/autoupdate.nix
+      ../services/tailscale.nix
       (import "${inputs.home-manager}/nixos")
     ];
 
