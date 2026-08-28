@@ -29,13 +29,16 @@
         { "action": "accept", "src": ["tag:elastic-spoke"], "dst": ["tag:elastic-hub:*"] },
         { "action": "accept", "src": ["tag:deploy"], "dst": ["*:*"] }
       ],
+      "groups": {
+        "group:admin": ["internal", "external", "admin"]
+      },
       "tagOwners": {
-        "tag:bierland": ["autogroup:nonroot"],
-        "tag:probatio-internal": ["autogroup:nonroot"],
-        "tag:elastic-hub": ["autogroup:nonroot"],
-        "tag:elastic-spoke": ["autogroup:nonroot"],
-        "tag:soc-external": ["autogroup:nonroot"],
-        "tag:deploy": ["autogroup:nonroot"]
+        "tag:bierland": ["group:admin"],
+        "tag:probatio-internal": ["group:admin"],
+        "tag:elastic-hub": ["group:admin"],
+        "tag:elastic-spoke": ["group:admin"],
+        "tag:soc-external": ["group:admin"],
+        "tag:deploy": ["group:admin"]
       }
     }
   '';
