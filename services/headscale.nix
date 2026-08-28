@@ -30,7 +30,7 @@
         { "action": "accept", "src": ["tag:deploy"], "dst": ["*:*"] }
       ],
       "groups": {
-        "group:admin": ["internal", "external", "admin"]
+        "group:admin": ["internal@probat.io", "external@probat.io", "admin@probat.io"]
       },
       "tagOwners": {
         "tag:bierland": ["group:admin"],
