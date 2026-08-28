@@ -15,36 +15,29 @@
       log.level = "info";
       policy = {
         mode = "file";
-        path = "/etc/headscale/acl.yaml";
+        path = "/etc/headscale/acl.json";
       };
     };
   };
 
-  environment.etc."headscale/acl.yaml".text = ''
-    acls:
-      - action: accept
-        src: ["tag:bierland"]
-        dst: ["tag:bierland:*"]
-      - action: accept
-        src: ["tag:probatio-internal"]
-        dst: ["tag:probatio-internal:*"]
-      - action: accept
-        src: ["tag:elastic-hub"]
-        dst: ["tag:elastic-spoke:*"]
-      - action: accept
-        src: ["tag:elastic-spoke"]
-        dst: ["tag:elastic-hub:*"]
-      - action: accept
-        src: ["tag:deploy"]
-        dst: ["*:*"]
-
-    tagOwners:
-      tag:bierland: ["autogroup:nonroot"]
-      tag:probatio-internal: ["autogroup:nonroot"]
-      tag:elastic-hub: ["autogroup:nonroot"]
-      tag:elastic-spoke: ["autogroup:nonroot"]
-      tag:soc-external: ["autogroup:nonroot"]
-      tag:deploy: ["autogroup:nonroot"]
+  environment.etc."headscale/acl.json".text = ''
+    {
+      "acls": [
+        { "action": "accept", "src": ["tag:bierland"], "dst": ["tag:bierland:*"] },
+        { "action": "accept", "src": ["tag:probatio-internal"], "dst": ["tag:probatio-internal:*"] },
+        { "action": "accept", "src": ["tag:elastic-hub"], "dst": ["tag:elastic-spoke:*"] },
+        { "action": "accept", "src": ["tag:elastic-spoke"], "dst": ["tag:elastic-hub:*"] },
+        { "action": "accept", "src": ["tag:deploy"], "dst": ["*:*"] }
+      ],
+      "tagOwners": {
+        "tag:bierland": ["autogroup:nonroot"],
+        "tag:probatio-internal": ["autogroup:nonroot"],
+        "tag:elastic-hub": ["autogroup:nonroot"],
+        "tag:elastic-spoke": ["autogroup:nonroot"],
+        "tag:soc-external": ["autogroup:nonroot"],
+        "tag:deploy": ["autogroup:nonroot"]
+      }
+    }
   '';
 
   environment.etc."traefik/headscale.yml".text = ''
