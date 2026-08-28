@@ -3,7 +3,11 @@ set -e
 
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Usage: ./headscale-key.sh <user> <tag>"
-  echo "Example: ./headscale-key.sh admin tag:elastic-spoke"
+  echo "Example: ./headscale-key.sh internal tag:elastic-spoke"
+  echo ""
+  echo "Important Users (Namespaces) for MagicDNS:"
+  echo "  internal -> yields hostname.internal.probat.io"
+  echo "  external -> yields hostname.external.probat.io"
   echo ""
   echo "Available tags:"
   echo "  tag:bierland"
