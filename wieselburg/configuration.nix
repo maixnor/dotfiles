@@ -134,7 +134,7 @@ in
 
   services.tailscale.authKeyFile = config.age.secrets.tailscale_key.path;
 
-  services.tailscale.extraUpFlags = [ "--login-server=https://headscale.maixnor.com" ];
+  services.tailscale.extraUpFlags = [ "--login-server=http://37.205.9.77:8080" ];
 
   environment.systemPackages = with pkgs; [ 
     git just
