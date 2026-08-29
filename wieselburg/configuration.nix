@@ -130,6 +130,12 @@ in
   networking.hostName = "${hostname}";
 
   ### System Packages
+  age.secrets.tailscale_key.file = ../secrets/tailscale-wieselburg.age;
+
+  services.tailscale.authKeyFile = config.age.secrets.tailscale_key.path;
+
+  services.tailscale.extraUpFlags = [ "--login-server=https://headscale.maixnor.com" ];
+
   environment.systemPackages = with pkgs; [ 
     git just
     wormhole-william

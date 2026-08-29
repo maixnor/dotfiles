@@ -166,6 +166,12 @@
     packages = [ nixvim ]; # nixvim
   };
 
+  age.secrets.tailscale_key.file = ../secrets/tailscale-bierzelt.age;
+
+  services.tailscale.authKeyFile = config.age.secrets.tailscale_key.path;
+
+  services.tailscale.extraUpFlags = [ "--login-server=https://headscale.maixnor.com" ];
+
   environment.systemPackages = with pkgs; [ 
     kdePackages.ksshaskpass
     wormhole-william

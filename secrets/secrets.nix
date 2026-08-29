@@ -24,4 +24,7 @@ in
   "rclone-gdrive.age".publicKeys = all;
   "cloudflare-token-maixnor-com.age".publicKeys = all;
   "tor-downloader-api-key.age".publicKeys = all;
+  "tailscale-wieselburg.age".publicKeys = all;
+  "tailscale-bierbasis.age".publicKeys = all;
+  "tailscale-bierzelt.age".publicKeys = all;
 }

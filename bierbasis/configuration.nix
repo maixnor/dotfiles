@@ -108,6 +108,12 @@
     extensions = with pkgs.postgresql17Packages; [ postgis ];
   };
 
+  age.secrets.tailscale_key.file = ../secrets/tailscale-bierbasis.age;
+
+  services.tailscale.authKeyFile = config.age.secrets.tailscale_key.path;
+
+  services.tailscale.extraUpFlags = [ "--login-server=https://headscale.maixnor.com" ];
+
   environment.systemPackages = with pkgs; [ 
     kdePackages.qt6ct
     kdePackages.qtstyleplugin-kvantum
