@@ -169,7 +169,7 @@ class SinkCollector:
 
             cleanup_cmd = [
                 "ssh", "-i", self.ssh_key, "-o", "IdentitiesOnly=yes", "-o", "StrictHostKeyChecking=accept-new",
-                f"{self.ssh_user}@{self.source_host}", f"rm -f {subprocess.list2cmdline([staging_path])}"
+                f"{self.ssh_user}@{self.source_host}", f"sudo rm -f {subprocess.list2cmdline([staging_path])}"
             ]
             subprocess.run(cleanup_cmd, capture_output=True)
             print(f"[Sink] Completed task {task_id}: {rel_path} ({file_size} bytes). Remote staging cleaned up.")

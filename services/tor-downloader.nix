@@ -194,6 +194,8 @@ in {
         client.enable = true;
         settings = {
           SocksPort = map (i: "127.0.0.1:${toString (cfg.agent.baseSocksPort + i)} IsolateDestAddr IsolateDestPort SessionGroup=${toString i}") (lib.range 0 (cfg.agent.workerCount - 1));
+          ControlPort = 9051;
+          CookieAuthentication = true;
           NumEntryGuards = 8;
           MaxCircuitDirtiness = 30;
           CircuitBuildTimeout = 15;

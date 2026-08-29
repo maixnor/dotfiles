@@ -10,6 +10,7 @@ import hashlib
 import urllib.parse
 import urllib.request
 import functools
+import random
 from html.parser import HTMLParser
 
 print = functools.partial(print, flush=True)
@@ -290,7 +291,48 @@ class TorWorker:
             if "429" in str(e) or "Too Many Requests" in str(e) or "rate limit" in str(e).lower():
                 print(f"[{self.worker_id}] Rate limited (429) on task {task_id}: {e}. Requeuing without failure penalty.")
                 self._post("/api/requeue", {"task_id": task_id, "worker_id": self.worker_id})
-                # Removed 5s backoff to play the numbers game
+                
+                # Synchronized Passive Waiting Room for NEWNYM (10.5s rotation)
+                import socket, binascii
+                debounce_file = "/tmp/last_tor_newnym"
+                failure_time = time.time()
+                print(f"[{self.worker_id}] Entering waiting room for fresh Tor circuit...")
+                
+                while True:
+                    try:
+                        mtime = os.path.getmtime(debounce_file) if os.path.exists(debounce_file) else 0
+                        # If a NEWNYM happened AFTER our failure, we have a fresh circuit!
+                        if mtime > failure_time:
+                            time.sleep(2) # Give Tor 2 seconds to actually build the new circuit
+                            print(f"[{self.worker_id}] Fresh circuit provisioned. Exiting waiting room.")
+                            break
+                        
+                        # If it has been > 10.5 seconds since the last NEWNYM, we trigger it ourselves
+                        if time.time() - mtime > 10.5:
+                            with open(debounce_file, "w") as f:
+                                f.write(str(time.time()))
+                            
+                            cookie_path = ""
+                            for p in ["/var/lib/tor/control_auth_cookie", "/run/tor/control_auth_cookie"]:
+                                if os.path.exists(p): cookie_path = p; break
+                                
+                            if cookie_path:
+                                with open(cookie_path, "rb") as f:
+                                    cookie = binascii.hexlify(f.read()).decode('utf-8')
+                                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                s.connect(('127.0.0.1', 9051))
+                                s.sendall(f'AUTHENTICATE {cookie}\r\nSIGNAL NEWNYM\r\nQUIT\r\n'.encode())
+                                res = s.recv(1024)
+                                s.close()
+                                print(f"[{self.worker_id}] Sent NEWNYM to Tor. Response: {res.decode().strip()}")
+                            else:
+                                print(f"[{self.worker_id}] Warning: Could not find Tor auth cookie.")
+                    except Exception as ne:
+                        print(f"[{self.worker_id}] Error in waiting room: {ne}")
+                        time.sleep(5)
+                        break # Failsafe breakout
+                        
+                    time.sleep(0.5) # Poll passive waiting room every half second
             else:
                 print(f"[{self.worker_id}] Task {task_id} failed: {e}")
                 self._post("/api/report_failed", {"task_id": task_id, "error": str(e)})
