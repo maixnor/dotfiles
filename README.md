@@ -1,3 +1,7 @@
+> [!WARNING]
+> This repository has been officially discontinued and will no longer be updated.
+> I had to move my dotfiles to a private repository because a large portion of the configuration now contains private/professional data that cannot be published.
+> For any questions regarding NixOS, past configurations, or their current evolution, visitors are highly encouraged to contact me directly or open an issue here. I am very happy to help and share insights!
 
 # Enter the Maixnor Realm
 
